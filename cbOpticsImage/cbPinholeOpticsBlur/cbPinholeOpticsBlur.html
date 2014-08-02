@@ -1,0 +1,334 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>cbPinholeOpticsBlur</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-08-02"><meta name="DC.source" content="cbPinholeOpticsBlur.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot slice of the diffraction limited psf for largest and smallest</a></li><li><a href="#8">Compute geometric blue for a pinhole optics.</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinoleOpticsBlur
+</pre><pre class="codeinput"><span class="comment">% cbPinholeOpticsBlur</span>
+<span class="comment">%</span>
+<span class="comment">% Examine the tradeoff between geometric blur due to a finite pupil</span>
+<span class="comment">% and blur due to diffraction, for a pinhole eye.</span>
+<span class="comment">%</span>
+<span class="comment">% Requires: Psychophysics Toolbox</span>
+<span class="comment">%</span>
+<span class="comment">% (c) David Brainard and Andrew Stockman, 2014</span>
+</pre><h2>Clear<a name="3"></a></h2><pre class="codeinput">clear; close <span class="string">all</span>;
+</pre><h2>Set parameters<a name="4"></a></h2><pre class="codeinput">eyeLengthMm = 17;
+wavelengthNm = 500;
+distanceToSourceMm = 2000;
+minPupilDiameterMm = 0.01;
+maxPupilDiamterMm = 0.1;
+nPupilDiameters = 5;
+pupilDiametersMm = linspace(minPupilDiameterMm,maxPupilDiamterMm,nPupilDiameters);
+VERBOSE = false;
+</pre><h2>Compute diffraction blur for each pupil size<a name="5"></a></h2><p>The Psychtoolbox routine AiryPattern does the work.</p><pre class="codeinput"><span class="comment">% Set up radii to compute on.  Start by specifying the range</span>
+<span class="comment">% in retinal mm and then converting to degrees.</span>
+retinalRadiiMm = 0.2;
+retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,eyeLengthMm);
+
+<span class="comment">% Set up grid matrices, so that we can convert radius to two-dimensional</span>
+<span class="comment">% image. Although it is probably inefficient to compute on all the radii</span>
+<span class="comment">% of a square image matrix (as opposed to computing for linear radii and</span>
+<span class="comment">% then propogating the andser onto an image), computers are fast enough</span>
+<span class="comment">% that we don't care.</span>
+nPixels = 501;
+centerPixel = round(nPixels+1)/2;
+radiusMatrixDegs = retinalRadiiDeg*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusMatrixMm = retinalRadiiMm*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusLineMm = radiusMatrixMm(centerPixel,centerPixel:end);
+
+<span class="comment">% Do the calculation for each pupil size and</span>
+<span class="comment">% normalize volume of PSF to unity.  Also</span>
+<span class="comment">% extract 1d slice.</span>
+fprintf(<span class="string">'Computing diffraction limited PSFs\n'</span>);
+<span class="keyword">for</span> p = 1:length(pupilDiametersMm)
+    fprintf(<span class="string">'\t%d of %d\n'</span>,p,length(pupilDiametersMm));
+    pupilDiameterMm = pupilDiametersMm(p);
+    diffractionPsfImage{p} = AiryPattern(radiusMatrixDegs,pupilDiameterMm,wavelengthNm);
+    diffractionPsfImage{p} = diffractionPsfImage{p}/sum(diffractionPsfImage{p}(:));
+    diffractionPsfSlice{p} = diffractionPsfImage{p}(centerPixel,centerPixel:end);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Computing diffraction limited PSFs
+	1 of 5
+	2 of 5
+	3 of 5
+	4 of 5
+	5 of 5
+</pre><h2>For comparison with geometric blur, it is convenient<a name="6"></a></h2><p>to characterize the diffraction limited PSF by an equivalent circular blur function.  We do this by finding the radius that contains a criterion percent of the pupil volume, and calling that the equivlent cirular psf.  This is a rough and ready approximation, but we find it conceptually convenient.</p><pre class="codeinput">criterionPsfFraction = 0.9;
+radiiMm = unique(radiusMatrixMm(:));
+fprintf(<span class="string">'Computing equivalent diffraction limited blur circle PSFs\n'</span>);
+<span class="keyword">for</span> p = 1:length(pupilDiametersMm)
+    fprintf(<span class="string">'\t%d of %d\n'</span>,p,length(pupilDiametersMm));
+    <span class="keyword">for</span> i = 2:length(radiiMm)
+        index = find(radiusMatrixMm &lt;= radiiMm(i));
+        volume(i) = sum(diffractionPsfImage{p}(index));
+        <span class="keyword">if</span> (volume(i) &gt; criterionPsfFraction)
+            lambda = (criterionPsfFraction-volume(i-1))/(volume(i)-volume(i-1));
+            eqDiffractionBlurCircleDiameterMm(p) = (1-lambda)*radiiMm(i-1) + lambda*radiiMm(i);
+            <span class="keyword">break</span>;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% Compute circular psfs at the equivalent diameters</span>
+    <span class="comment">%</span>
+    <span class="comment">% Build the image</span>
+    eqDiffractionPsfImageMm{p} = ones(size(radiusMatrixMm));
+    index = find(radiusMatrixMm &gt; eqDiffractionBlurCircleDiameterMm(p));
+    eqDiffractionPsfImageMm{p}(index) = 0;
+
+    <span class="comment">% Normalize volume and extract slice</span>
+    eqDiffractionPsfImageMm{p} = eqDiffractionPsfImageMm{p}/sum(eqDiffractionPsfImageMm{p}(:));
+    eqDiffractionPsfSlice{p} = eqDiffractionPsfImageMm{p}(centerPixel,centerPixel:end);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Computing equivalent diffraction limited blur circle PSFs
+	1 of 5
+	2 of 5
+	3 of 5
+	4 of 5
+	5 of 5
+</pre><h2>Plot slice of the diffraction limited psf for largest and smallest<a name="7"></a></h2><p>pupil sizes.  The plot works better to compare shapes if we normalize PSF's to max of 1, rather than unit volume.</p><p>Plot also shows radius of equivalent blur circle as dashed vertical lines. [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit; diffractionSliceFigParams.xLimLow = 0; diffractionSliceFigParams.xLimHigh = 0.06; diffractionSliceFigParams.xTicks = [0 0.03 0.06]; diffractionSliceFigParams.xTickLabels = {}; diffractionSliceFigParams.yLimLow = 0; diffractionSliceFigParams.yLimHigh = 1; diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1]; diffractionSliceFigParams.yTickLabels = {}; plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth); plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth); plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1); plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1); xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize); ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize); title('Pinhole Cameara - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize); cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams); legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize); FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);</p><h2>Compute geometric blue for a pinhole optics.<a name="8"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput">fprintf(<span class="string">'Computing pinhole geometric blur circle PSFs\n'</span>);
+<span class="keyword">for</span> p = 1:length(pupilDiametersMm)
+    fprintf(<span class="string">'\t%d of %d\n'</span>,p,length(pupilDiametersMm));
+
+    <span class="comment">% Geometric calculation</span>
+    geometricBlurCircleDiameterMm(p)  = ((distanceToSourceMm+eyeLengthMm)/distanceToSourceMm)*pupilDiametersMm(p);
+
+    <span class="comment">% For a really fair comparison with diffraction, should find the</span>
+    <span class="comment">% equivalent circle diameter, that contains the criterion fraction</span>
+    <span class="comment">% of the volume.</span>
+    eqGeometricBlurCircleDiameterMm(p) = sqrt(criterionPsfFraction)*geometricBlurCircleDiameterMm(p);
+    eqGeometricPsfImageMm{p} = ones(size(radiusMatrixMm));
+    index = find(radiusMatrixMm &gt; eqGeometricPsfImageMm{p});
+    eqGeometricPsfImageMm{p}(index) = 0;
+
+    <span class="comment">% Normalize volume and extract slice</span>
+    eqGeometricPsfImageMm{p} = eqGeometricPsfImageMm{p}/sum(eqGeometricPsfImageMm{p}(:));
+    eqGeometricPsfSlice{p} = eqGeometricPsfImageMm{p}(centerPixel,centerPixel:end);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Computing pinhole geometric blur circle PSFs
+	1 of 5
+	2 of 5
+	3 of 5
+	4 of 5
+	5 of 5
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function cbPinoleOpticsBlur
+% cbPinholeOpticsBlur
+%
+% Examine the tradeoff between geometric blur due to a finite pupil
+% and blur due to diffraction, for a pinhole eye.
+%
+% Requires: Psychophysics Toolbox
+%
+% (c) David Brainard and Andrew Stockman, 2014
+
+%% Clear
+clear; close all;
+
+%% Set parameters
+eyeLengthMm = 17;
+wavelengthNm = 500;
+distanceToSourceMm = 2000;
+minPupilDiameterMm = 0.01;
+maxPupilDiamterMm = 0.1;
+nPupilDiameters = 5;
+pupilDiametersMm = linspace(minPupilDiameterMm,maxPupilDiamterMm,nPupilDiameters);
+VERBOSE = false;
+
+%% Compute diffraction blur for each pupil size
+%
+% The Psychtoolbox routine AiryPattern does the
+% work.
+
+% Set up radii to compute on.  Start by specifying the range
+% in retinal mm and then converting to degrees.
+retinalRadiiMm = 0.2;
+retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,eyeLengthMm);
+
+% Set up grid matrices, so that we can convert radius to two-dimensional
+% image. Although it is probably inefficient to compute on all the radii
+% of a square image matrix (as opposed to computing for linear radii and
+% then propogating the andser onto an image), computers are fast enough
+% that we don't care.
+nPixels = 501;
+centerPixel = round(nPixels+1)/2;
+radiusMatrixDegs = retinalRadiiDeg*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusMatrixMm = retinalRadiiMm*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusLineMm = radiusMatrixMm(centerPixel,centerPixel:end);
+
+% Do the calculation for each pupil size and
+% normalize volume of PSF to unity.  Also
+% extract 1d slice.
+fprintf('Computing diffraction limited PSFs\n');
+for p = 1:length(pupilDiametersMm)
+    fprintf('\t%d of %d\n',p,length(pupilDiametersMm));
+    pupilDiameterMm = pupilDiametersMm(p);
+    diffractionPsfImage{p} = AiryPattern(radiusMatrixDegs,pupilDiameterMm,wavelengthNm); 
+    diffractionPsfImage{p} = diffractionPsfImage{p}/sum(diffractionPsfImage{p}(:));
+    diffractionPsfSlice{p} = diffractionPsfImage{p}(centerPixel,centerPixel:end);
+end
+
+%% For comparison with geometric blur, it is convenient
+% to characterize the diffraction limited PSF by an equivalent
+% circular blur function.  We do this by finding the radius that
+% contains a criterion percent of the pupil volume, and
+% calling that the equivlent cirular psf.  This is a rough
+% and ready approximation, but we find it conceptually
+% convenient.
+criterionPsfFraction = 0.9;
+radiiMm = unique(radiusMatrixMm(:));
+fprintf('Computing equivalent diffraction limited blur circle PSFs\n');
+for p = 1:length(pupilDiametersMm)
+    fprintf('\t%d of %d\n',p,length(pupilDiametersMm));
+    for i = 2:length(radiiMm)
+        index = find(radiusMatrixMm <= radiiMm(i));
+        volume(i) = sum(diffractionPsfImage{p}(index));
+        if (volume(i) > criterionPsfFraction)
+            lambda = (criterionPsfFraction-volume(i-1))/(volume(i)-volume(i-1));
+            eqDiffractionBlurCircleDiameterMm(p) = (1-lambda)*radiiMm(i-1) + lambda*radiiMm(i);
+            break;
+        end
+    end
+    
+    % Compute circular psfs at the equivalent diameters
+    %
+    % Build the image
+    eqDiffractionPsfImageMm{p} = ones(size(radiusMatrixMm));
+    index = find(radiusMatrixMm > eqDiffractionBlurCircleDiameterMm(p));
+    eqDiffractionPsfImageMm{p}(index) = 0;
+    
+    % Normalize volume and extract slice
+    eqDiffractionPsfImageMm{p} = eqDiffractionPsfImageMm{p}/sum(eqDiffractionPsfImageMm{p}(:));
+    eqDiffractionPsfSlice{p} = eqDiffractionPsfImageMm{p}(centerPixel,centerPixel:end);
+end
+
+%% Plot slice of the diffraction limited psf for largest and smallest
+% pupil sizes.  The plot works better to compare shapes if we
+% normalize PSF's to max of 1, rather than unit volume.
+%
+% Plot also shows radius of equivalent blur circle as dashed vertical lines. 
+% [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
+% diffractionSliceFigParams.xLimLow = 0;
+% diffractionSliceFigParams.xLimHigh = 0.06;
+% diffractionSliceFigParams.xTicks = [0 0.03 0.06];
+% diffractionSliceFigParams.xTickLabels = {};
+% diffractionSliceFigParams.yLimLow = 0;
+% diffractionSliceFigParams.yLimHigh = 1;
+% diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
+% diffractionSliceFigParams.yTickLabels = {};
+% plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
+% plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
+% plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+% plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+% xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
+% ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
+% title('Pinhole Cameara - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
+% cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
+% legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
+% FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
+
+%% Compute geometric blue for a pinhole optics.
+%
+% This depends on the distance to the object, and in the
+% limit of a infitely distant point source is just the
+% pupil diameter directly.
+%
+% We think that the distance dependence is also true of diffraction, in the
+% sense that using the Airy pattern as the PSF results
+% from some approximations that treat the arriving wavefront
+% as planar at the pupil.
+%
+% In any case, we'll use a distance that is big with respect to the
+% scale of the model eye.
+fprintf('Computing pinhole geometric blur circle PSFs\n');
+for p = 1:length(pupilDiametersMm)
+    fprintf('\t%d of %d\n',p,length(pupilDiametersMm));
+
+    % Geometric calculation
+    geometricBlurCircleDiameterMm(p)  = ((distanceToSourceMm+eyeLengthMm)/distanceToSourceMm)*pupilDiametersMm(p);
+    
+    % For a really fair comparison with diffraction, should find the
+    % equivalent circle diameter, that contains the criterion fraction
+    % of the volume.
+    eqGeometricBlurCircleDiameterMm(p) = sqrt(criterionPsfFraction)*geometricBlurCircleDiameterMm(p);
+    eqGeometricPsfImageMm{p} = ones(size(radiusMatrixMm));
+    index = find(radiusMatrixMm > eqGeometricPsfImageMm{p});
+    eqGeometricPsfImageMm{p}(index) = 0;
+    
+    % Normalize volume and extract slice
+    eqGeometricPsfImageMm{p} = eqGeometricPsfImageMm{p}/sum(eqGeometricPsfImageMm{p}(:));
+    eqGeometricPsfSlice{p} = eqGeometricPsfImageMm{p}(centerPixel,centerPixel:end);
+end
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
