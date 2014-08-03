@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>cbPinholeOpticsBlur</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-08-02"><meta name="DC.source" content="cbPinholeOpticsBlur.m"><style type="text/css">
+      --><title>cbPinholeOpticsBlur</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-08-03"><meta name="DC.source" content="cbPinholeOpticsBlur.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,11 +66,10 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot slice of the diffraction limited psf for largest and smallest</a></li><li><a href="#8">Compute geometric blue for a pinhole optics.</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinoleOpticsBlur
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot slice of the diffraction limited psf for largest and smallest</a></li><li><a href="#8">Compute geometric blue for a pinhole optics.</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinholeOpticsBlur
 </pre><pre class="codeinput"><span class="comment">% cbPinholeOpticsBlur</span>
 <span class="comment">%</span>
-<span class="comment">% Examine the tradeoff between geometric blur due to a finite pupil</span>
-<span class="comment">% and blur due to diffraction, for a pinhole eye.</span>
+<span class="comment">% Examine size of geometric blur due to a finite pupil and of blur due to diffraction, for a pinhole eye.</span>
 <span class="comment">%</span>
 <span class="comment">% Requires: Psychophysics Toolbox</span>
 <span class="comment">%</span>
@@ -149,7 +148,26 @@ fprintf(<span class="string">'Computing equivalent diffraction limited blur circ
 	3 of 5
 	4 of 5
 	5 of 5
-</pre><h2>Plot slice of the diffraction limited psf for largest and smallest<a name="7"></a></h2><p>pupil sizes.  The plot works better to compare shapes if we normalize PSF's to max of 1, rather than unit volume.</p><p>Plot also shows radius of equivalent blur circle as dashed vertical lines. [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit; diffractionSliceFigParams.xLimLow = 0; diffractionSliceFigParams.xLimHigh = 0.06; diffractionSliceFigParams.xTicks = [0 0.03 0.06]; diffractionSliceFigParams.xTickLabels = {}; diffractionSliceFigParams.yLimLow = 0; diffractionSliceFigParams.yLimHigh = 1; diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1]; diffractionSliceFigParams.yTickLabels = {}; plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth); plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth); plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1); plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1); xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize); ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize); title('Pinhole Cameara - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize); cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams); legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize); FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);</p><h2>Compute geometric blue for a pinhole optics.<a name="8"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput">fprintf(<span class="string">'Computing pinhole geometric blur circle PSFs\n'</span>);
+</pre><h2>Plot slice of the diffraction limited psf for largest and smallest<a name="7"></a></h2><p>pupil sizes.  The plot works better to compare shapes if we normalize PSF's to max of 1, rather than unit volume.</p><p>Plot also shows radius of equivalent blur circle as dashed vertical lines.</p><pre class="codeinput">[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
+diffractionSliceFigParams.xLimLow = 0;
+diffractionSliceFigParams.xLimHigh = 0.06;
+diffractionSliceFigParams.xTicks = [0 0.03 0.06];
+diffractionSliceFigParams.xTickLabels = {};
+diffractionSliceFigParams.yLimLow = 0;
+diffractionSliceFigParams.yLimHigh = 1;
+diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
+diffractionSliceFigParams.yTickLabels = {};
+plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth);
+plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth);
+plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],<span class="string">'r:'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth-1);
+plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],<span class="string">'b:'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth-1);
+xlabel(<span class="string">'Retinal Radius (mm)'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.labelFontSize);
+ylabel(<span class="string">'Point Spread Function'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.labelFontSize);
+title(<span class="string">'Pinhole Camera - Diffraction Limited Blur'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.titleFontSize);
+cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
+legend({sprintf(<span class="string">'Pupil: %0.2f mm'</span>,pupilDiametersMm(1)) sprintf(<span class="string">'Pupil: %0.2f mm'</span>,pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.legendFontSize);
+FigureSave(<span class="string">'PinholeOpticsBlurDiffractionSlice'</span>,diffractionSliceFig,diffractionSliceFigParams.figType);
+</pre><img vspace="5" hspace="5" src="cbPinholeOpticsBlur_01.png" alt=""> <h2>Compute geometric blue for a pinhole optics.<a name="8"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput">fprintf(<span class="string">'Computing pinhole geometric blur circle PSFs\n'</span>);
 <span class="keyword">for</span> p = 1:length(pupilDiametersMm)
     fprintf(<span class="string">'\t%d of %d\n'</span>,p,length(pupilDiametersMm));
 
@@ -176,11 +194,10 @@ fprintf(<span class="string">'Computing equivalent diffraction limited blur circ
 	5 of 5
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-function cbPinoleOpticsBlur
+function cbPinholeOpticsBlur
 % cbPinholeOpticsBlur
 %
-% Examine the tradeoff between geometric blur due to a finite pupil
-% and blur due to diffraction, for a pinhole eye.
+% Examine size of geometric blur due to a finite pupil and of blur due to diffraction, for a pinhole eye.
 %
 % Requires: Psychophysics Toolbox
 %
@@ -271,25 +288,25 @@ end
 % normalize PSF's to max of 1, rather than unit volume.
 %
 % Plot also shows radius of equivalent blur circle as dashed vertical lines. 
-% [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
-% diffractionSliceFigParams.xLimLow = 0;
-% diffractionSliceFigParams.xLimHigh = 0.06;
-% diffractionSliceFigParams.xTicks = [0 0.03 0.06];
-% diffractionSliceFigParams.xTickLabels = {};
-% diffractionSliceFigParams.yLimLow = 0;
-% diffractionSliceFigParams.yLimHigh = 1;
-% diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-% diffractionSliceFigParams.yTickLabels = {};
-% plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
-% plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
-% plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-% plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-% xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
-% ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
-% title('Pinhole Cameara - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
-% cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-% legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
-% FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
+[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
+diffractionSliceFigParams.xLimLow = 0;
+diffractionSliceFigParams.xLimHigh = 0.06;
+diffractionSliceFigParams.xTicks = [0 0.03 0.06];
+diffractionSliceFigParams.xTickLabels = {};
+diffractionSliceFigParams.yLimLow = 0;
+diffractionSliceFigParams.yLimHigh = 1;
+diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
+diffractionSliceFigParams.yTickLabels = {};
+plot(radiusLineMm,diffractionPsfSlice{1}/max(diffractionPsfSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
+plot(radiusLineMm,diffractionPsfSlice{end}/max(diffractionPsfSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
+plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 1],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 1],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
+ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
+title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
+cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
+legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
+FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
 
 %% Compute geometric blue for a pinhole optics.
 %
