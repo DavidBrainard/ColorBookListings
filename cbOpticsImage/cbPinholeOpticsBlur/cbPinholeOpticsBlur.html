@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot a slice of the diffraction limited psf</a></li><li><a href="#8">Compute geometric blur for a pinhole optics.</a></li><li><a href="#9">Close up</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinholeOpticsBlur
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">Compute equivalent blur circle</a></li><li><a href="#7">Plot a slice of the diffraction limited psf</a></li><li><a href="#8">Compute geometric blur for a pinhole optics.</a></li><li><a href="#9">Close up</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinholeOpticsBlur
 </pre><pre class="codeinput"><span class="comment">% cbPinholeOpticsBlur</span>
 <span class="comment">%</span>
 <span class="comment">% Examine size of geometric blur due to a finite pupil and of blur due to diffraction, for a pinhole eye.</span>
@@ -116,7 +116,7 @@ fprintf(<span class="string">'Computing diffraction limited PSFs\n'</span>);
 	3 of 5
 	4 of 5
 	5 of 5
-</pre><h2>For comparison with geometric blur, it is convenient<a name="6"></a></h2><p>to characterize the diffraction limited PSF by an equivalent circular blur function.  We do this by finding the radius that contains a criterion percent of the pupil volume, and calling that the equivlent cirular psf.  This is a rough and ready approximation, but we find it conceptually convenient.</p><pre class="codeinput">criterionPsfFraction = 0.9;
+</pre><h2>Compute equivalent blur circle<a name="6"></a></h2><p>For comparison with geometric blur, it is convenient to characterize the diffraction limited PSF by an equivalent blur circle.  We do this by finding the radius that contains a criterion percent of the pupil volume, and calling that the equivlent cirular psf.  This is a rough and ready approximation, but we find it conceptually convenient.</p><pre class="codeinput">criterionPsfFraction = 0.9;
 radiiMm = unique(radiusMatrixMm(:));
 fprintf(<span class="string">'Computing equivalent diffraction limited blur circle PSFs\n'</span>);
 <span class="keyword">for</span> p = 1:length(pupilDiametersMm)
@@ -248,13 +248,11 @@ for p = 1:length(pupilDiametersMm)
     diffractionPsfSlice{p} = diffractionPsfImage{p}(centerPixel,centerPixel:end);
 end
 
-%% For comparison with geometric blur, it is convenient
-% to characterize the diffraction limited PSF by an equivalent
-% circular blur function.  We do this by finding the radius that
-% contains a criterion percent of the pupil volume, and
-% calling that the equivlent cirular psf.  This is a rough
-% and ready approximation, but we find it conceptually
-% convenient.
+%% Compute equivalent blur circle
+% For comparison with geometric blur, it is convenient to characterize the diffraction
+% limited PSF by an equivalent blur circle.  We do this by finding the radius that
+% contains a criterion percent of the pupil volume, and calling that the equivlent cirular psf.  This is a rough
+% and ready approximation, but we find it conceptually convenient.
 criterionPsfFraction = 0.9;
 radiiMm = unique(radiusMatrixMm(:));
 fprintf('Computing equivalent diffraction limited blur circle PSFs\n');
