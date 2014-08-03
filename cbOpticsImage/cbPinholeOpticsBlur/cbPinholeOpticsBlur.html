@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot slice of the diffraction limited psf for largest and smallest</a></li><li><a href="#8">Compute geometric blue for a pinhole optics.</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinholeOpticsBlur
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Clear</a></li><li><a href="#4">Set parameters</a></li><li><a href="#5">Compute diffraction blur for each pupil size</a></li><li><a href="#6">For comparison with geometric blur, it is convenient</a></li><li><a href="#7">Plot a slice of the diffraction limited psf</a></li><li><a href="#8">Compute geometric blur for a pinhole optics.</a></li><li><a href="#9">Close up</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> cbPinholeOpticsBlur
 </pre><pre class="codeinput"><span class="comment">% cbPinholeOpticsBlur</span>
 <span class="comment">%</span>
 <span class="comment">% Examine size of geometric blur due to a finite pupil and of blur due to diffraction, for a pinhole eye.</span>
@@ -148,7 +148,7 @@ fprintf(<span class="string">'Computing equivalent diffraction limited blur circ
 	3 of 5
 	4 of 5
 	5 of 5
-</pre><h2>Plot slice of the diffraction limited psf for largest and smallest<a name="7"></a></h2><p>pupil sizes.  The plot works better to compare shapes if we normalize PSF's to max of 1, rather than unit volume.</p><p>Plot also shows radius of equivalent blur circle as dashed vertical lines.</p><pre class="codeinput">[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
+</pre><h2>Plot a slice of the diffraction limited psf<a name="7"></a></h2><p>The plot shows a slice through the center of the psf for two pupil sizes (the smallest and largest that we compute for.).</p><p>The plot works better to compare shapes if we normalize PSFs to max of 1 rather than to unit volume, but be aware that the height of the volume normalized PSF will be different as a function of pupil size.</p><p>The plot also shows radius of equivalent blur circle as dashed vertical lines.</p><pre class="codeinput">[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
 diffractionSliceFigParams.xLimLow = 0;
 diffractionSliceFigParams.xLimHigh = 0.06;
 diffractionSliceFigParams.xTicks = [0 0.03 0.06];
@@ -167,7 +167,7 @@ title(<span class="string">'Pinhole Camera - Diffraction Limited Blur'</span>,<s
 cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
 legend({sprintf(<span class="string">'Pupil: %0.2f mm'</span>,pupilDiametersMm(1)) sprintf(<span class="string">'Pupil: %0.2f mm'</span>,pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.legendFontSize);
 FigureSave(<span class="string">'PinholeOpticsBlurDiffractionSlice'</span>,diffractionSliceFig,diffractionSliceFigParams.figType);
-</pre><img vspace="5" hspace="5" src="cbPinholeOpticsBlur_01.png" alt=""> <h2>Compute geometric blue for a pinhole optics.<a name="8"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput">fprintf(<span class="string">'Computing pinhole geometric blur circle PSFs\n'</span>);
+</pre><img vspace="5" hspace="5" src="cbPinholeOpticsBlur_01.png" alt=""> <h2>Compute geometric blur for a pinhole optics.<a name="8"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput">fprintf(<span class="string">'Computing pinhole geometric blur circle PSFs\n'</span>);
 <span class="keyword">for</span> p = 1:length(pupilDiametersMm)
     fprintf(<span class="string">'\t%d of %d\n'</span>,p,length(pupilDiametersMm));
 
@@ -192,6 +192,7 @@ FigureSave(<span class="string">'PinholeOpticsBlurDiffractionSlice'</span>,diffr
 	3 of 5
 	4 of 5
 	5 of 5
+</pre><h2>Close up<a name="9"></a></h2><p>This prevents a mess when we publish many scripts at once.</p><pre class="codeinput">close <span class="string">all</span>;
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 function cbPinholeOpticsBlur
@@ -217,9 +218,7 @@ pupilDiametersMm = linspace(minPupilDiameterMm,maxPupilDiamterMm,nPupilDiameters
 VERBOSE = false;
 
 %% Compute diffraction blur for each pupil size
-%
-% The Psychtoolbox routine AiryPattern does the
-% work.
+% The Psychtoolbox routine AiryPattern does the work.
 
 % Set up radii to compute on.  Start by specifying the range
 % in retinal mm and then converting to degrees.
@@ -283,11 +282,16 @@ for p = 1:length(pupilDiametersMm)
     eqDiffractionPsfSlice{p} = eqDiffractionPsfImageMm{p}(centerPixel,centerPixel:end);
 end
 
-%% Plot slice of the diffraction limited psf for largest and smallest
-% pupil sizes.  The plot works better to compare shapes if we
-% normalize PSF's to max of 1, rather than unit volume.
+%% Plot a slice of the diffraction limited psf
+% The plot shows a slice through the center of the
+% psf for two pupil sizes (the smallest and largest that
+% we compute for.).
 %
-% Plot also shows radius of equivalent blur circle as dashed vertical lines. 
+% The plot works better to compare shapes if we normalize PSFs to max of 1
+% rather than to unit volume, but be aware that the height of the volume
+% normalized PSF will be different as a function of pupil size.
+%
+% The plot also shows radius of equivalent blur circle as dashed vertical lines. 
 [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
 diffractionSliceFigParams.xLimLow = 0;
 diffractionSliceFigParams.xLimHigh = 0.06;
@@ -308,8 +312,7 @@ cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
 legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
 FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
 
-%% Compute geometric blue for a pinhole optics.
-%
+%% Compute geometric blur for a pinhole optics.
 % This depends on the distance to the object, and in the
 % limit of a infitely distant point source is just the
 % pupil diameter directly.
@@ -340,6 +343,10 @@ for p = 1:length(pupilDiametersMm)
     eqGeometricPsfImageMm{p} = eqGeometricPsfImageMm{p}/sum(eqGeometricPsfImageMm{p}(:));
     eqGeometricPsfSlice{p} = eqGeometricPsfImageMm{p}(centerPixel,centerPixel:end);
 end
+
+%% Close up
+% This prevents a mess when we publish many scripts at once.
+close all;
 
 
 
