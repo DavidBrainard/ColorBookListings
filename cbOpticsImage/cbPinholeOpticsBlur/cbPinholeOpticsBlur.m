@@ -6,16 +6,28 @@ function cbPinholeOpticsBlur
 % The default parameters show results for an eye about the size of the
 % human eye but for much smaller pupils.  The pupil sizes chosen illustrate
 % a range where the factor limiting the size of the PSF switches between
-% diffraction and the geometry of image formation.  To see this, run the
-% script and compare the two figures.  For the smaller pupil size, the
-% diffraction limited blur is about twice the size of the geometric optics
-% blur.  For the larger pupil, this relation is reversed.  Note that the
-% regime where this happens is for pupils of the order of 0.01 mm in
-% diameter, about 100 times smaller than the human pupil.  And that the
-% size of the blur for a pinhole camera with these pupil sizes is
-% considerably larger than that of the real human eye, which has its best
-% optical resolution corresponding roughly to the diffraction limit of a
-% pupil of 2-3 mm in diameter.
+% diffraction and the geometry of image formation.
+%
+% To see this, run the script and compare the two figures.  For the smaller
+% pupil size, the diffraction limited blur is about twice the size of the
+% geometric optics blur.  For the larger pupil, this relation is reversed.
+% Note that the regime where this happens is for pupils of the order of
+% 0.01 mm in diameter, about 100 times smaller than the human pupil.
+%
+% Also note that the size of the blur for a pinhole camera with these pupil
+% sizes is considerably larger than that of the real human eye, which has
+% its best optical resolution corresponding roughly to the diffraction
+% limit of a pupil of 2-3 mm in diameter.
+%
+% Possible extensions for the interested reader:
+% 1) Examine how the relation between the two types of blur depends on what
+% PSF volume is chosen to compute the equivalent blur circle.
+% 2) Convert the size of the blur circles from mm on the retina to degrees
+% of visual angle.
+% 3) Compare the blur circles here computed with the size of the real human PSF.
+% 4) Examine how the blur due to diffraction depends on wavelength.
+% 5) Examine how the geometric blur varies with distance to the object.
+% This begins to get at the concept of depth of field.
 %
 % Requires: Psychophysics Toolbox
 %
