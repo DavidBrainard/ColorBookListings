@@ -12,17 +12,19 @@ clear; close all;
 
 % Web site target
 webTargetDir = '/Users/Shared/GitWebSites/ColorBookListings';
-cbSections = {};
-nSections = 0;
+wikiBaseURL = 'http://davidbrainard.github.io/ColorBookListings/';
 
 % Wiki target
 wikiTargetDir = '/Users/Shared/GitWebSites/ColorBookListings.wiki';
-wikiBaseURL = 'http://davidbrainard.github.io/ColorBookListings/';
 wikiTemplateFile = 'WikiHomeTemplate.md';
 wikiAddedFile = 'WikiHomeAdded.md';
 wikiTargetFile = 'Home.md';
 unix(['rm -rf ' fullfile(wikiTargetDir,wikiAddedFile)]);
 wikiFid = fopen(fullfile(wikiTargetDir,wikiAddedFile),'w');
+
+% Counters and accumulators
+cbSections = {};
+nSections = 0;
 
 % OpticsImage
 nSections = nSections + 1;
