@@ -70,12 +70,12 @@ fclose(wikiFid);
 % prompt.  Using the git keychain access seems to work from the command
 % line, but not from here.
 %   git config --global credential.helper osxkeychain
-cd(wikiTargetDir);
-unix(['cat ' wikiTemplateFile ' ' wikiAddedFile ' > ' wikiTargetFile]);
-unix(['git commit -a -m "Autopublish"; ~/bin/runGitPush.sh']);
-cd(webTargetDir);
-unix(['git commit -a -m "Autopublish"; ~/bin/runGitPush.sh']);
-cd(listingDir);
+% cd(wikiTargetDir);
+% unix(['cat ' wikiTemplateFile ' ' wikiAddedFile ' > ' wikiTargetFile]);
+% unix(['git commit -a -m "Autopublish"; ~/bin/runGitPush.sh']);
+% cd(webTargetDir);
+% unix(['git commit -a -m "Autopublish"; ~/bin/runGitPush.sh']);
+% cd(listingDir);
 
 
 

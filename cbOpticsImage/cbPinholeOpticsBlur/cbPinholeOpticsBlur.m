@@ -9,24 +9,25 @@ function cbPinholeOpticsBlur
 % diffraction and the geometry of image formation.
 %
 % To see this, run the script and compare the two figures.  For the smaller
-% pupil size, the diffraction limited blur is about twice the size of the
-% geometric optics blur.  For the larger pupil, this relation is reversed.
-% Note that the regime where this happens is for pupils of the order of
-% 0.01 mm in diameter, about 100 times smaller than the human pupil.
+% pupil size, the diffraction limited blur is smaller than size of the
+% geometric optics blur. For the larger pupil, this relation is reversed.
+% For the intermediate pupil size (no figure, see printout to command
+% window), the blur from the two factors is about the same. Note that the
+% regime where the crossover happens is for pupils of the order of 0.1 mm
+% in diameter, about 10 times smaller than the human pupil.
 %
 % Also note that the size of the blur for a pinhole camera with these pupil
 % sizes is considerably larger than that of the real human eye, which has
-% its best optical resolution corresponding roughly to the diffraction
-% limit of a pupil of 2-3 mm in diameter.
+% an optical resolution about 10 times better, that is aPSF about 10 times
+% smaller).
 %
 % Possible extensions for the interested reader:
-% 1) Examine how the relation between the two types of blur depends on what
+% - Examine how the relation between the two types of blur depends on what
 % PSF volume is chosen to compute the equivalent blur circle.
-% 2) Convert the size of the blur circles from mm on the retina to degrees
-% of visual angle.
-% 3) Compare the blur circles here computed with the size of the real human PSF.
-% 4) Examine how the blur due to diffraction depends on wavelength.
-% 5) Examine how the geometric blur varies with distance to the object.
+% - Compare the blur circles here computed with the size of the real human
+% PSF.
+% - Examine how the blur due to diffraction depends on wavelength.
+% - Examine how the geometric blur varies with distance to the object.
 % This begins to get at the concept of depth of field.
 %
 % Requires: Psychophysics Toolbox
@@ -38,49 +39,50 @@ clear; close all;
 
 %% Set parameters
 eyeLengthMm = 24;
-wavelengthNm = 500;
+wavelengthNm = 550;
 distanceToSourceMm = 2000;
-minPupilDiameterMm = 0.01;
-maxPupilDiamterMm = 0.02;
-nPupilDiameters = 2;
 eqCriterionPSFFraction = 0.8;
-pupilDiametersMm = linspace(minPupilDiameterMm,maxPupilDiamterMm,nPupilDiameters);
-VERBOSE = false;
+pupilDiametersMm = [0.05 0.1 0.2];
+nPupilDiameters = length(pupilDiametersMm);
 
 %% Compute diffraction blur for each pupil size
 % The Psychtoolbox routine AiryPattern does the work.
 
-% Set up radii to compute on.  Start by specifying the range
-% in retinal mm and then converting to degrees.
-retinalRadiiMm = 0.4;
+% Set up radii to compute on.  Start by specifying the range in retinal mm
+% and then converting to degrees.
+retinalRadiiMm = 0.5;
 retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,eyeLengthMm);
+retinalRadiiRad = degtorad(retinalRadiiDeg);
 
 % Set up grid matrices, so that we can convert radius to two-dimensional
-% image. Although it is probably inefficient to compute on all the radii
-% of a square image matrix (as opposed to computing for linear radii and
-% then propogating the andser onto an image), computers are fast enough
-% that we don't care.
+% image. Although it is probably inefficient to compute on all the radii of
+% a square image matrix (as opposed to computing for linear radii and then
+% propogating the andser onto an image), computers are fast enough that we
+% don't care.
 nPixels = 501;
 centerPixel = round(nPixels+1)/2;
-radiusMatrixDegs = retinalRadiiDeg*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
-radiusMatrixMm = retinalRadiiMm*MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusMatrixRaw = MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
+radiusMatrixDegs = retinalRadiiDeg*radiusMatrixRaw;
+radiusMatrixRad = retinalRadiiRad*radiusMatrixRaw;
+radiusMatrixMm = retinalRadiiMm*radiusMatrixRaw;
 radiusLineMm = radiusMatrixMm(centerPixel,centerPixel:end);
 
-% Do the calculation for each pupil size and
-% normalize volume of PSF to unity.  Also
-% extract 1d slice.
+% Do the calculation for each pupil size and normalize volume of PSF to
+% unity.  Also extract 1d slice.
 for p = 1:length(pupilDiametersMm)
     pupilDiameterMm = pupilDiametersMm(p);
-    diffractionPSFImage{p} = AiryPattern(radiusMatrixDegs,pupilDiameterMm,wavelengthNm); 
+    diffractionPSFImage{p} = AiryPattern(radiusMatrixRad,pupilDiameterMm,wavelengthNm); 
     diffractionPSFImage{p} = diffractionPSFImage{p}/sum(diffractionPSFImage{p}(:));
     diffractionPSFSlice{p} = diffractionPSFImage{p}(centerPixel,centerPixel:end);
 end
 
 %% Compute equivalent blur circle
-% For comparison with geometric blur, it is convenient to characterize the diffraction
-% limited PSF by an equivalent blur circle.  We do this by finding the radius that
-% contains a criterion fraction of the pupil volume, and calling that the equivlent cirular psf.
-% This is a rough and ready approximation, but we find it conceptually convenient.
+% For comparison with geometric blur, it is convenient to characterize the
+% diffraction limited PSF by an equivalent blur circle.  We do this by
+% finding the radius that contains a criterion fraction of the pupil
+% volume, and calling that the equivlent cirular psf. This is a rough and
+% ready approximation, but we find it conceptually convenient as a summary
+% of the size of the PSF.
 radiiMm = unique(radiusMatrixMm(:));
 for p = 1:length(pupilDiametersMm)
     for i = 2:length(radiiMm)
@@ -89,6 +91,7 @@ for p = 1:length(pupilDiametersMm)
         if (volume(i) > eqCriterionPSFFraction)
             lambda = (eqCriterionPSFFraction-volume(i-1))/(volume(i)-volume(i-1));
             eqDiffractionBlurCircleDiameterMm(p) = (1-lambda)*radiiMm(i-1) + lambda*radiiMm(i);
+            eqDiffractionBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqDiffractionBlurCircleDiameterMm(p),eyeLengthMm);
             break;
         end
     end
@@ -103,22 +106,27 @@ for p = 1:length(pupilDiametersMm)
     % Normalize volume and extract slice
     eqDiffractionPSFImageMm{p} = eqDiffractionPSFImageMm{p}/sum(eqDiffractionPSFImageMm{p}(:));
     eqDiffractionPSFSlice{p} = eqDiffractionPSFImageMm{p}(centerPixel,centerPixel:end);
+    
+    % Print summary of this calculation
+    fprintf('Pupil size %0.2f mm, diffraction equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
+        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqDiffractionBlurCircleDiameterMm(p),eqDiffractionBlurCircleDiameterDegs(p));
 end
+fprintf('\n');
 
 %% Plot a slice of the diffraction limited psf
-% The plot shows a slice through the center of the
-% psf for two pupil sizes (the smallest and largest that
-% we compute for.).
+% The plot shows a slice through the center of the psf for two pupil sizes
+% (the smallest and largest that we compute for.).
 %
 % The plot works better to compare shapes if we normalize PSFs to max of 1
 % rather than to unit volume, but be aware that the height of the volume
 % normalized PSF will be different as a function of pupil size.
 %
-% The plot also shows radius of equivalent blur circle as dashed vertical lines. 
+% The plot also shows radius of equivalent blur circle as dashed vertical
+% lines.
 [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
 diffractionSliceFigParams.xLimLow = 0;
-diffractionSliceFigParams.xLimHigh = 0.04;
-diffractionSliceFigParams.xTicks = [0 0.01 0.02 0.03 0.04];;
+diffractionSliceFigParams.xLimHigh = 0.4;
+diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
 diffractionSliceFigParams.xTickLabels = {};
 diffractionSliceFigParams.yLimLow = 0;
 diffractionSliceFigParams.yLimHigh = 1;
@@ -136,24 +144,24 @@ legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm'
 FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
 
 %% Compute geometric blur for a pinhole optics.
-% This depends on the distance to the object, and in the limit of a infitely
-% distant point source is just the pupil diameter directly.
+% This depends on the distance to the object, and in the limit of a
+% infitely distant point source is just the pupil diameter directly.
 %
 % We think that the distance dependence is also true of diffraction, in the
-% sense that using the Airy pattern as the PSF results
-% from some approximations that treat the arriving wavefront
-% as planar at the pupil.
+% sense that using the Airy pattern as the PSF results from some
+% approximations that treat the arriving wavefront as planar at the pupil.
 %
-% In any case, we'll use a distance that is big with respect to the
-% scale of the model eye.
+% In any case, we'll use a distance that is big with respect to the scale
+% of the model eye.
 for p = 1:length(pupilDiametersMm)
     % Geometric calculation
     geometricBlurCircleDiameterMm(p)  = ((distanceToSourceMm+eyeLengthMm)/distanceToSourceMm)*pupilDiametersMm(p);
     
     % For a really fair comparison with diffraction, should find the
-    % equivalent circle diameter, that contains the criterion fraction
-    % of the volume.
+    % equivalent circle diameter, that contains the criterion fraction of
+    % the volume.
     eqGeometricBlurCircleDiameterMm(p) = sqrt(eqCriterionPSFFraction)*geometricBlurCircleDiameterMm(p);
+    eqGeometricBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqGeometricBlurCircleDiameterMm(p),eyeLengthMm);
     eqGeometricPSFImageMm{p} = ones(size(radiusMatrixMm));
     index = find(radiusMatrixMm > geometricBlurCircleDiameterMm(p));
     eqGeometricPSFImageMm{p}(index) = 0;
@@ -161,22 +169,27 @@ for p = 1:length(pupilDiametersMm)
     % Normalize volume and extract slice
     eqGeometricPSFImageMm{p} = eqGeometricPSFImageMm{p}/sum(eqGeometricPSFImageMm{p}(:));
     eqGeometricPSFSlice{p} = eqGeometricPSFImageMm{p}(centerPixel,centerPixel:end);
+    
+     % Print summary of this calculation
+    fprintf('Pupil size %0.2f mm, geometric equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
+        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqGeometricBlurCircleDiameterMm(p),eqGeometricBlurCircleDiameterDegs(p));
 end
+fprintf('\n');
 
 %% Plot a slice through the geometric blur circle
-% The plot shows the geometry-limited PSF, which is just a circle.
-% It doesn't look quite like a circle because of numerical precision
-% issues in the 2D computation of the PSF implemented here, but the basic point 
-% is clear.
+% The plot shows the geometry-limited PSF, which is just a circle. It
+% doesn't look quite like a circle because of numerical precision issues in
+% the 2D computation of the PSF implemented here, but the basic point is
+% clear.
 %
 % The plot also shows as a dashed line the radius that contains the same
 % criterion fraction of the PSF mass as for the diffraction limited
-% calculation.  This provides a metric that may be compared to the
-% size of the same metric for the diffraction limited PSF.
+% calculation.  This provides a metric that may be compared to the size of
+% the same metric for the diffraction limited PSF.
 [geometricSliceFig,geometricSliceFigParams] = cbFigInit;
 geometricSliceFigParams.xLimLow = 0;
-geometricSliceFigParams.xLimHigh = 0.04;
-geometricSliceFigParams.xTicks = [0 0.01 0.02 0.03 0.04];
+geometricSliceFigParams.xLimHigh = 0.4;
+geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
 geometricSliceFigParams.xTickLabels = {};
 geometricSliceFigParams.yLimLow = 0;
 geometricSliceFigParams.yLimHigh = 1;
