@@ -215,9 +215,9 @@ end
 
 %% Save validation data
 UnitTest.validationData('calcParams', calcParams);
-UnitTest.validationData('diffractionPSFSlice', diffractionPSFSlice);
+UnitTest.validationData('diffractionPSFSlice', diffractionPSFSlice{1});
 UnitTest.validationData('eqGeometricBlurCircleDiameterMm', eqGeometricBlurCircleDiameterMm);
-UnitTest.validationData('eqGeometricPSFSlice', eqGeometricPSFSlice);
+UnitTest.validationData('eqGeometricPSFSlice', eqGeometricPSFSlice{1});
 
 end
 

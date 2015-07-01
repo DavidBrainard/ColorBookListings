@@ -32,7 +32,8 @@ UnitTest.setPref('graphMismatchedData', false);
 UnitTest.listPrefs();
 
 %% What to validate
-vScriptsList = cbValidateListAllValidationDirs;
+listingScript = UnitTest.getPref('listingScript');
+vScriptsList = eval(listingScript);
 
 %% How to validate
 % Run a RUN_TIME_ERRORS_ONLY validation session
