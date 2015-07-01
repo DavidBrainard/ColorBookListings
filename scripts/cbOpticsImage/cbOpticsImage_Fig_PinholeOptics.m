@@ -1,5 +1,4 @@
-function cbPinholeOpticsBlur
-% cbPinholeOpticsBlur
+function varargout = cbOpticsImage_Fig_PinholeOptics(varargin)
 %
 % Explore geometric and diffraction optical blur for a pinhole eye.
 %
@@ -30,20 +29,24 @@ function cbPinholeOpticsBlur
 % - Examine how the geometric blur varies with distance to the object.
 % This begins to get at the concept of depth of field.
 %
-% Requires: Psychophysics Toolbox
-%
 % (c) David Brainard and Andrew Stockman, 2014
 
-%% Clear
-clear; close all;
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+%% Function implementing the isetbio validation code
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
 %% Set parameters
-eyeLengthMm = 24;
-wavelengthNm = 550;
-distanceToSourceMm = 2000;
-eqCriterionPSFFraction = 0.8;
-pupilDiametersMm = [0.05 0.1 0.2];
-nPupilDiameters = length(pupilDiametersMm);
+calcParams.eyeDiameterMm = 24;
+calcParams.wavelengthNm = 550;
+calcParams.distanceToSourceMm = 2000;
+calcParams.eqCriterionPSFFraction = 0.8;
+calcParams.pupilDiametersMm = [0.05 0.1 0.2];
+nPupilDiameters = length(calcParams.pupilDiametersMm);
 
 %% Compute diffraction blur for each pupil size
 % The Psychtoolbox routine AiryPattern does the work.
@@ -51,7 +54,7 @@ nPupilDiameters = length(pupilDiametersMm);
 % Set up radii to compute on.  Start by specifying the range in retinal mm
 % and then converting to degrees.
 retinalRadiiMm = 0.5;
-retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,eyeLengthMm);
+retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,calcParams.eyeDiameterMm);
 retinalRadiiRad = degtorad(retinalRadiiDeg);
 
 % Set up grid matrices, so that we can convert radius to two-dimensional
@@ -69,9 +72,9 @@ radiusLineMm = radiusMatrixMm(centerPixel,centerPixel:end);
 
 % Do the calculation for each pupil size and normalize volume of PSF to
 % unity.  Also extract 1d slice.
-for p = 1:length(pupilDiametersMm)
-    pupilDiameterMm = pupilDiametersMm(p);
-    diffractionPSFImage{p} = AiryPattern(radiusMatrixRad,pupilDiameterMm,wavelengthNm); 
+for p = 1:length(calcParams.pupilDiametersMm)
+    pupilDiameterMm = calcParams.pupilDiametersMm(p);
+    diffractionPSFImage{p} = AiryPattern(radiusMatrixRad,pupilDiameterMm,calcParams.wavelengthNm); 
     diffractionPSFImage{p} = diffractionPSFImage{p}/sum(diffractionPSFImage{p}(:));
     diffractionPSFSlice{p} = diffractionPSFImage{p}(centerPixel,centerPixel:end);
 end
@@ -84,14 +87,14 @@ end
 % ready approximation, but we find it conceptually convenient as a summary
 % of the size of the PSF.
 radiiMm = unique(radiusMatrixMm(:));
-for p = 1:length(pupilDiametersMm)
+for p = 1:length(calcParams.pupilDiametersMm)
     for i = 2:length(radiiMm)
         index = find(radiusMatrixMm <= radiiMm(i));
         volume(i) = sum(diffractionPSFImage{p}(index));
-        if (volume(i) > eqCriterionPSFFraction)
-            lambda = (eqCriterionPSFFraction-volume(i-1))/(volume(i)-volume(i-1));
+        if (volume(i) > calcParams.eqCriterionPSFFraction)
+            lambda = (calcParams.eqCriterionPSFFraction-volume(i-1))/(volume(i)-volume(i-1));
             eqDiffractionBlurCircleDiameterMm(p) = (1-lambda)*radiiMm(i-1) + lambda*radiiMm(i);
-            eqDiffractionBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqDiffractionBlurCircleDiameterMm(p),eyeLengthMm);
+            eqDiffractionBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqDiffractionBlurCircleDiameterMm(p),calcParams.eyeDiameterMm);
             break;
         end
     end
@@ -109,7 +112,7 @@ for p = 1:length(pupilDiametersMm)
     
     % Print summary of this calculation
     fprintf('Pupil size %0.2f mm, diffraction equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
-        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqDiffractionBlurCircleDiameterMm(p),eqDiffractionBlurCircleDiameterDegs(p));
+        calcParams.pupilDiametersMm(p),round(100*calcParams.eqCriterionPSFFraction),eqDiffractionBlurCircleDiameterMm(p),eqDiffractionBlurCircleDiameterDegs(p));
 end
 fprintf('\n');
 
@@ -123,25 +126,27 @@ fprintf('\n');
 %
 % The plot also shows radius of equivalent blur circle as dashed vertical
 % lines.
-[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
-diffractionSliceFigParams.xLimLow = 0;
-diffractionSliceFigParams.xLimHigh = 0.4;
-diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-diffractionSliceFigParams.xTickLabels = {};
-diffractionSliceFigParams.yLimLow = 0;
-diffractionSliceFigParams.yLimHigh = 1;
-diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-diffractionSliceFigParams.yTickLabels = {};
-plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
-plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
-plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
-ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
-title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
-cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
-FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
+if (runTimeParams.generatePlots)
+    [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
+    diffractionSliceFigParams.xLimLow = 0;
+    diffractionSliceFigParams.xLimHigh = 0.4;
+    diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
+    diffractionSliceFigParams.xTickLabels = {};
+    diffractionSliceFigParams.yLimLow = 0;
+    diffractionSliceFigParams.yLimHigh = 1;
+    diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
+    diffractionSliceFigParams.yTickLabels = {};
+    plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
+    plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
+    plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+    plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
+    xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
+    ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
+    title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
+    cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
+    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
+    FigureSave([mfilename '_BlurDiffractionSlice'],diffractionSliceFig,diffractionSliceFigParams.figType);
+end
 
 %% Compute geometric blur for a pinhole optics.
 % This depends on the distance to the object, and in the limit of a
@@ -153,15 +158,15 @@ FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSl
 %
 % In any case, we'll use a distance that is big with respect to the scale
 % of the model eye.
-for p = 1:length(pupilDiametersMm)
+for p = 1:length(calcParams.pupilDiametersMm)
     % Geometric calculation
-    geometricBlurCircleDiameterMm(p)  = ((distanceToSourceMm+eyeLengthMm)/distanceToSourceMm)*pupilDiametersMm(p);
+    geometricBlurCircleDiameterMm(p)  = ((calcParams.distanceToSourceMm+calcParams.eyeDiameterMm)/calcParams.distanceToSourceMm)*calcParams.pupilDiametersMm(p);
     
     % For a really fair comparison with diffraction, should find the
     % equivalent circle diameter, that contains the criterion fraction of
     % the volume.
-    eqGeometricBlurCircleDiameterMm(p) = sqrt(eqCriterionPSFFraction)*geometricBlurCircleDiameterMm(p);
-    eqGeometricBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqGeometricBlurCircleDiameterMm(p),eyeLengthMm);
+    eqGeometricBlurCircleDiameterMm(p) = sqrt(calcParams.eqCriterionPSFFraction)*geometricBlurCircleDiameterMm(p);
+    eqGeometricBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqGeometricBlurCircleDiameterMm(p),calcParams.eyeDiameterMm);
     eqGeometricPSFImageMm{p} = ones(size(radiusMatrixMm));
     index = find(radiusMatrixMm > geometricBlurCircleDiameterMm(p));
     eqGeometricPSFImageMm{p}(index) = 0;
@@ -172,7 +177,7 @@ for p = 1:length(pupilDiametersMm)
     
      % Print summary of this calculation
     fprintf('Pupil size %0.2f mm, geometric equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
-        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqGeometricBlurCircleDiameterMm(p),eqGeometricBlurCircleDiameterDegs(p));
+        calcParams.pupilDiametersMm(p),round(100*calcParams.eqCriterionPSFFraction),eqGeometricBlurCircleDiameterMm(p),eqGeometricBlurCircleDiameterDegs(p));
 end
 fprintf('\n');
 
@@ -186,25 +191,35 @@ fprintf('\n');
 % criterion fraction of the PSF mass as for the diffraction limited
 % calculation.  This provides a metric that may be compared to the size of
 % the same metric for the diffraction limited PSF.
-[geometricSliceFig,geometricSliceFigParams] = cbFigInit;
-geometricSliceFigParams.xLimLow = 0;
-geometricSliceFigParams.xLimHigh = 0.4;
-geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-geometricSliceFigParams.xTickLabels = {};
-geometricSliceFigParams.yLimLow = 0;
-geometricSliceFigParams.yLimHigh = 1;
-geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-geometricSliceFigParams.yTickLabels = {};
-plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),'r','LineWidth',geometricSliceFigParams.lineWidth+1);
-plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),'b','LineWidth',geometricSliceFigParams.lineWidth);
-plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',geometricSliceFigParams.lineWidth-1);
-plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',geometricSliceFigParams.lineWidth-1);
-xlabel('Retinal Radius (mm)','FontSize',geometricSliceFigParams.labelFontSize);
-ylabel('Point Spread Function','FontSize',geometricSliceFigParams.labelFontSize);
-title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSliceFigParams.titleFontSize);
-cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
-legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
-FigureSave('PinholeOpticsBlurgeometricSlice',geometricSliceFig,geometricSliceFigParams.figType);
+if (runTimeParams.generatePlots)
+    [geometricSliceFig,geometricSliceFigParams] = cbFigInit;
+    geometricSliceFigParams.xLimLow = 0;
+    geometricSliceFigParams.xLimHigh = 0.4;
+    geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
+    geometricSliceFigParams.xTickLabels = {};
+    geometricSliceFigParams.yLimLow = 0;
+    geometricSliceFigParams.yLimHigh = 1;
+    geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
+    geometricSliceFigParams.yTickLabels = {};
+    plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),'r','LineWidth',geometricSliceFigParams.lineWidth+1);
+    plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),'b','LineWidth',geometricSliceFigParams.lineWidth);
+    plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',geometricSliceFigParams.lineWidth-1);
+    plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',geometricSliceFigParams.lineWidth-1);
+    xlabel('Retinal Radius (mm)','FontSize',geometricSliceFigParams.labelFontSize);
+    ylabel('Point Spread Function','FontSize',geometricSliceFigParams.labelFontSize);
+    title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSliceFigParams.titleFontSize);
+    cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
+    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
+    FigureSave([mfilename '_BlurGeometricSlice'],geometricSliceFig,geometricSliceFigParams.figType);
+end
+
+%% Save validation data
+UnitTest.validationData('calcParams', calcParams);
+UnitTest.validationData('diffractionPSFSlice', diffractionPSFSlice);
+UnitTest.validationData('eqGeometricBlurCircleDiameterMm', eqGeometricBlurCircleDiameterMm);
+UnitTest.validationData('eqGeometricPSFSlice', eqGeometricPSFSlice);
+
+end
 
 
 

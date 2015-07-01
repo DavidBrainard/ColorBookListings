@@ -1,17 +1,20 @@
-function cbHumanPSF
-% cbPinholeOpticsBlur
+function varargout = cbOpticsImage_Fig_HumanPSF(varargin)
 %
 % Compute PSF for human eye.
 %
-% Requires: Psychophysics Toolbox, isetbio
-%
-% (c) David Brainard and Andrew Stockman, 2014
+% (c) David Brainard and Andrew Stockman, 2014-2015.
 
-%% Clear
-clear; close all;
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+%% Function implementing the isetbio validation code
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
 %% Set parameters
-eyeLengthMm = 17;
+eyeLengthMm = EyeLength('Human','Rodieck');
 wavelengthNm = 550;
 distanceToSourceMm = 2000;
 eqCriterionPSFFraction = 0.8;
@@ -19,6 +22,7 @@ pupilDiametersMm = [0.05 0.1 0.2];
 nPupilDiameters = length(pupilDiametersMm);
 
 %% Compute diffraction blur for each pupil size
+%
 % The Psychtoolbox routine AiryPattern does the work.
 
 % Set up radii to compute on.  Start by specifying the range in retinal mm
@@ -96,6 +100,7 @@ fprintf('\n');
 %
 % The plot also shows radius of equivalent blur circle as dashed vertical
 % lines.
+if (runTimeParams.generatePlots)
 [diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
 diffractionSliceFigParams.xLimLow = 0;
 diffractionSliceFigParams.xLimHigh = 0.4;
@@ -115,6 +120,8 @@ title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFig
 cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
 legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
 FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
+if (runTimeParams.generatePlots)
+
 
 %% Compute geometric blur for a pinhole optics.
 % This depends on the distance to the object, and in the limit of a
@@ -178,6 +185,8 @@ title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSlice
 cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
 legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
 FigureSave('PinholeOpticsBlurgeometricSlice',geometricSliceFig,geometricSliceFigParams.figType);
+
+end
 
 
 
