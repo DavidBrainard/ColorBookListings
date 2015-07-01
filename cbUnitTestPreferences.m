@@ -28,7 +28,8 @@ function cbUnitTestPreferencesTemplate
             'clonedWikiLocation',    '/Users/Shared/GitWebSites/ColorBookListings.wiki', ...                                          % Local path to the directory where the wiki is cloned. Only relevant for publishing tutorials.
             'clonedGhPagesLocation', '/Users/Shared/GitWebSites/ColorBookListings', ...                                               % Local path to the directory where the gh-pages repository is cloned. Only relevant for publishing tutorials.
             'githubRepoURL',         'https://github.com/DavidBrainard/ColorBookListings', ...                                        % Github URL for the project. This is only used for publishing tutorials.
-            'generateGroundTruthDataIfNotFound',   true ...                                                                           % Flag indicating whether to generate ground truth if one is not found
+            'generateGroundTruthDataIfNotFound',   true, ...                                                                          % Flag indicating whether to generate ground truth if one is not found
+            'listingScript',         'cbValidateListAllValidationDirs' ...                                                            % Routine that lists validation dirs
         );
 
     generatePreferenceGroup(p);

@@ -18,12 +18,11 @@ function validateFullAll(varargin)
 %
 % NC, ISETBIO Team, Copyright 2015
 
-close all;  % Is this necessary?
-% clc - I prefer controlling my command line. I leave stuff in there
-% sometimes.
+%% Allows this to control figures
+close all;
 
-%% We will use preferences for the 'isetbioValidation' project - this is project specific
-UnitTest.usePreferencesForProject('isetbioValidation', 'reset');
+%% Use preferences for the 'cbScripes' project - this is project specific
+UnitTest.usePreferencesForProject('cbScripts', 'reset');
 
 %% Set preferences for this function
 
@@ -72,7 +71,8 @@ end
 UnitTest.listPrefs();
 
 %% What to validate
-vScriptsList = validateListAllValidationDirs;
+listingScript = UnitTest.getPref('listingScript');
+vScriptsList = eval(listingScript);
 
 %% How to validate
 % Run a FULL validation session (comparing actual data)

@@ -1,7 +1,10 @@
 function validateFullAndPublishOne(varargin)
     
-    %% We will use preferences for the 'isetbioValidation' project - this is project specific
-    UnitTest.usePreferencesForProject('isetbioValidation', 'reset');
+%% Allows this to control figures
+close all;
+
+%% Use preferences for the 'cbScripes' project - this is project specific
+UnitTest.usePreferencesForProject('cbScripts', 'reset');
 
     % Run time error behavior
     % valid options are: 'rethrowExceptionAndAbort', 'catchExceptionAndContinue'
@@ -22,7 +25,7 @@ function validateFullAndPublishOne(varargin)
     UnitTest.setPref('graphMismatchedData', true);
 
     %% Print all existing validation scripts and ask the user to select one for validation
-    singleScriptToValidate = UnitTest.selectScriptFromExistingOnes();
+    singleScriptToValidate = UnitTest.SelectScriptFromExistingOnes();
     
     %% Validate
     UnitTest.runValidationSession({{singleScriptToValidate, []}}, 'PUBLISH');
