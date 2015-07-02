@@ -118,7 +118,7 @@ if (runTimeParams.generatePlots)
     plot(data.eccDegrees,data.eccMmLinear,'b:','LineWidth',figParams.lineWidth);
     plot(data.eccDegrees,data.eccMm,'r','LineWidth',figParams.lineWidth);
     % plot(data.eccDegrees,data.eccMmTangent,'g','LineWidth',figParams.lineWidth);
-    plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);
+    % plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);
     
     xlabel('Eccentricity (degrees)','FontSize',figParams.labelFontSize);
     ylabel('Eccentricity (mm)','FontSize',figParams.labelFontSize);
