@@ -238,9 +238,9 @@ Pupil size 0.20 mm, geometric equiv blur cicle (80% volume) 0.181 mm, 0.432 deg
     FigureSave([mfilename <span class="string">'_BlurGeometricSlice'</span>],geometricSliceFig,geometricSliceFigParams.figType);
 <span class="keyword">end</span>
 </pre><img vspace="5" hspace="5" src="cbOpticsImage_Fig_PinholeOptics_02.png" alt=""> <h2>Save validation data<a name="11"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'calcParams'</span>, calcParams);
-UnitTest.validationData(<span class="string">'diffractionPSFSlice'</span>, diffractionPSFSlice{1});
+UnitTest.validationData(<span class="string">'diffractionPSFSlice'</span>, diffractionPSFSlice);
 UnitTest.validationData(<span class="string">'eqGeometricBlurCircleDiameterMm'</span>, eqGeometricBlurCircleDiameterMm);
-UnitTest.validationData(<span class="string">'eqGeometricPSFSlice'</span>, eqGeometricPSFSlice{1});
+UnitTest.validationData(<span class="string">'eqGeometricPSFSlice'</span>, eqGeometricPSFSlice);
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
@@ -461,9 +461,9 @@ end
 
 %% Save validation data
 UnitTest.validationData('calcParams', calcParams);
-UnitTest.validationData('diffractionPSFSlice', diffractionPSFSlice{1});
+UnitTest.validationData('diffractionPSFSlice', diffractionPSFSlice);
 UnitTest.validationData('eqGeometricBlurCircleDiameterMm', eqGeometricBlurCircleDiameterMm);
-UnitTest.validationData('eqGeometricPSFSlice', eqGeometricPSFSlice{1});
+UnitTest.validationData('eqGeometricPSFSlice', eqGeometricPSFSlice);
 
 end
 
