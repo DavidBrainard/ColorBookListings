@@ -27,7 +27,7 @@ function cbUnitTestPreferencesTemplate
             'alternateFullDataDir',  '/Volumes/Users1/Shared/Matlab/Analysis/ColorBookListings/data/full', ...                                  % Alternate FULL data directory location. Specify '' to use the default location, i.e., $validationRootDir/data/full
             'clonedWikiLocation',    '/Users/Shared/GitWebSites/ColorBookListings.wiki', ...                                          % Local path to the directory where the wiki is cloned. Only relevant for publishing tutorials.
             'clonedGhPagesLocation', '/Users/Shared/GitWebSites/ColorBookListings', ...                                               % Local path to the directory where the gh-pages repository is cloned. Only relevant for publishing tutorials.
-            'githubRepoURL',         'https://github.com/DavidBrainard/ColorBookListings', ...                                        % Github URL for the project. This is only used for publishing tutorials.
+            'githubRepoURL',         'https://davidbrainard.github.io/ColorBookListings', ...                                        % Github URL for the project. This is only used for publishing tutorials.
             'generateGroundTruthDataIfNotFound',   true, ...                                                                          % Flag indicating whether to generate ground truth if one is not found
             'listingScript',         'cbValidateListAllValidationDirs' ...                                                            % Routine that lists validation dirs
         );
