@@ -98,22 +98,22 @@ fprintf(<span class="string">'Computing for species %s\n'</span>,species);
 fprintf(<span class="string">'\tMm per degree, linear approximation: %0.2f, assuming nodal point to retina of %0.1f mm\n'</span>,degPerMm,data.eyeLengthMm);
 fprintf(<span class="string">'\tCorresponding degrees per mm: %0.1f\n'</span>,mmPerDeg);
 tolerance = 1e-6;
-<span class="comment">%UnitTest.assertIsZero(abs(degPerMm*mmPerDeg-1),'Linear calculation self-inversion check',tolerance);</span>
+UnitTest.assertIsZero(abs(degPerMm*mmPerDeg-1),<span class="string">'Linear calculation self-inversion check'</span>,tolerance);
 </pre><pre class="codeoutput">Computing for species Human
-	Mm per degree, linear approximation: 1.00, assuming nodal point to retina of 16.1 mm
-	Corresponding degrees per mm: 1.0
+	Mm per degree, linear approximation: 0.28, assuming nodal point to retina of 16.1 mm
+	Corresponding degrees per mm: 3.6
 </pre><h2>Degrees to Mm calculations<a name="7"></a></h2><pre class="codeinput">upperLimitDegrees = 100;
 data.eccDegrees = linspace(0,upperLimitDegrees,100);
 data.eccMm = DegreesToRetinalEccentricityMM(data.eccDegrees,species,<span class="string">'DaceyPeterson'</span>);
 data.eccMmLinear = DegreesToRetinalEccentricityMM(data.eccDegrees,species,<span class="string">'Linear'</span>,data.eyeLengthMm);
 data.eccDegreesCheck =  RetinalEccentricityMMToDegrees(data.eccMm,species,<span class="string">'DaceyPeterson'</span>);
-<span class="comment">%UnitTest.assertIsZero(abs(data.eccDegrees-data.eccDegreesCheck),'Conversion functions self-inversion check',tolerance);</span>
+UnitTest.assertIsZero(abs(data.eccDegrees-data.eccDegreesCheck),<span class="string">'Conversion functions self-inversion check'</span>,tolerance);
 </pre><h2>Mm to degrees calculations<a name="8"></a></h2><pre class="codeinput">upperLimitMm = 20;
 data.eccMm1 = linspace(0,upperLimitMm,100);
 data.eccDegrees1 = RetinalEccentricityMMToDegrees(data.eccMm1,species,<span class="string">'DaceyPeterson'</span>);
 data.eccDegreesLinear1 = RetinalEccentricityMMToDegrees(data.eccMm1,species,<span class="string">'Linear'</span>,data.eyeLengthMm);
 data.eccMmCheck1 = DegreesToRetinalEccentricityMM(data.eccDegrees1,species,<span class="string">'DaceyPeterson'</span>);
-<span class="comment">%UnitTest.assertIsZero(abs(data.eccMm1-data.eccMmCheck1),'Conversion functions self-inversion check',tolerance);</span>
+UnitTest.assertIsZero(abs(data.eccMm1-data.eccMmCheck1),<span class="string">'Conversion functions self-inversion check'</span>,tolerance);
 
 <span class="comment">% This is the tangent calculation, which although it once seemed to me</span>
 <span class="comment">% a better approximation than the pure linear approximation turns out to</span>
@@ -190,22 +190,6 @@ data.eccDegreesTangent1 = RetinalMMToDegrees(data.eccMm1,data.eyeLengthMm,true);
 <span class="keyword">end</span>
 </pre><h2>Save validation data<a name="12"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
 </pre><pre class="codeinput"><span class="keyword">end</span>
-
-<span class="keyword">function</span> a = DegreesToRetinalMM(varargin)
-    a = 1;
-<span class="keyword">end</span>
-
-<span class="keyword">function</span> a = RetinalMMToDegrees(varargin)
-    a = 1;
-<span class="keyword">end</span>
-
-<span class="keyword">function</span> a = DegreesToRetinalEccentricityMM(varargin)
-a = 1;
-<span class="keyword">end</span>
-
-<span class="keyword">function</span> a= RetinalEccentricityMMToDegrees(varargin)
-a = 1;
-<span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 function varargout = cbOpticsImage_Box_AngleToMm(varargin)
@@ -251,7 +235,7 @@ fprintf('Computing for species %s\n',species);
 fprintf('\tMm per degree, linear approximation: %0.2f, assuming nodal point to retina of %0.1f mm\n',degPerMm,data.eyeLengthMm);
 fprintf('\tCorresponding degrees per mm: %0.1f\n',mmPerDeg);
 tolerance = 1e-6;
-%UnitTest.assertIsZero(abs(degPerMm*mmPerDeg-1),'Linear calculation self-inversion check',tolerance);
+UnitTest.assertIsZero(abs(degPerMm*mmPerDeg-1),'Linear calculation self-inversion check',tolerance);
 
 %% Degrees to Mm calculations
 upperLimitDegrees = 100;
@@ -259,7 +243,7 @@ data.eccDegrees = linspace(0,upperLimitDegrees,100);
 data.eccMm = DegreesToRetinalEccentricityMM(data.eccDegrees,species,'DaceyPeterson');
 data.eccMmLinear = DegreesToRetinalEccentricityMM(data.eccDegrees,species,'Linear',data.eyeLengthMm);
 data.eccDegreesCheck =  RetinalEccentricityMMToDegrees(data.eccMm,species,'DaceyPeterson');
-%UnitTest.assertIsZero(abs(data.eccDegrees-data.eccDegreesCheck),'Conversion functions self-inversion check',tolerance);
+UnitTest.assertIsZero(abs(data.eccDegrees-data.eccDegreesCheck),'Conversion functions self-inversion check',tolerance);
 
 %% Mm to degrees calculations
 upperLimitMm = 20;
@@ -267,7 +251,7 @@ data.eccMm1 = linspace(0,upperLimitMm,100);
 data.eccDegrees1 = RetinalEccentricityMMToDegrees(data.eccMm1,species,'DaceyPeterson');
 data.eccDegreesLinear1 = RetinalEccentricityMMToDegrees(data.eccMm1,species,'Linear',data.eyeLengthMm);
 data.eccMmCheck1 = DegreesToRetinalEccentricityMM(data.eccDegrees1,species,'DaceyPeterson');
-%UnitTest.assertIsZero(abs(data.eccMm1-data.eccMmCheck1),'Conversion functions self-inversion check',tolerance);
+UnitTest.assertIsZero(abs(data.eccMm1-data.eccMmCheck1),'Conversion functions self-inversion check',tolerance);
 
 % This is the tangent calculation, which although it once seemed to me
 % a better approximation than the pure linear approximation turns out to
@@ -367,20 +351,7 @@ UnitTest.validationData('validateDataStruct', data);
 
 end
 
-function a = DegreesToRetinalMM(varargin)
-    a = 1;
-end
 
-function a = RetinalMMToDegrees(varargin)
-    a = 1;
-end
 
-function a = DegreesToRetinalEccentricityMM(varargin)
-a = 1;
-end
-
-function a= RetinalEccentricityMMToDegrees(varargin)
-a = 1;
-end
 ##### SOURCE END #####
 --></body></html>
