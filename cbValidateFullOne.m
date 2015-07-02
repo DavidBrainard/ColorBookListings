@@ -1,4 +1,4 @@
-function validateFullOne(varargin)
+function cbValidateFullOne(varargin)
 
 %% Allows this to control figures
 close all;

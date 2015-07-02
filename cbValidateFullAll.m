@@ -1,4 +1,4 @@
-function validateFullAll(varargin)
+function cbValidateFullAll(varargin)
 % Full data check (no figures, no publish) of all validation functions
 %
 %    validateFullAll(param,val, ...)

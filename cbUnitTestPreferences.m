@@ -17,7 +17,7 @@
 %
 % ISETBIO Team, 2015
 
-function cbUnitTestPreferencesTemplate
+function cbUnitTestPreferences
 
     % Specify project-specific preferences
     p = struct(...
