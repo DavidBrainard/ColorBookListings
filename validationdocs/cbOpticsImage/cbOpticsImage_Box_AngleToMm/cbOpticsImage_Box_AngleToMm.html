@@ -80,7 +80,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
 
     varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
-    <span class="comment">% Test</span>
+
 <span class="keyword">end</span>
 </pre><h2>Function implementing the isetbio validation code<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> ValidationFunction(runTimeParams)
 </pre><h2>Hello<a name="4"></a></h2><pre class="codeinput">UnitTest.validationRecord(<span class="string">'SIMPLE_MESSAGE'</span>, sprintf(<span class="string">'%s'</span>,mfilename));
@@ -167,7 +167,7 @@ data.eccDegreesTangent1 = RetinalMMToDegrees(data.eccMm1,data.eyeLengthMm,true);
     legend({<span class="string">'Linear'</span>, <span class="string">'Model Eye Based'</span>},<span class="string">'Location'</span>,<span class="string">'NorthWest'</span>,<span class="string">'FontSize'</span>,figParams.legendFontSize);
     FigureSave([mfilename <span class="string">'_ConvertAngleToMm'</span>],angleToMmFig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Can also make the inverse figure.<a name="11"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_Box_AngleToMm_01.png" alt=""> <h2>Can also make the inverse figure.<a name="11"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
     [mmToAngleFig,figParams] = cbFigInit;
     figParams.xLimLow = 0;
     figParams.xLimHigh = 25;
@@ -189,7 +189,7 @@ data.eccDegreesTangent1 = RetinalMMToDegrees(data.eccMm1,data.eyeLengthMm,true);
     legend({<span class="string">'Linear'</span>, <span class="string">'Model Eye Based'</span>},<span class="string">'Location'</span>,<span class="string">'NorthWest'</span>,<span class="string">'FontSize'</span>,figParams.legendFontSize);
     FigureSave([mfilename <span class="string">'_ConvertMmToAngle'</span>],mmToAngleFig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Save validation data<a name="12"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_Box_AngleToMm_02.png" alt=""> <h2>Save validation data<a name="12"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
@@ -207,7 +207,7 @@ function varargout = cbOpticsImage_Box_AngleToMm(varargin)
 % (c) David Brainard and Andrew Stockman, 2015
 
     varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
-    % Test
+
 end
 
 %% Function implementing the isetbio validation code
