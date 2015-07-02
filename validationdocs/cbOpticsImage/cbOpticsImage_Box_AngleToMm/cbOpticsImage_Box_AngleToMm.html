@@ -157,7 +157,7 @@ data.eccDegreesTangent1 = RetinalMMToDegrees(data.eccMm1,data.eyeLengthMm,true);
     plot(data.eccDegrees,data.eccMmLinear,<span class="string">'b:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
     plot(data.eccDegrees,data.eccMm,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
     <span class="comment">% plot(data.eccDegrees,data.eccMmTangent,'g','LineWidth',figParams.lineWidth);</span>
-    plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    <span class="comment">% plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);</span>
 
     xlabel(<span class="string">'Eccentricity (degrees)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     ylabel(<span class="string">'Eccentricity (mm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
@@ -312,7 +312,7 @@ if (runTimeParams.generatePlots)
     plot(data.eccDegrees,data.eccMmLinear,'b:','LineWidth',figParams.lineWidth);
     plot(data.eccDegrees,data.eccMm,'r','LineWidth',figParams.lineWidth);
     % plot(data.eccDegrees,data.eccMmTangent,'g','LineWidth',figParams.lineWidth);
-    plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);
+    % plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);
     
     xlabel('Eccentricity (degrees)','FontSize',figParams.labelFontSize);
     ylabel('Eccentricity (mm)','FontSize',figParams.labelFontSize);
