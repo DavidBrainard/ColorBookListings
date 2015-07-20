@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>cbOpticsImage_Fig_PinholeOptics</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-02"><meta name="DC.source" content="cbOpticsImage_Fig_PinholeOptics.m"><style type="text/css">
+      --><title>cbOpticsImage_Fig_PinholeOptics</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-20"><meta name="DC.source" content="cbOpticsImage_Fig_PinholeOptics.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -174,20 +174,20 @@ Pupil size 0.20 mm, diffraction equiv blur cicle (80% volume) 0.054 mm, 0.128 de
     diffractionSliceFigParams.xLimLow = 0;
     diffractionSliceFigParams.xLimHigh = 0.4;
     diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    diffractionSliceFigParams.xTickLabels = {};
+    diffractionSliceFigParams.xTickLabels = {<span class="string">'^{ }0_{ }'</span> <span class="string">'^{ }0.1_{ }'</span> <span class="string">'^{ }0.2_{ }'</span> <span class="string">'^{ }0.3_{ }'</span> <span class="string">'^{ }0.4_{ }'</span>};
     diffractionSliceFigParams.yLimLow = 0;
     diffractionSliceFigParams.yLimHigh = 1;
     diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    diffractionSliceFigParams.yTickLabels = {};
+    diffractionSliceFigParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.2 '</span> <span class="string">' 0.4 '</span> <span class="string">' 0.6 '</span> <span class="string">' 0.8 '</span> <span class="string">' 1.0 '</span>};
     plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth);
     plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth);
     plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],<span class="string">'r:'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth-1);
     plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],<span class="string">'b:'</span>,<span class="string">'LineWidth'</span>,diffractionSliceFigParams.lineWidth-1);
     xlabel(<span class="string">'Retinal Radius (mm)'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.labelFontSize);
     ylabel(<span class="string">'Point Spread Function'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.labelFontSize);
-    title(<span class="string">'Pinhole Camera - Diffraction Limited Blur'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.titleFontSize);
+    title({<span class="string">'Pinhole Camera - Diffraction Limited Blur'</span> ; <span class="string">' '</span>},<span class="string">'FontSize'</span>,diffractionSliceFigParams.titleFontSize);
     cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-    legend({sprintf(<span class="string">'Pupil: %0.2f mm'</span>,calcParams.pupilDiametersMm(1)) sprintf(<span class="string">'Pupil: %0.2f mm'</span>,calcParams.pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.legendFontSize);
+    legend({sprintf(<span class="string">'^{ } Pupil: %0.2f mm '</span>,calcParams.pupilDiametersMm(1)) sprintf(<span class="string">'^{ } Pupil: %0.2f mm '</span>,calcParams.pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,diffractionSliceFigParams.legendFontSize);
     FigureSave([mfilename <span class="string">'_BlurDiffractionSlice'</span>],diffractionSliceFig,diffractionSliceFigParams.figType);
 <span class="keyword">end</span>
 </pre><img vspace="5" hspace="5" src="cbOpticsImage_Fig_PinholeOptics_01.png" alt=""> <h2>Compute geometric blur for a pinhole optics.<a name="9"></a></h2><p>This depends on the distance to the object, and in the limit of a infitely distant point source is just the pupil diameter directly.</p><p>We think that the distance dependence is also true of diffraction, in the sense that using the Airy pattern as the PSF results from some approximations that treat the arriving wavefront as planar at the pupil.</p><p>In any case, we'll use a distance that is big with respect to the scale of the model eye.</p><pre class="codeinput"><span class="keyword">for</span> p = 1:length(calcParams.pupilDiametersMm)
@@ -221,20 +221,20 @@ Pupil size 0.20 mm, geometric equiv blur cicle (80% volume) 0.181 mm, 0.432 deg
     geometricSliceFigParams.xLimLow = 0;
     geometricSliceFigParams.xLimHigh = 0.4;
     geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    geometricSliceFigParams.xTickLabels = {};
+    geometricSliceFigParams.xTickLabels = {<span class="string">'^{ }0_{ }'</span> <span class="string">'^{ }0.1_{ }'</span> <span class="string">'^{ }0.2_{ }'</span> <span class="string">'^{ }0.3_{ }'</span> <span class="string">'^{ }0.4_{ }'</span>};
     geometricSliceFigParams.yLimLow = 0;
     geometricSliceFigParams.yLimHigh = 1;
     geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    geometricSliceFigParams.yTickLabels = {};
+    geometricSliceFigParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.2 '</span> <span class="string">' 0.4 '</span> <span class="string">' 0.6 '</span> <span class="string">' 0.8 '</span> <span class="string">' 1.0 '</span>};
     plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,geometricSliceFigParams.lineWidth+1);
     plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,geometricSliceFigParams.lineWidth);
     plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],<span class="string">'r:'</span>,<span class="string">'LineWidth'</span>,geometricSliceFigParams.lineWidth-1);
     plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],<span class="string">'b:'</span>,<span class="string">'LineWidth'</span>,geometricSliceFigParams.lineWidth-1);
     xlabel(<span class="string">'Retinal Radius (mm)'</span>,<span class="string">'FontSize'</span>,geometricSliceFigParams.labelFontSize);
     ylabel(<span class="string">'Point Spread Function'</span>,<span class="string">'FontSize'</span>,geometricSliceFigParams.labelFontSize);
-    title(<span class="string">'Pinhole Camera - Geometric Optics Limited Blur'</span>,<span class="string">'FontSize'</span>,geometricSliceFigParams.titleFontSize);
+    title({<span class="string">'Pinhole Camera - Geometric Optics Limited Blur'</span> ; <span class="string">' '</span>},<span class="string">'FontSize'</span>,geometricSliceFigParams.titleFontSize);
     cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
-    legend({sprintf(<span class="string">'Pupil: %0.2f mm'</span>,calcParams.pupilDiametersMm(1)) sprintf(<span class="string">'Pupil: %0.2f mm'</span>,calcParams.pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,geometricSliceFigParams.legendFontSize);
+    legend({sprintf(<span class="string">'^{ } Pupil: %0.2f mm '</span>,calcParams.pupilDiametersMm(1)) sprintf(<span class="string">'^{ } Pupil: %0.2f mm '</span>,calcParams.pupilDiametersMm(end))},<span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,geometricSliceFigParams.legendFontSize);
     FigureSave([mfilename <span class="string">'_BlurGeometricSlice'</span>],geometricSliceFig,geometricSliceFigParams.figType);
 <span class="keyword">end</span>
 </pre><img vspace="5" hspace="5" src="cbOpticsImage_Fig_PinholeOptics_02.png" alt=""> <h2>Save validation data<a name="11"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'calcParams'</span>, calcParams);
@@ -377,20 +377,20 @@ if (runTimeParams.generatePlots)
     diffractionSliceFigParams.xLimLow = 0;
     diffractionSliceFigParams.xLimHigh = 0.4;
     diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    diffractionSliceFigParams.xTickLabels = {};
+    diffractionSliceFigParams.xTickLabels = {'^{ }0_{ }' '^{ }0.1_{ }' '^{ }0.2_{ }' '^{ }0.3_{ }' '^{ }0.4_{ }'};
     diffractionSliceFigParams.yLimLow = 0;
     diffractionSliceFigParams.yLimHigh = 1;
     diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    diffractionSliceFigParams.yTickLabels = {};
+    diffractionSliceFigParams.yTickLabels = {' 0.0 ' ' 0.2 ' ' 0.4 ' ' 0.6 ' ' 0.8 ' ' 1.0 '};
     plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
     plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
     plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
     plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
     xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
     ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
-    title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
+    title({'Pinhole Camera - Diffraction Limited Blur' ; ' '},'FontSize',diffractionSliceFigParams.titleFontSize);
     cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
+    legend({sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(1)) sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
     FigureSave([mfilename '_BlurDiffractionSlice'],diffractionSliceFig,diffractionSliceFigParams.figType);
 end
 
@@ -442,20 +442,20 @@ if (runTimeParams.generatePlots)
     geometricSliceFigParams.xLimLow = 0;
     geometricSliceFigParams.xLimHigh = 0.4;
     geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    geometricSliceFigParams.xTickLabels = {};
+    geometricSliceFigParams.xTickLabels = {'^{ }0_{ }' '^{ }0.1_{ }' '^{ }0.2_{ }' '^{ }0.3_{ }' '^{ }0.4_{ }'};
     geometricSliceFigParams.yLimLow = 0;
     geometricSliceFigParams.yLimHigh = 1;
     geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    geometricSliceFigParams.yTickLabels = {};
+    geometricSliceFigParams.yTickLabels = {' 0.0 ' ' 0.2 ' ' 0.4 ' ' 0.6 ' ' 0.8 ' ' 1.0 '};
     plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),'r','LineWidth',geometricSliceFigParams.lineWidth+1);
     plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),'b','LineWidth',geometricSliceFigParams.lineWidth);
     plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',geometricSliceFigParams.lineWidth-1);
     plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',geometricSliceFigParams.lineWidth-1);
     xlabel('Retinal Radius (mm)','FontSize',geometricSliceFigParams.labelFontSize);
     ylabel('Point Spread Function','FontSize',geometricSliceFigParams.labelFontSize);
-    title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSliceFigParams.titleFontSize);
+    title({'Pinhole Camera - Geometric Optics Limited Blur' ; ' '},'FontSize',geometricSliceFigParams.titleFontSize);
     cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
-    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
+    legend({sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(1)) sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
     FigureSave([mfilename '_BlurGeometricSlice'],geometricSliceFig,geometricSliceFigParams.figType);
 end
 
