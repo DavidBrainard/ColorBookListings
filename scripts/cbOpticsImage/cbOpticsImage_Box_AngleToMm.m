@@ -7,8 +7,6 @@ function varargout = cbOpticsImage_Box_AngleToMm(varargin)
 %
 % The underlying routines are in the Psychophysics Toolbox.
 %
-% Requires: Psychophysics Toolbox
-%
 % (c) David Brainard and Andrew Stockman, 2015
 
     varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
@@ -108,12 +106,13 @@ if (runTimeParams.generatePlots)
     [angleToMmFig,figParams] = cbFigInit;
     figParams.xLimLow = 0;
     figParams.xLimHigh = 80;
-    figParams.xTicks = [0 10 20 30 40 50 60 70 80];
-    figParams.xTickLabels = {};
+    figParams.xTicks = [0 10 20 30 40 50 60 70 80]; 
+    figParams.xTickLabels = {'^{ }0_{ }' '^{ }10_{ }' '^{ }20_{ }' '^{ }30_{ }' '^{ }40_{ }' '^{ }50_{ }' ...
+        '^{ }60_{ }' '^{ }70_{ }' };
     figParams.yLimLow = 0;
     figParams.yLimHigh = 25;
     figParams.yTicks = [0 5 10 15 20 25];
-    figParams.yTickLabels = {};
+    figParams.yTickLabels = {'  0 ' '  5 ' ' 10 ' ' 15 ' ' 20 ' ' 25 '};
     
     plot(data.eccDegrees,data.eccMmLinear,'b:','LineWidth',figParams.lineWidth);
     plot(data.eccDegrees,data.eccMm,'r','LineWidth',figParams.lineWidth);
@@ -124,7 +123,7 @@ if (runTimeParams.generatePlots)
     ylabel('Eccentricity (mm)','FontSize',figParams.labelFontSize);
     title('Eccentricity Conversion','FontSize',figParams.titleFontSize);
     cbFigAxisSet(angleToMmFig,figParams);
-    legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
+    legend({'^{ } Linear', '^{ } Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
     FigureSave([mfilename '_ConvertAngleToMm'],angleToMmFig,figParams.figType);
 end
 
@@ -134,11 +133,11 @@ if (runTimeParams.generatePlots)
     figParams.xLimLow = 0;
     figParams.xLimHigh = 25;
     figParams.xTicks = [0 5 10 15 20 25];
-    figParams.xTickLabels = {};
+    figParams.xTickLabels = {'^{ }0_{ }' '^{ }5_{ }' '^{ }10_{ }' '^{ }15_{ }' '^{ }20_{ }' '^{ }25_{ }'};
     figParams.yLimLow = 0;
     figParams.yLimHigh = 80;
     figParams.yTicks = [0 10 20 30 40 50 60 70 80];
-    figParams.yTickLabels = {};
+    figParams.yTickLabels = {'  0 ' ' 10 ' ' 20 ' ' 30 ' ' 40 ' ' 50 ' ' 60 ' ' 70 ' ' 80 '};
     
     plot(data.eccMm1,data.eccDegreesLinear1,'b:','LineWidth',figParams.lineWidth);
     plot(data.eccMm1,data.eccDegrees1,'r','LineWidth',figParams.lineWidth);
@@ -148,7 +147,7 @@ if (runTimeParams.generatePlots)
     ylabel('Eccentricity (degrees)','FontSize',figParams.labelFontSize);
     title('Eccentricity Conversion','FontSize',figParams.titleFontSize);
     cbFigAxisSet(mmToAngleFig,figParams);
-    legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
+    legend({'^{ } Linear', '^{ } Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
     FigureSave([mfilename '_ConvertMmToAngle'],mmToAngleFig,figParams.figType);
 end
 

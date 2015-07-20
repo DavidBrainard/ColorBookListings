@@ -131,20 +131,20 @@ if (runTimeParams.generatePlots)
     diffractionSliceFigParams.xLimLow = 0;
     diffractionSliceFigParams.xLimHigh = 0.4;
     diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    diffractionSliceFigParams.xTickLabels = {};
+    diffractionSliceFigParams.xTickLabels = {'^{ }0_{ }' '^{ }0.1_{ }' '^{ }0.2_{ }' '^{ }0.3_{ }' '^{ }0.4_{ }'};
     diffractionSliceFigParams.yLimLow = 0;
     diffractionSliceFigParams.yLimHigh = 1;
     diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    diffractionSliceFigParams.yTickLabels = {};
+    diffractionSliceFigParams.yTickLabels = {' 0.0 ' ' 0.2 ' ' 0.4 ' ' 0.6 ' ' 0.8 ' ' 1.0 '};
     plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
     plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
     plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
     plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
     xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
     ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
-    title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
+    title({'Pinhole Camera - Diffraction Limited Blur' ; ' '},'FontSize',diffractionSliceFigParams.titleFontSize);
     cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
+    legend({sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(1)) sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
     FigureSave([mfilename '_BlurDiffractionSlice'],diffractionSliceFig,diffractionSliceFigParams.figType);
 end
 
@@ -196,20 +196,20 @@ if (runTimeParams.generatePlots)
     geometricSliceFigParams.xLimLow = 0;
     geometricSliceFigParams.xLimHigh = 0.4;
     geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-    geometricSliceFigParams.xTickLabels = {};
+    geometricSliceFigParams.xTickLabels = {'^{ }0_{ }' '^{ }0.1_{ }' '^{ }0.2_{ }' '^{ }0.3_{ }' '^{ }0.4_{ }'};
     geometricSliceFigParams.yLimLow = 0;
     geometricSliceFigParams.yLimHigh = 1;
     geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-    geometricSliceFigParams.yTickLabels = {};
+    geometricSliceFigParams.yTickLabels = {' 0.0 ' ' 0.2 ' ' 0.4 ' ' 0.6 ' ' 0.8 ' ' 1.0 '};
     plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),'r','LineWidth',geometricSliceFigParams.lineWidth+1);
     plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),'b','LineWidth',geometricSliceFigParams.lineWidth);
     plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',geometricSliceFigParams.lineWidth-1);
     plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',geometricSliceFigParams.lineWidth-1);
     xlabel('Retinal Radius (mm)','FontSize',geometricSliceFigParams.labelFontSize);
     ylabel('Point Spread Function','FontSize',geometricSliceFigParams.labelFontSize);
-    title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSliceFigParams.titleFontSize);
+    title({'Pinhole Camera - Geometric Optics Limited Blur' ; ' '},'FontSize',geometricSliceFigParams.titleFontSize);
     cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
-    legend({sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
+    legend({sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(1)) sprintf('^{ } Pupil: %0.2f mm ',calcParams.pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
     FigureSave([mfilename '_BlurGeometricSlice'],geometricSliceFig,geometricSliceFigParams.figType);
 end
 
