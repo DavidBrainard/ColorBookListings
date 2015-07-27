@@ -1,4 +1,4 @@
-function varargout = cbOpticsImage_Box_AngleToMm(varargin)
+function varargout = cbOpticsImage_AngleToMm(varargin)
 %
 % Illustrates calculations converting degrees of visual angle to mm.
 %

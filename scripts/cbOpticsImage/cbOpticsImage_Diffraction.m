@@ -1,4 +1,4 @@
-function varargout = cbOpticsImage_Box_Diffraction(varargin)
+function varargout = cbOpticsImage_Diffraction(varargin)
 %
 % Compute and show slices through the diffraction Airy disk.
 %

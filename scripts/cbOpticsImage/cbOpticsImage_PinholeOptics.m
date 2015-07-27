@@ -1,4 +1,4 @@
-function varargout = cbOpticsImage_Fig_PinholeOptics(varargin)
+function varargout = cbOpticsImage_PinholeOptics(varargin)
 %
 % Explore geometric and diffraction optical blur for a pinhole eye.
 %
@@ -22,12 +22,12 @@ function varargout = cbOpticsImage_Fig_PinholeOptics(varargin)
 %
 % Possible extensions for the interested reader:
 % - Examine how the relation between the two types of blur depends on what
-% PSF volume is chosen to compute the equivalent blur circle.
+%   PSF volume is chosen to compute the equivalent blur circle.
 % - Compare the blur circles here computed with the size of the real human
-% PSF.
+%   PSF.
 % - Examine how the blur due to diffraction depends on wavelength.
 % - Examine how the geometric blur varies with distance to the object.
-% This begins to get at the concept of depth of field.
+%   This begins to get at the concept of depth of field.
 %
 % (c) David Brainard and Andrew Stockman, 2014
 

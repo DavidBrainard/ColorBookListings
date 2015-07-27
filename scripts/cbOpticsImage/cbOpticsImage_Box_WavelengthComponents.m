@@ -1,4 +1,4 @@
-function varargout = cbOpticsImage_Box_WavelengthComponents(varargin)
+function varargout = cbOpticsImage_WavelengthComponents(varargin)
 %
 % Show an illustrative spectrum and decompose it.
 %
