@@ -1,0 +1,298 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>cbOpticsImage_WavelengthComponents</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-27"><meta name="DC.source" content="cbOpticsImage_WavelengthComponents.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Function implementing the isetbio validation code</a></li><li><a href="#4">Hello</a></li><li><a href="#5">Load in a spectrum</a></li><li><a href="#6">Generate a set of narrowband lights with specified FWHM and a Gaussian shape.</a></li><li><a href="#7">Analyze the broadband spectrum as a weighted sum of the narrowband basis spectra</a></li><li><a href="#8">Make a figure of the spectrum and its fit for the box</a></li><li><a href="#9">Figure of the scaled narrowband lights</a></li><li><a href="#10">Save validation data</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = cbOpticsImage_WavelengthComponents(varargin)
+<span class="comment">%</span>
+<span class="comment">% Show an illustrative spectrum and decompose it.</span>
+<span class="comment">%</span>
+<span class="comment">% This illustrates how we can analyze and synthesize lights as superpositions of</span>
+<span class="comment">% other lights.</span>
+<span class="comment">%</span>
+<span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
+
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+<span class="keyword">end</span>
+</pre><h2>Function implementing the isetbio validation code<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> ValidationFunction(runTimeParams)
+</pre><h2>Hello<a name="4"></a></h2><pre class="codeinput">UnitTest.validationRecord(<span class="string">'SIMPLE_MESSAGE'</span>, sprintf(<span class="string">'%s'</span>,mfilename));
+outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
+<span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
+    mkdir(outputDir);
+<span class="keyword">end</span>
+</pre><h2>Load in a spectrum<a name="5"></a></h2><p>This is sunlight measured off a white paper in DHB's office. Input units are radiance, Watts/[m2-sr-wlband].  Wavelength sampling follows PTB conventions and is given in the vector S, which has [start delta nsamples] in nm.</p><p>After loading, convert units to power per nm, by converting to 1 nm spaceing.</p><pre class="codeinput">S = [380 1 401];
+load <span class="string">spd_phillybright</span>
+data.theSpdRadiance = SplineSpd(S_phillybright,spd_phillybright,S);
+data.theWls = SToWls(S);
+
+<span class="comment">% Convert radiance to the incident irradiance, assuming that the white</span>
+<span class="comment">% paper was a perfectly reflecting diffuser.  (Not exactly correct, but</span>
+<span class="comment">% close enough for illustrative purposes.)</span>
+<span class="comment">%</span>
+<span class="comment">% The radiance gives the amount of light coming out through a sr per m2 of</span>
+<span class="comment">% the paper.  For a perfect diffuser, this value is the same in all</span>
+<span class="comment">% directions, and the total light coming out per m2 is the same as the light arriving</span>
+<span class="comment">% per m2. A sphere has 4*pi steradians, but all the light is coming out over a hemisphere.</span>
+<span class="comment">% So the irradiance is 2*pi times the radiance for this special case.</span>
+data.theSpdIrradiance = 2*pi*data.theSpdRadiance;
+</pre><h2>Generate a set of narrowband lights with specified FWHM and a Gaussian shape.<a name="6"></a></h2><p>There is nothing magic about the Gaussian, but it is a convenient approximation to the kinds of narrowband lights one can get with filters.</p><p>You can explore the effect of varying the FWHM of the narrowband components and the number of components used in the analysis/synthesis by changing these parameters below.</p><pre class="codeinput">data.FWHM = 10;
+data.nNarrowband = 50;
+data.centerWls = linspace(data.theWls(1),data.theWls(end),data.nNarrowband);
+data.gaussSd = FWHMToStd(10);
+data.B = MakeGaussBasis(data.theWls,data.centerWls,data.gaussSd^2);
+</pre><h2>Analyze the broadband spectrum as a weighted sum of the narrowband basis spectra<a name="7"></a></h2><p>and then syntehsize it.</p><pre class="codeinput">data.weights = data.B\data.theSpdIrradiance;
+data.theSpdSynthesized = data.B*data.weights;
+
+<span class="comment">% Also construct the scaled basis spectra for plotting.  These add without</span>
+<span class="comment">% additional weights to</span>
+data.scaledB = data.B*diag(data.weights);
+checkSpd = sum(data.scaledB,2);
+UnitTest.assertIsZero(checkSpd-data.theSpdSynthesized,<span class="string">'Compare of two ways of synthesizing'</span>,0);
+</pre><h2>Make a figure of the spectrum and its fit for the box<a name="8"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+    [spectralFig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 800;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
+    figParams.xTickLabels = {<span class="string">'^{ }350_{ }'</span> <span class="string">'^{ }400_{ }'</span> <span class="string">'^{ }450_{ }'</span> <span class="string">'^{ }500_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }550_{ }'</span> <span class="string">'^{ }600_{ }'</span> <span class="string">'^{ }650_{ }'</span> <span class="string">'^{ }700_{ }'</span> <span class="string">'^{ }750_{ }'</span> <span class="string">'^{ }800_{ }'</span>};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span> <span class="string">' 1.5 '</span>};
+
+    plot(data.theWls,data.theSpdIrradiance,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.theWls,data.theSpdSynthesized,<span class="string">'k--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+
+    xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'Irradiance (Watts/[m2-nm])'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    cbFigAxisSet(spectralFig,figParams);
+    [~,legendChildObjs] = legend({[<span class="string">'^{ }'</span> figParams.legendExtraSpaceStr <span class="string">'  Spectrum  '</span>],[ <span class="string">'^{ }'</span> figParams.legendExtraSpaceStr <span class="string">'  Synthesized Spectrum'</span>]}, <span class="keyword">...</span>
+        <span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,figParams.legendFontSize);
+    lineObjs = findobj(legendChildObjs, <span class="string">'Type'</span>, <span class="string">'line'</span>);
+    xCoords = get(lineObjs, <span class="string">'XData'</span>) ;
+    <span class="keyword">for</span> lineIdx = 1:length(xCoords)
+        <span class="keyword">if</span> (length(xCoords{lineIdx}) ~= 2), <span class="keyword">continue</span>; <span class="keyword">end</span>
+        set(lineObjs(lineIdx), <span class="string">'XData'</span>, xCoords{lineIdx} + [0 figParams.legendLineTweak])
+    <span class="keyword">end</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_Spectrum'</span>]),spectralFig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_WavelengthComponents_01.png" alt=""> <h2>Figure of the scaled narrowband lights<a name="9"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+    [narrowbandFig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 800;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
+    figParams.xTickLabels = {<span class="string">'^{ }350_{ }'</span> <span class="string">'^{ }400_{ }'</span> <span class="string">'^{ }450_{ }'</span> <span class="string">'^{ }500_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }550_{ }'</span> <span class="string">'^{ }600_{ }'</span> <span class="string">'^{ }650_{ }'</span> <span class="string">'^{ }700_{ }'</span> <span class="string">'^{ }750_{ }'</span> <span class="string">'^{ }800_{ }'</span>};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span> <span class="string">' 1.5 '</span>};
+
+    plot(data.theWls,data.scaledB,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+
+    xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'Irradiance (Watts/[m2-nm])'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    cbFigAxisSet(spectralFig,figParams);
+    <span class="comment">%legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_NarrowbandSpectra'</span>]),spectralFig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_WavelengthComponents_02.png" alt=""> <img vspace="5" hspace="5" src="cbOpticsImage_WavelengthComponents_03.png" alt=""> <h2>Save validation data<a name="10"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function varargout = cbOpticsImage_WavelengthComponents(varargin)
+%
+% Show an illustrative spectrum and decompose it.
+%
+% This illustrates how we can analyze and synthesize lights as superpositions of
+% other lights.
+%
+% (c) David Brainard and Andrew Stockman, 2015
+
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+%% Function implementing the isetbio validation code
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+
+%% Load in a spectrum
+%
+% This is sunlight measured off a white paper in DHB's office.
+% Input units are radiance, Watts/[m2-sr-wlband].  Wavelength
+% sampling follows PTB conventions and is given in the vector S,
+% which has [start delta nsamples] in nm.
+%
+% After loading, convert units to power per nm, by converting to
+% 1 nm spaceing.
+S = [380 1 401];
+load spd_phillybright
+data.theSpdRadiance = SplineSpd(S_phillybright,spd_phillybright,S);
+data.theWls = SToWls(S);
+
+% Convert radiance to the incident irradiance, assuming that the white
+% paper was a perfectly reflecting diffuser.  (Not exactly correct, but
+% close enough for illustrative purposes.)
+%
+% The radiance gives the amount of light coming out through a sr per m2 of
+% the paper.  For a perfect diffuser, this value is the same in all
+% directions, and the total light coming out per m2 is the same as the light arriving
+% per m2. A sphere has 4*pi steradians, but all the light is coming out over a hemisphere.  
+% So the irradiance is 2*pi times the radiance for this special case.
+data.theSpdIrradiance = 2*pi*data.theSpdRadiance;
+
+%% Generate a set of narrowband lights with specified FWHM and a Gaussian shape.
+%
+% There is nothing magic about the Gaussian, but it is a convenient
+% approximation to the kinds of narrowband lights one can get with filters.
+%
+% You can explore the effect of varying the FWHM of the narrowband
+% components and the number of components used in the analysis/synthesis by
+% changing these parameters below.
+data.FWHM = 10;
+data.nNarrowband = 50;
+data.centerWls = linspace(data.theWls(1),data.theWls(end),data.nNarrowband);
+data.gaussSd = FWHMToStd(10);
+data.B = MakeGaussBasis(data.theWls,data.centerWls,data.gaussSd^2);
+
+%% Analyze the broadband spectrum as a weighted sum of the narrowband basis spectra
+% and then syntehsize it.
+data.weights = data.B\data.theSpdIrradiance;
+data.theSpdSynthesized = data.B*data.weights;
+
+% Also construct the scaled basis spectra for plotting.  These add without
+% additional weights to 
+data.scaledB = data.B*diag(data.weights);
+checkSpd = sum(data.scaledB,2);
+UnitTest.assertIsZero(checkSpd-data.theSpdSynthesized,'Compare of two ways of synthesizing',0);
+
+%% Make a figure of the spectrum and its fit for the box
+if (runTimeParams.generatePlots)
+    [spectralFig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 800;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
+    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
+    
+    plot(data.theWls,data.theSpdIrradiance,'r','LineWidth',figParams.lineWidth);
+    plot(data.theWls,data.theSpdSynthesized,'kREPLACE_WITH_DASH_DASH','LineWidth',figParams.lineWidth-1);
+    
+    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
+    ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
+    cbFigAxisSet(spectralFig,figParams);
+    [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Spectrum  '],[ '^{ }' figParams.legendExtraSpaceStr '  Synthesized Spectrum']}, ...
+        'Location','NorthEast','FontSize',figParams.legendFontSize);
+    lineObjs = findobj(legendChildObjs, 'Type', 'line');
+    xCoords = get(lineObjs, 'XData') ;
+    for lineIdx = 1:length(xCoords)
+        if (length(xCoords{lineIdx}) ~= 2), continue; end
+        set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+    end
+    FigureSave(fullfile(outputDir,[mfilename '_Spectrum']),spectralFig,figParams.figType);
+end
+
+%% Figure of the scaled narrowband lights
+if (runTimeParams.generatePlots)
+    [narrowbandFig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 800;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
+    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
+    
+    plot(data.theWls,data.scaledB,'LineWidth',figParams.lineWidth);
+    
+    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
+    ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
+    cbFigAxisSet(spectralFig,figParams);
+    %legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
+    FigureSave(fullfile(outputDir,[mfilename '_NarrowbandSpectra']),spectralFig,figParams.figType);
+end
+
+%% Save validation data
+UnitTest.validationData('validateDataStruct', data);
+
+end
+
+
+
+##### SOURCE END #####
+--></body></html>
