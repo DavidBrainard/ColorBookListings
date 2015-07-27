@@ -17,6 +17,10 @@ function ValidationFunction(runTimeParams)
 
 %% Hello
 UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
 
 %% Set parameters
 %
@@ -114,17 +118,28 @@ if (runTimeParams.generatePlots)
     figParams.yTicks = [0 5 10 15 20 25];
     figParams.yTickLabels = {'  0 ' '  5 ' ' 10 ' ' 15 ' ' 20 ' ' 25 '};
     
-    plot(data.eccDegrees,data.eccMmLinear,'b:','LineWidth',figParams.lineWidth);
+    plot(data.eccDegrees,data.eccMmLinear,'b--','LineWidth',figParams.lineWidth);
     plot(data.eccDegrees,data.eccMm,'r','LineWidth',figParams.lineWidth);
     % plot(data.eccDegrees,data.eccMmTangent,'g','LineWidth',figParams.lineWidth);
-    % plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k:','LineWidth',figParams.lineWidth-1);
+    % plot(drasdoFowlerData(:,1),drasdoFowlerData(:,2),'k--','LineWidth',figParams.lineWidth-1);
     
     xlabel('Eccentricity (degrees)','FontSize',figParams.labelFontSize);
     ylabel('Eccentricity (mm)','FontSize',figParams.labelFontSize);
     title('Eccentricity Conversion','FontSize',figParams.titleFontSize);
     cbFigAxisSet(angleToMmFig,figParams);
-    legend({'^{ } Linear', '^{ } Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
-    FigureSave([mfilename '_ConvertAngleToMm'],angleToMmFig,figParams.figType);
+    
+    % Legend, with tweak to make lines long enough so that dash shows.
+    % Note the extra spaces that preface the actual legend text. Ugh.
+    [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...
+        'Location','NorthWest','FontSize',figParams.legendFontSize);
+    lineObjs = findobj(legendChildObjs, 'Type', 'line');
+    xCoords = get(lineObjs, 'XData') ;
+    for lineIdx = 1:length(xCoords)
+        if (length(xCoords{lineIdx}) ~= 2), continue; end
+        set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+    end
+    
+    FigureSave(fullfile(outputDir,[mfilename '_ConvertAngleToMm']),angleToMmFig,figParams.figType);
 end
 
 %% Can also make the inverse figure.
@@ -139,7 +154,7 @@ if (runTimeParams.generatePlots)
     figParams.yTicks = [0 10 20 30 40 50 60 70 80];
     figParams.yTickLabels = {'  0 ' ' 10 ' ' 20 ' ' 30 ' ' 40 ' ' 50 ' ' 60 ' ' 70 ' ' 80 '};
     
-    plot(data.eccMm1,data.eccDegreesLinear1,'b:','LineWidth',figParams.lineWidth);
+    plot(data.eccMm1,data.eccDegreesLinear1,'b--','LineWidth',figParams.lineWidth);
     plot(data.eccMm1,data.eccDegrees1,'r','LineWidth',figParams.lineWidth);
     % plot(data.eccMm1,data.eccDegreesTangent1,'g','LineWidth',figParams.lineWidth);
     
@@ -147,8 +162,19 @@ if (runTimeParams.generatePlots)
     ylabel('Eccentricity (degrees)','FontSize',figParams.labelFontSize);
     title('Eccentricity Conversion','FontSize',figParams.titleFontSize);
     cbFigAxisSet(mmToAngleFig,figParams);
-    legend({'^{ } Linear', '^{ } Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
-    FigureSave([mfilename '_ConvertMmToAngle'],mmToAngleFig,figParams.figType);
+    
+    % Legend, with tweak to make lines long enough so that dash shows.
+    % Note the extra spaces that preface the actual legend text. Ugh.
+    [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear  '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based  ']},...
+        'Location','NorthWest','FontSize',figParams.legendFontSize);
+    lineObjs = findobj(legendChildObjs, 'Type', 'line');
+    xCoords = get(lineObjs, 'XData') ;
+    for lineIdx = 1:length(xCoords)
+        if (length(xCoords{lineIdx}) ~= 2), continue; end
+        set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+    end
+    
+    FigureSave(fullfile(outputDir,[mfilename '_ConvertMmToAngle']),mmToAngleFig,figParams.figType);
 end
 
 %% Save validation data

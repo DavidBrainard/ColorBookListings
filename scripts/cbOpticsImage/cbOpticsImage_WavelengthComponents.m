@@ -15,6 +15,10 @@ function ValidationFunction(runTimeParams)
 
 %% Hello
 UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
 
 %% Load in a spectrum
 %
@@ -23,11 +27,12 @@ UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 % sampling follows PTB conventions and is given in the vector S,
 % which has [start delta nsamples] in nm.
 %
-% After loading, convert units to power per nm, by dividing by the
-% size of the wavelength sample bands.
+% After loading, convert units to power per nm, by converting to
+% 1 nm spaceing.
+S = [380 1 401];
 load spd_phillybright
-data.theSpdRadiance = spd_phillybright/S_phillybright(3);
-data.theWls = SToWls(S_phillybright);
+data.theSpdRadiance = SplineSpd(S_phillybright,spd_phillybright,S);
+data.theWls = SToWls(S);
 
 % Convert radiance to the incident irradiance, assuming that the white
 % paper was a perfectly reflecting diffuser.  (Not exactly correct, but
@@ -74,18 +79,25 @@ if (runTimeParams.generatePlots)
     figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
         '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
     figParams.yLimLow = 0;
-    figParams.yLimHigh = 0.050;
-    figParams.yTicks = [0 0.025 0.050];
-    figParams.yTickLabels = {' 0.000 ' ' 0.025 ' ' 0.050 '};
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
     
     plot(data.theWls,data.theSpdIrradiance,'r','LineWidth',figParams.lineWidth);
-    plot(data.theWls,data.theSpdSynthesized,'k:','LineWidth',figParams.lineWidth-1);
+    plot(data.theWls,data.theSpdSynthesized,'k--','LineWidth',figParams.lineWidth-1);
     
     xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
     ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
     cbFigAxisSet(spectralFig,figParams);
-    legend({'^{ } Spectrum', '^{ } Synthesized Specrum'},'Location','NorthEast','FontSize',figParams.legendFontSize);
-    FigureSave([mfilename '_Spectrum'],spectralFig,figParams.figType);
+    [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Spectrum  '],[ '^{ }' figParams.legendExtraSpaceStr '  Synthesized Spectrum']}, ...
+        'Location','NorthEast','FontSize',figParams.legendFontSize);
+    lineObjs = findobj(legendChildObjs, 'Type', 'line');
+    xCoords = get(lineObjs, 'XData') ;
+    for lineIdx = 1:length(xCoords)
+        if (length(xCoords{lineIdx}) ~= 2), continue; end
+        set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+    end
+    FigureSave(fullfile(outputDir,[mfilename '_Spectrum']),spectralFig,figParams.figType);
 end
 
 %% Figure of the scaled narrowband lights
@@ -97,9 +109,9 @@ if (runTimeParams.generatePlots)
     figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
         '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
     figParams.yLimLow = 0;
-    figParams.yLimHigh = 0.050;
-    figParams.yTicks = [0 0.025 0.050];
-    figParams.yTickLabels = {' 0.000 ' ' 0.025 ' ' 0.050 '};
+    figParams.yLimHigh = 1.5;
+    figParams.yTicks = [0 0.5 1 1.5];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
     
     plot(data.theWls,data.scaledB,'LineWidth',figParams.lineWidth);
     
@@ -107,7 +119,7 @@ if (runTimeParams.generatePlots)
     ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
     cbFigAxisSet(spectralFig,figParams);
     %legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
-    FigureSave([mfilename '_NarrowbandSpectra'],spectralFig,figParams.figType);
+    FigureSave(fullfile(outputDir,[mfilename '_NarrowbandSpectra']),spectralFig,figParams.figType);
 end
 
 %% Save validation data
