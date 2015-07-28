@@ -84,7 +84,7 @@ if (runTimeParams.generatePlots)
     figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
     
     plot(data.theWls,data.theSpdIrradiance,'r','LineWidth',figParams.lineWidth);
-    plot(data.theWls,data.theSpdSynthesized,'k--','LineWidth',figParams.lineWidth-1);
+    plot(data.theWls,data.theSpdSynthesized,'k:','LineWidth',figParams.lineWidth-1);
     
     xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
     ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
