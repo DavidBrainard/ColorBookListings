@@ -47,8 +47,10 @@ fprintf('Scene illumination luminance taken as %0.0f cd/m2\n',sceneIlluminantXYZ
 % We do this to get retinal irradiance, and for the first part of this
 % script we only want photon noise so we skip the blurring.
 theData.oi = oiCreate('human');
-optics = opticsSet(optics,'off axis method','skip');
-optics = opticsSet(optics,'otf method','skip otf');
+theData.optics = oiGet(theData.oi,'optics');
+theData.optics = opticsSet(theData.optics,'off axis method','skip');
+theData.optics = opticsSet(theData.optics,'otf method','skip otf');
+theData.oi = oiSet(theData.oi,'optics',theData.optics);
 theData.oi = oiCompute(theData.oi,theData.scene);
 theData.oiRGBImage = oiGet(theData.oi,'rgb image');
 vcAddAndSelectObject(theData.oi); oiWindow;
@@ -61,7 +63,7 @@ oiPixelArea_M2 = oiPixelSize_M(1)*oiPixelSize_M(2);
 oiIrradiance_PhotonsPerSecPixel = oiIrradiance_PhotonsPerSecM2*oiPixelArea_M2;
 
 %% Pick an integration time to get photons
-theData.integrationTime_Sec = 0.1;
+theData.integrationTime_Sec = 1;
 oiEnergy_PhotonsPerPixel = oiIrradiance_PhotonsPerSecPixel*theData.integrationTime_Sec;
 
 %% Get one wavelength plane
@@ -96,9 +98,23 @@ for ii = 1:length(theIrradianceScaleFactors)
     title(sprintf('Poisson photon noise for irradiance factor %g',theIrradianceScaleFactors(ii)));
     
     % Check.  Isetbio can give us a photon noised image, so when the scale
-    % factor is unity we generate that too and have a look
-    % I AM WORKING HERE.
-    % if (theIrradianceScaleF
+    % factor is unity we generate that too and have a look.  I am not sure
+    % how useful this will be, because it only makes sense for a 1 second
+    % integration time and a 1 m2 pixel.
+    if (theIrradianceScaleFactors(ii) == 1 & theData.integrationTime_Sec == 1)
+        % Let oiGet do its thing
+        noisyPhotonsISETBIO = oiGet(theData.oi,'photons noise');
+        noisyPhotonsISETBIO = double(noisyPhotonsISETBIO(:,:,wlIndex));
+        
+        % Scale
+        meanPhotonsISETBIO = oiIrradiance_PhotonsPerSecM2(:,:,wlIndex);
+        scaledNoisyPhotonsISETBIO = meanScalar*noisyPhotonsISETBIO/mean(meanPhotonsISETBIO(:));
+        
+        % Make a figure
+        figure; clf;
+        imshow(scaledNoisyPhotonsISETBIO.^displayGamma);
+        title('ISETBIO noisy photons return');
+    end
 end
 
 
@@ -108,7 +124,7 @@ if (runTimeParams.generatePlots)
 end
 
 %% Save validation data
-UnitTest.validationData('theData', data);
+UnitTest.validationData('theData', theData);
 
 end
 
