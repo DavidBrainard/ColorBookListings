@@ -232,13 +232,14 @@ try
         % Save the PDF
         FigureSave(fullfile(outputDir,[mfilename '_NoiseImageFigure']),noiseFigure,'png');
     end
-
-    %% Can also make the inverse figure.
-    if (runTimeParams.generatePlots)
-        
-    end
     
     %% Save validation data
+    %
+    % Strip out some of the really big stuff.
+    theData = rmfield(theData,'scene');
+    theData = rmfield(theData,'oi');
+    theData.partialIrradiance = theData.oiIrradiance_PhotonsPerSecM2Nm(1:10,100:110,8);
+    theData = rmfield(theData,'oiIrradiance_PhotonsPerSecM2Nm');
     UnitTest.validationData('theData', theData);
     
     
