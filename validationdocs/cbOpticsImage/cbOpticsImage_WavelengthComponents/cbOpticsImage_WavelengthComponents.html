@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>cbOpticsImage_WavelengthComponents</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-27"><meta name="DC.source" content="cbOpticsImage_WavelengthComponents.m"><style type="text/css">
+      --><title>cbOpticsImage_WavelengthComponents</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-29"><meta name="DC.source" content="cbOpticsImage_WavelengthComponents.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -124,7 +124,7 @@ UnitTest.assertIsZero(checkSpd-data.theSpdSynthesized,<span class="string">'Comp
     figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span> <span class="string">' 1.5 '</span>};
 
     plot(data.theWls,data.theSpdIrradiance,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
-    plot(data.theWls,data.theSpdSynthesized,<span class="string">'k--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    plot(data.theWls,data.theSpdSynthesized,<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
 
     xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     ylabel(<span class="string">'Irradiance (Watts/[m2-nm])'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
@@ -249,7 +249,7 @@ if (runTimeParams.generatePlots)
     figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
     
     plot(data.theWls,data.theSpdIrradiance,'r','LineWidth',figParams.lineWidth);
-    plot(data.theWls,data.theSpdSynthesized,'kREPLACE_WITH_DASH_DASH','LineWidth',figParams.lineWidth-1);
+    plot(data.theWls,data.theSpdSynthesized,'k:','LineWidth',figParams.lineWidth-1);
     
     xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
     ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
