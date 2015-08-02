@@ -21,11 +21,15 @@ end
 %% Set parameters
 
 %% Get and plot Stiles-Burch 10-degree color matching functions
+%
+% Also spline down to 10 nm sampling for plotting purposes.
 load T_stiles10;
 wls = SToWls(S_stiles10);
 data.wls = wls;
 data.S_stiles10 = S_stiles10;
 data.T_stiles10 = T_stiles10;
+S_10nm = [390 10 37];
+data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
 clear S_stiles10 T_stiles10
 if (runTimeParams.generatePlots)
     [stilesBurch10Fig,figParams] = cbFigInit;
@@ -55,6 +59,8 @@ end
 %% Load Stockman-Sharpe 10-degree cone fundamentals
 load T_cones_ss10
 data.T_cones10 = SplineCmf(S_cones_ss10,T_cones_ss10,wls);
+
+% Fit with linear transform of cmf's, just to show that it works.
 data.M_CmfToCones = ((data.T_stiles10')\(data.T_cones10'))';
 data.T_cones10_fit = data.M_CmfToCones*data.T_stiles10;
 if (runTimeParams.generatePlots)
@@ -86,38 +92,80 @@ if (runTimeParams.generatePlots)
     FigureSave(fullfile(outputDir,[mfilename '_StockmanSharpe10']),stockmanSharpe10Fig,figParams.figType);
 end
 
+%% Find hte stimuli that isolate each of the cones.
+%
+% Get the isolating directions
+data.MConesToCmf = inv(data.M_CmfToCones);
+data.coneIsolatingCmfDirs = data.MConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+
+%% Get the CMF spectrum locus normalized to simplex
+for i = 1:size(data.T_stiles10,2);
+    data.T_stiles10_simplex(:,i) = data.T_stiles10(:,i)/sum(data.T_stiles10(:,i));
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+end
+
 %% Make a 3D plot of the spectrum locus
-S_10nm = [390 10 37];
-data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
 if (runTimeParams.generatePlots)
     [stilesBurch10SpectrumLocusFig,figParams] = cbFigInit;
-    figParams.xLimLow = -1;
+    figParams.xLimLow = -3;
     figParams.xLimHigh = 4;
-    figParams.xTicks = [-1 0 1 2 3 4];
-    figParams.xTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
+    figParams.xTicks = [-3 -2 -1 0 1 2 3 4];
+    figParams.xTickLabels = {'-3.0 ' '-2.0 ' '-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
     figParams.yLimLow = -0.5;
-    figParams.yLimHigh = 1.5;
-    figParams.yTicks = [-0.5 0 0.5 1.0 1.5 ];
-    figParams.yTickLabels = {'-0.5 ' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
+    figParams.yLimHigh = 3.0;
+    figParams.yTicks = [-0.5 0 0.5 1.0 1.5 2.0 2.5 3.0];
+    figParams.yTickLabels = {'-0.5 ' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' '2.0 ' ' 2.5 ' ' 3.0 '};
     figParams.zLimLow = -0.5;
-    figParams.zLimHigh = 1.5;
-    figParams.zTicks = [-0.5 0 0.5 1.0 1.5 ];
-    figParams.zTickLabels = {'-0.5' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
+    figParams.zLimHigh = 2.0;
+    figParams.zTicks = [-0.5 0 0.5 1.0 1.5 2.0 ];
+    figParams.zTickLabels = {'-0.5' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' ' 2.0 '};
     
+    % Plot the spectrum locus
     plot3(data.T_stiles10(1,:)',data.T_stiles10(2,:)',data.T_stiles10(3,:)', ...
         'k','LineWidth',figParams.lineWidth);
     plot3(data.T_stiles10_10nm(1,:)',data.T_stiles10_10nm(2,:)',data.T_stiles10_10nm(3,:)', ...
-        'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-10);
+        'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-14);
     
-    xlabel('r','FontSize',figParams.labelFontSize);
-    ylabel('g','FontSize',figParams.labelFontSize);
-    zlabel('b','FontSize',figParams.labelFontSize);
+    % Plot it on the simplex plane
+    plot3(data.T_stiles10_simplex(1,:)',data.T_stiles10_simplex(2,:)',data.T_stiles10_simplex(3,:)', ...
+        'y','LineWidth',figParams.lineWidth);
+    plot3(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)',data.T_stiles10_10nm_simplex(3,:)', ...
+        'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
+    
+    % Plot the cone isolating directions
+    plot3([-data.coneIsolatingCmfDirs(1,1) data.coneIsolatingCmfDirs(1,1)], ...
+        [-data.coneIsolatingCmfDirs(2,1) data.coneIsolatingCmfDirs(2,1)], ...
+        [-data.coneIsolatingCmfDirs(3,1) data.coneIsolatingCmfDirs(3,1)], ...
+        'r','LineWidth',figParams.lineWidth);
+    plot3([-data.coneIsolatingCmfDirs(1,2) data.coneIsolatingCmfDirs(1,2)], ...
+        [-data.coneIsolatingCmfDirs(2,2) data.coneIsolatingCmfDirs(2,2)], ...
+        [-data.coneIsolatingCmfDirs(3,2) data.coneIsolatingCmfDirs(3,2)], ...
+        'g','LineWidth',figParams.lineWidth);
+    plot3([-data.coneIsolatingCmfDirs(1,3) data.coneIsolatingCmfDirs(1,3)], ...
+        [-data.coneIsolatingCmfDirs(2,3) data.coneIsolatingCmfDirs(2,3)], ...
+        [-data.coneIsolatingCmfDirs(3,3) data.coneIsolatingCmfDirs(3,3)], ...
+        'b','LineWidth',figParams.lineWidth);
+    
+    % Fill in simplex triangle
+    fill3([-1 -3.5 2]',[4 0.5 -0.5]',[-2 4 -0.5],[0.5 0.5 0.5],'EdgeColor','None','FaceAlpha',0.75);
+    %fill3([-1 1.5 0.5]',[0 0.5 0.5]',[-0.5 2 -0.5],[0.5 0.5 0.5],'EdgeColor','None','FaceAlpha',0.75);
+    
+    % This latex magic puts a bar over the labels, which we want here.  But
+    % it also changes their font.  Not sure how to get the font to stay put
+    % while still putting an overbar over the symbols.
+    xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
     title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
     zlim([figParams.zLimLow figParams.zLimHigh]);
     set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabels',figParams.zTickLabels);
-    az = 55; el = 26; view(az,el);
+    set(gca,'ZTickLabel',figParams.zTickLabels);
+    set(gca,'XDir','Reverse');
+    set(gca,'YDir','Reverse');
+    az = -51; el = 34; view(az,el);
     grid on
  
     % Save the figure
