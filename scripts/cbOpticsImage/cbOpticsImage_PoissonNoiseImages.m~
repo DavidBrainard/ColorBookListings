@@ -261,7 +261,7 @@ try
         
         xlabel('Value','FontSize',figParams.labelFontSize);
         ylabel('Probability','FontSize',figParams.labelFontSize);
-        title('Poisson Probability Density','FontSize',figParams.titleFontSize);
+        title('Poisson P','FontSize',figParams.titleFontSize);
         %cbFigAxisSet(angleToMmFig,figParams);
         
         % Legend, with tweak to make lines long enough so that dash shows.
@@ -274,10 +274,6 @@ try
             if (length(xCoords{lineIdx}) ~= 2), continue; end
             set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
         end
-        
-        % Save it
-        FigureSave(fullfile(outputDir,[mfilename '_PoisonPdf']),angleToMmFig,figParams.figType);
-
     end
     
     %% Save validation data
