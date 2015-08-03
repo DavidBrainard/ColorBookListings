@@ -308,6 +308,8 @@ try
         figParams.yTicks = [0 200 400 600 800 1000];
         figParams.yTickLabels = {'    0 ' '   200 ' '  400 ' '  600 ' '  800 ' ' 1000 '};
         
+        % For semilog, need hold off for first plot, otherwise don't get
+        % seimilog axis.  Go figure.
         hold off;
         semilogx(data.theMeans,data.theSDs,'r','LineWidth',figParams.lineWidth);
         hold on; 
@@ -322,7 +324,7 @@ try
     end
     
     % Can slso look at how the standard deviation over the mean grows,
-    % which is how threshold would grow when expressed as contrast
+    % which is how threshold would vary when expressed as contrast.
     if (runTimeParams.generatePlots)
         [poissSDMeanContrastRatio,figParams] = cbFigInit;
         figParams.xLimLow = 10^0;
@@ -334,6 +336,8 @@ try
         figParams.yTicks = [0 0.2 0.4 0.6 0.8 1];
         figParams.yTickLabels = {' 0.0 ' '  0.2 ' '  0.4 ' '  0.6 ' '  0.8 ' '  1.0 '};
         
+        % For semilog, need hold off for first plot, otherwise don't get
+        % seimilog axis.  Go figure.
         hold off;
         semilogx(data.theMeans,data.theSDs./data.theMeans,'r','LineWidth',figParams.lineWidth);
         hold on; 
