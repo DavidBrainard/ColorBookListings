@@ -7,6 +7,9 @@ function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
 % the cone isolating vectors and spectrum locus look in the RGB and rg
 % diagrams.
 %
+% The Stiles-Burch Cmfs are expressed with respect to primaries at 
+% 645.16, 526.32, 444.44 nm.
+%
 % (c) David Brainard and Andrew Stockman, 2015
 
     varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
