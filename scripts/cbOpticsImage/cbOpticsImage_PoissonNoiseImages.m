@@ -1,11 +1,6 @@
 function varargout = cbOpticsImage_PoissonNoiseImages(varargin)
 %
-% Illustrate magnitude of Poisson noise as a function of light level.
-%
-% This produces a set of images that illustrate visually the amount of
-% noise as a function of light level.  It also produces some explanatory figures
-% that show the Poisson pdf as well as how SNR varies a a function of
-% Poisson mean.
+% Illustrate magnitude of Poisson noise as a function of light level
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
@@ -25,19 +20,19 @@ end
 
 %% Supress irritating warnings
 warnS = warning('off','images:initSize:adjustingMag');
-
 try
+    
     %% Frozen noise, so that we can validate OK
     randomSeedValue = 26;
     rng(randomSeedValue);
-    
+
     %% Load a hyperspectral scene in ISETBIO format.
     theHyperSceneDir = '/Volumes/Users1/Shared/Matlab/Analysis/hyperspectral-images/manchester_database';
     theHyperSceneName = 'isetbioSceneFor_scene7.mat';
     theData = load(fullfile(theHyperSceneDir,theHyperSceneName));
     theData.sceneRGBImage = sceneGet(theData.scene,'rgb image');
     % vcAddAndSelectObject(theData.scene); sceneWindow;
-    
+
     %% Parameters
     theData.whichWavelength = 550;
     meanScalar = 0.2;
@@ -67,7 +62,7 @@ try
         figParams.xLimHigh = 750;
         figParams.xTicks = [350 400 450 500 550 600 650 700 750];
         figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
-            '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
         figParams.yLimLow = 0;
         figParams.yLimHigh = 2e19;
         figParams.yTicks = [0 0.5e19 1.0e19 1.5e19 2.0e19];
@@ -113,7 +108,7 @@ try
     
     %% Figure out optical image cropping parameters
     %
-    % The optical image gets padded to allow the OTF
+    % The optical image gets padded to allow the OTF 
     % convolutions to have something to look at outside
     % the border of the original image.  Figure out here
     % how big this padding is so that we can crop the optical
@@ -166,7 +161,7 @@ try
     %% Pick an integration time to get photons
     theData.integrationTime_Sec = 0.050;
     oiEnergy_PhotonsPerPixel = oiIrradiance_PhotonsPerSecPixel*theData.integrationTime_Sec;
-    
+        
     %% Make image noise free at selected wavelength
     meanPhotons0 = double(oiEnergy_PhotonsPerPixel(:,:,oiWlIndex));
     scaledMeanPhotons0 = meanScalar*meanPhotons0/mean(meanPhotons0(:));
@@ -238,48 +233,6 @@ try
         FigureSave(fullfile(outputDir,[mfilename '_NoiseImageFigure']),noiseFigure,'png');
     end
     
-    %% Some basic explanatory figures about the Poisson.
-    poissPdfXVals = 1:200;
-    mean1 = 10;
-    mean2 = 100;
-    poissPdf1 = poisspdf(poissPdfXVals,mean1);
-    poissPdf2 = poisspdf(poissPdfXVals,mean2);
-    if (runTimeParams.generatePlots)
-        [poissPdfFig,figParams] = cbFigInit;
-        figParams.xLimLow = 0;
-        figParams.xLimHigh = 80;
-        figParams.xTicks = [0 10 20 30 40 50 60 70 80];
-        figParams.xTickLabels = {'^{ }0_{ }' '^{ }10_{ }' '^{ }20_{ }' '^{ }30_{ }' '^{ }40_{ }' '^{ }50_{ }' ...
-            '^{ }60_{ }' '^{ }70_{ }' };
-        figParams.yLimLow = 0;
-        figParams.yLimHigh = 25;
-        figParams.yTicks = [0 5 10 15 20 25];
-        figParams.yTickLabels = {'  0 ' '  5 ' ' 10 ' ' 15 ' ' 20 ' ' 25 '};
-        
-        plot(poissPdfXVals,poissPdf1,'r','LineWidth',figParams.lineWidth);
-        plot(poissPdfXVals,poissPdf2,'b','LineWidth',figParams.lineWidth);
-        
-        xlabel('Value','FontSize',figParams.labelFontSize);
-        ylabel('Probability','FontSize',figParams.labelFontSize);
-        title('Poisson Probability Density','FontSize',figParams.titleFontSize);
-        %cbFigAxisSet(angleToMmFig,figParams);
-        
-        % Legend, with tweak to make lines long enough so that dash shows.
-        % Note the extra spaces that preface the actual legend text. Ugh.
-        [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...
-            'Location','NorthWest','FontSize',figParams.legendFontSize);
-        lineObjs = findobj(legendChildObjs, 'Type', 'line');
-        xCoords = get(lineObjs, 'XData') ;
-        for lineIdx = 1:length(xCoords)
-            if (length(xCoords{lineIdx}) ~= 2), continue; end
-            set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
-        end
-        
-        % Save it
-        FigureSave(fullfile(outputDir,[mfilename '_PoisonPdf']),angleToMmFig,figParams.figType);
-
-    end
-    
     %% Save validation data
     %
     % Strip out some of the really big stuff.
@@ -288,6 +241,7 @@ try
     theData.partialIrradiance = theData.oiIrradiance_PhotonsPerSecM2Nm(1:10,100:110,8);
     theData = rmfield(theData,'oiIrradiance_PhotonsPerSecM2Nm');
     UnitTest.validationData('theData', theData);
+    
     
     %% Restore warning state
     warning(warnS.state,warnS.identifier);
