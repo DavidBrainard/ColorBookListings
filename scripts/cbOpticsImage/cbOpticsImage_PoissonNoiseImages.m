@@ -1,6 +1,10 @@
 function varargout = cbOpticsImage_PoissonNoiseImages(varargin)
 %
-% Illustrate magnitude of Poisson noise as a function of light level
+% Illustrate magnitude of Poisson noise as a function of light level.
+%
+% Produces images that show Poisson noise as a function of illuminant
+% irradiance.  Also produces some explanatory figures about the Poisson
+% distribution.
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
@@ -27,8 +31,16 @@ try
     rng(randomSeedValue);
 
     %% Load a hyperspectral scene in ISETBIO format.
+    %
+    % A set of such images is produced as part of the
+    % BLHyperspectralImageComputations project.  You will need
+    % to get that project and generate the images for this script to run.
     theHyperSceneDir = '/Volumes/Users1/Shared/Matlab/Analysis/hyperspectral-images/manchester_database';
     theHyperSceneName = 'isetbioSceneFor_scene7.mat';
+    if (~exist(theHyperSceneDir,'dir'))
+        fprintf('You need to get the hyperspectral image data to run this script.\n');
+        return;
+    end
     theData = load(fullfile(theHyperSceneDir,theHyperSceneName));
     theData.sceneRGBImage = sceneGet(theData.scene,'rgb image');
     % vcAddAndSelectObject(theData.scene); sceneWindow;
@@ -79,6 +91,7 @@ try
         FigureSave(fullfile(outputDir,[mfilename '_IlluminantQuantalUnits']),illumSpdFig,figParams.figType);
     end
     
+    % Print out some information.
     UnitTest.assertIsZero(max(abs(sceneIlluminantXYZ(:)-ourSceneIlluminantXYZ(:))),'Check on XYZ computation',0.1);
     sceneFov = sceneGet(theData.scene,'horizontal fov');
     fprintf('Scene field of view (horizontal) is %0.1f degrees\n',sceneFov);
@@ -198,7 +211,7 @@ try
                 'FontName',figParams.fontName,'FontSize',figParams.titleFontSize-2);
         end
         
-        % Check.  Isetbio can gives us a photon noised image, so when the scale
+        % Check.  Isetbio can give us a photon noise image, so when the scale
         % factor is unity we generate that too and have a look.  That returns
         % the value for a 50 msec integration time and one pixel.
         CHECK = false;
@@ -233,6 +246,107 @@ try
         FigureSave(fullfile(outputDir,[mfilename '_NoiseImageFigure']),noiseFigure,'png');
     end
     
+    %% Make some explanatory figures that illustrate properties of the Poisson distribution.
+    %
+    % First figure just shows Poisson PDF for two different means, to give
+    % the general idea.
+    data.mean1 = 10;
+    data.mean2 = 100;
+    data.xValues = 0:2*data.mean2;
+    data.probMean1 = poisspdf(data.xValues,data.mean1);
+    data.probMean2 = poisspdf(data.xValues,data.mean2);
+    if (runTimeParams.generatePlots)
+        [poissPDFFig,figParams] = cbFigInit;
+        figParams.xLimLow = 0;
+        figParams.xLimHigh = 150;
+        figParams.xTicks = [0 50 100 150];
+        figParams.xTickLabels = {'^{ }0_{ }' '^{ }50_{ }' '^{ }100_{ }' '^{ }150_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 0.15;
+        figParams.yTicks = [0 .05 .10 .15];
+        figParams.yTickLabels = {'  0.00 ' '  0.05 ' ' 0.10 ' ' 0.15 '};
+        
+        plot(data.xValues,data.probMean1,'r','LineWidth',figParams.lineWidth);
+        plot(data.xValues,data.probMean2,'b','LineWidth',figParams.lineWidth);
+        
+        xlabel('Value','FontSize',figParams.labelFontSize);
+        ylabel('Probability','FontSize',figParams.labelFontSize);
+        title('Poisson PDF','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissPDFFig,figParams);
+        
+        % Legend, with tweak to make lines long enough so that dash shows.
+        % Note the extra spaces that preface the actual legend text. Ugh.
+        [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Mean ' num2str(data.mean1) ' '],[ '^{ }' figParams.legendExtraSpaceStr '  Mean ' num2str(data.mean2) ' ']},...
+            'Location','NorthEast','FontSize',figParams.legendFontSize);
+        lineObjs = findobj(legendChildObjs, 'Type', 'line');
+        xCoords = get(lineObjs, 'XData') ;
+        for lineIdx = 1:length(xCoords)
+            if (length(xCoords{lineIdx}) ~= 2), continue; end
+            set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+        end
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonPDF']),poissPDFFig,figParams.figType); 
+    end
+    
+    %% Second explanatory figure plots Poisson SD as function of mean
+    % 
+    % This is a measure of how big a signal has to be against a background
+    % to be an equivalent amount above the noise.  OK, so it is a simple
+    % plot.  But I stil like it.
+    data.decades = 6;
+    data.theMeans = logspace(0,data.decades,1000);
+    data.theSDs = sqrt(data.theMeans);
+    if (runTimeParams.generatePlots)
+        [poissSDMeanRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {'^{ }10^{0}_{ }' '^{ }10^{1}_{ }' '^{ }10^{2}_{ }' '^{ }10^{3}_{ }' '^{ }10^{4}_{ }' '^{ }10^{5}_{ }' '^{ }10^{6}_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1000;
+        figParams.yTicks = [0 200 400 600 800 1000];
+        figParams.yTickLabels = {'    0 ' '   200 ' '  400 ' '  600 ' '  800 ' ' 1000 '};
+        
+        hold off;
+        semilogx(data.theMeans,data.theSDs,'r','LineWidth',figParams.lineWidth);
+        hold on; 
+        
+        xlabel('Intensity','FontSize',figParams.labelFontSize);
+        ylabel('Standard Deviation','FontSize',figParams.labelFontSize);
+        title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanRatio,figParams);
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonMeanSDRatio']),poissSDMeanRatio,figParams.figType); 
+    end
+    
+    % Can slso look at how the standard deviation over the mean grows,
+    % which is how threshold would grow when expressed as contrast
+    if (runTimeParams.generatePlots)
+        [poissSDMeanContrastRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {'^{ }10^{0}_{ }' '^{ }10^{1}_{ }' '^{ }10^{2}_{ }' '^{ }10^{3}_{ }' '^{ }10^{4}_{ }' '^{ }10^{5}_{ }' '^{ }10^{6}_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1;
+        figParams.yTicks = [0 0.2 0.4 0.6 0.8 1];
+        figParams.yTickLabels = {' 0.0 ' '  0.2 ' '  0.4 ' '  0.6 ' '  0.8 ' '  1.0 '};
+        
+        hold off;
+        semilogx(data.theMeans,data.theSDs./data.theMeans,'r','LineWidth',figParams.lineWidth);
+        hold on; 
+        
+        xlabel('Intensity','FontSize',figParams.labelFontSize);
+        ylabel('Ratio of Standard Deviation To Mean','FontSize',figParams.labelFontSize);
+        title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanContrastRatio,figParams);
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonMeanSDContrastRatio']),poissSDMeanContrastRatio,figParams.figType); 
+    end
+    
     %% Save validation data
     %
     % Strip out some of the really big stuff.
@@ -240,8 +354,7 @@ try
     theData = rmfield(theData,'oi');
     theData.partialIrradiance = theData.oiIrradiance_PhotonsPerSecM2Nm(1:10,100:110,8);
     theData = rmfield(theData,'oiIrradiance_PhotonsPerSecM2Nm');
-    UnitTest.validationData('theData', theData);
-    
+    UnitTest.validationData('theData', theData); 
     
     %% Restore warning state
     warning(warnS.state,warnS.identifier);
