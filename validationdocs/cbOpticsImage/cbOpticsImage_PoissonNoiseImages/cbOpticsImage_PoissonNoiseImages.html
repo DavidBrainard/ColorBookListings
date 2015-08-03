@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>cbOpticsImage_PoissonNoiseImages</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-29"><meta name="DC.source" content="cbOpticsImage_PoissonNoiseImages.m"><style type="text/css">
+      --><title>cbOpticsImage_PoissonNoiseImages</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-08-03"><meta name="DC.source" content="cbOpticsImage_PoissonNoiseImages.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,9 +66,13 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Function implementing the isetbio validation code</a></li><li><a href="#4">Hello</a></li><li><a href="#5">Supress irritating warnings</a></li><li><a href="#6">Frozen noise, so that we can validate OK</a></li><li><a href="#7">Load a hyperspectral scene in ISETBIO format.</a></li><li><a href="#8">Parameters</a></li><li><a href="#9">The scene object has a view about what the illuminant is.</a></li><li><a href="#10">Make optical image</a></li><li><a href="#11">Figure out optical image cropping parameters</a></li><li><a href="#12">Look at scene and oi sRGB images</a></li><li><a href="#13">Get the retinal irradiance per pixel</a></li><li><a href="#14">Pick an integration time to get photons</a></li><li><a href="#15">Make image noise free at selected wavelength</a></li><li><a href="#16">Make images for different irradiance levels</a></li><li><a href="#17">Save validation data</a></li><li><a href="#18">Restore warning state</a></li><li><a href="#20">Restore warning state</a></li><li><a href="#21">Rethrow error</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = cbOpticsImage_PoissonNoiseImages(varargin)
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Function implementing the isetbio validation code</a></li><li><a href="#4">Hello</a></li><li><a href="#5">Supress irritating warnings</a></li><li><a href="#7">Frozen noise, so that we can validate OK</a></li><li><a href="#8">Load a hyperspectral scene in ISETBIO format.</a></li><li><a href="#9">Parameters</a></li><li><a href="#10">The scene object has a view about what the illuminant is.</a></li><li><a href="#11">Make optical image</a></li><li><a href="#12">Figure out optical image cropping parameters</a></li><li><a href="#13">Look at scene and oi sRGB images</a></li><li><a href="#14">Get the retinal irradiance per pixel</a></li><li><a href="#15">Pick an integration time to get photons</a></li><li><a href="#16">Make image noise free at selected wavelength</a></li><li><a href="#17">Make images for different irradiance levels</a></li><li><a href="#18">Make some explanatory figures that illustrate properties of the Poisson distribution.</a></li><li><a href="#19">Second explanatory figure plots Poisson SD as function of mean</a></li><li><a href="#20">Save validation data</a></li><li><a href="#21">Restore warning state</a></li><li><a href="#23">Restore warning state</a></li><li><a href="#24">Rethrow error</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = cbOpticsImage_PoissonNoiseImages(varargin)
 <span class="comment">%</span>
-<span class="comment">% Illustrate magnitude of Poisson noise as a function of light level</span>
+<span class="comment">% Illustrate magnitude of Poisson noise as a function of light level.</span>
+<span class="comment">%</span>
+<span class="comment">% Produces images that show Poisson noise as a function of illuminant</span>
+<span class="comment">% irradiance.  Also produces some explanatory figures about the Poisson</span>
+<span class="comment">% distribution.</span>
 <span class="comment">%</span>
 <span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
 
@@ -82,20 +86,23 @@ outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
     mkdir(outputDir);
 <span class="keyword">end</span>
 </pre><h2>Supress irritating warnings<a name="5"></a></h2><pre class="codeinput">warnS = warning(<span class="string">'off'</span>,<span class="string">'images:initSize:adjustingMag'</span>);
-
 <span class="keyword">try</span>
-</pre><h2>Frozen noise, so that we can validate OK<a name="6"></a></h2><pre class="codeinput">    randomSeedValue = 26;
+</pre><h2>Frozen noise, so that we can validate OK<a name="7"></a></h2><pre class="codeinput">    randomSeedValue = 26;
     rng(randomSeedValue);
-</pre><h2>Load a hyperspectral scene in ISETBIO format.<a name="7"></a></h2><pre class="codeinput">    theHyperSceneDir = <span class="string">'/Volumes/Users1/Shared/Matlab/Analysis/hyperspectral-images/manchester_database'</span>;
+</pre><h2>Load a hyperspectral scene in ISETBIO format.<a name="8"></a></h2><p>A set of such images is produced as part of the BLHyperspectralImageComputations project.  You will need to get that project and generate the images for this script to run.</p><pre class="codeinput">    theHyperSceneDir = <span class="string">'/Volumes/Users1/Shared/Matlab/Analysis/hyperspectral-images/manchester_database'</span>;
     theHyperSceneName = <span class="string">'isetbioSceneFor_scene7.mat'</span>;
+    <span class="keyword">if</span> (~exist(theHyperSceneDir,<span class="string">'dir'</span>))
+        fprintf(<span class="string">'You need to get the hyperspectral image data to run this script.\n'</span>);
+        <span class="keyword">return</span>;
+    <span class="keyword">end</span>
     theData = load(fullfile(theHyperSceneDir,theHyperSceneName));
     theData.sceneRGBImage = sceneGet(theData.scene,<span class="string">'rgb image'</span>);
     <span class="comment">% vcAddAndSelectObject(theData.scene); sceneWindow;</span>
-</pre><h2>Parameters<a name="8"></a></h2><pre class="codeinput">    theData.whichWavelength = 550;
+</pre><h2>Parameters<a name="9"></a></h2><pre class="codeinput">    theData.whichWavelength = 550;
     meanScalar = 0.2;
     displayGamma = 0.5;
     theIrradianceScaleFactors = [1e-3 1e-2 1e-1 1];
-</pre><h2>The scene object has a view about what the illuminant is.<a name="9"></a></h2><p>Get this to help us set a reasonable physical scale for the scene.</p><pre class="codeinput">    sceneWave = sceneGet(theData.scene,<span class="string">'wave'</span>);
+</pre><h2>The scene object has a view about what the illuminant is.<a name="10"></a></h2><p>Get this to help us set a reasonable physical scale for the scene.</p><pre class="codeinput">    sceneWave = sceneGet(theData.scene,<span class="string">'wave'</span>);
     sceneWlIndex = find(sceneWave == theData.whichWavelength);
     sceneS = WlsToS(sceneWave);
     theData.sceneIlluminantSpdRadiance_WattsPerM2SrNm = sceneGet(theData.scene,<span class="string">'illuminant energy'</span>);
@@ -132,6 +139,7 @@ outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
         FigureSave(fullfile(outputDir,[mfilename <span class="string">'_IlluminantQuantalUnits'</span>]),illumSpdFig,figParams.figType);
     <span class="keyword">end</span>
 
+    <span class="comment">% Print out some information.</span>
     UnitTest.assertIsZero(max(abs(sceneIlluminantXYZ(:)-ourSceneIlluminantXYZ(:))),<span class="string">'Check on XYZ computation'</span>,0.1);
     sceneFov = sceneGet(theData.scene,<span class="string">'horizontal fov'</span>);
     fprintf(<span class="string">'Scene field of view (horizontal) is %0.1f degrees\n'</span>,sceneFov);
@@ -144,7 +152,7 @@ outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
 Scene illumination luminance taken as 58126 cd/m2
 Scene illuminant irradiance at selected wavelength (550 nm) is 1.4e+19 quanta/[sec-m2-nm]
 Scene illuminant total irradiance 1.5e+03 Watts/m2, 4.3e+21 quanta/[sec-m2]
-</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_01.png" alt=""> <h2>Make optical image<a name="10"></a></h2><p>We do this to get retinal irradiance, and for the first part of this script we only want photon noise so we skip the blurring.  THere are built in ways to skip the blurring, but they have side effects that currently surprise me.  So we just set an OTF off all ones and get on with life.</p><pre class="codeinput">    theData.oi = oiCreate(<span class="string">'human'</span>);
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_01.png" alt=""> <h2>Make optical image<a name="11"></a></h2><p>We do this to get retinal irradiance, and for the first part of this script we only want photon noise so we skip the blurring.  THere are built in ways to skip the blurring, but they have side effects that currently surprise me.  So we just set an OTF off all ones and get on with life.</p><pre class="codeinput">    theData.oi = oiCreate(<span class="string">'human'</span>);
     theData.optics = oiGet(theData.oi,<span class="string">'optics'</span>);
     theData.optics = opticsSet(theData.optics,<span class="string">'off axis method'</span>,<span class="string">'skip'</span>);
     OTFData = opticsGet(theData.optics,<span class="string">'otfdata'</span>);
@@ -154,13 +162,13 @@ Scene illuminant total irradiance 1.5e+03 Watts/m2, 4.3e+21 quanta/[sec-m2]
     theData.oi = oiCompute(theData.oi,theData.scene);
     theData.oiRGBImage = oiGet(theData.oi,<span class="string">'rgb image'</span>);
     <span class="comment">% vcAddAndSelectObject(theData.oi); oiWindow;</span>
-</pre><h2>Figure out optical image cropping parameters<a name="11"></a></h2><p>The optical image gets padded to allow the OTF convolutions to have something to look at outside the border of the original image.  Figure out here how big this padding is so that we can crop the optical images back to the size of the original scene, give or take a pixel.</p><pre class="codeinput">    [sceneRows,sceneCols] = size(theData.sceneRGBImage(:,:,1));
+</pre><h2>Figure out optical image cropping parameters<a name="12"></a></h2><p>The optical image gets padded to allow the OTF convolutions to have something to look at outside the border of the original image.  Figure out here how big this padding is so that we can crop the optical images back to the size of the original scene, give or take a pixel.</p><pre class="codeinput">    [sceneRows,sceneCols] = size(theData.sceneRGBImage(:,:,1));
     [oiRows,oiCols] = size(theData.oiRGBImage(:,:,1));
     extraRows = oiRows - sceneRows;
     extraCols = oiCols - sceneCols;
     cropRows = ceil(extraRows/2):oiRows-ceil(extraRows/2)-1;
     cropCols = ceil(extraCols/2):oiCols-ceil(extraCols/2)-1;
-</pre><h2>Look at scene and oi sRGB images<a name="12"></a></h2><p>Because these are normalized and we didn't blur, they look the same.</p><pre class="codeinput">    <span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><h2>Look at scene and oi sRGB images<a name="13"></a></h2><p>Because these are normalized and we didn't blur, they look the same.</p><pre class="codeinput">    <span class="keyword">if</span> (runTimeParams.generatePlots)
         figure; clf;
         imshow(theData.sceneRGBImage);
         set(gcf,<span class="string">'Name'</span>,<span class="string">'Scene Radiance sRGB'</span>);
@@ -171,7 +179,7 @@ Scene illuminant total irradiance 1.5e+03 Watts/m2, 4.3e+21 quanta/[sec-m2]
         set(gcf,<span class="string">'Name'</span>,<span class="string">'Retinal Image sRGB'</span>);
         imwrite(theData.oiRGBImage(cropRows,cropCols,:),fullfile(outputDir,[mfilename <span class="string">'_RetinalIrradianceRGB.png'</span>]),<span class="string">'png'</span>);
     <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_02.png" alt=""> <img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_03.png" alt=""> <h2>Get the retinal irradiance per pixel<a name="13"></a></h2><pre class="codeinput">    oiWave = oiGet(theData.oi,<span class="string">'wave'</span>);
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_02.png" alt=""> <img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_03.png" alt=""> <h2>Get the retinal irradiance per pixel<a name="14"></a></h2><pre class="codeinput">    oiWave = oiGet(theData.oi,<span class="string">'wave'</span>);
     oiWlIndex = find(oiWave == theData.whichWavelength);
     theData.oiIrradiance_PhotonsPerSecM2Nm = double(oiGet(theData.oi,<span class="string">'photons'</span>));
     oiPixelSize_M = oiGet(theData.oi,<span class="string">'sample spacing'</span>);
@@ -195,10 +203,10 @@ Scene illuminant total irradiance 1.5e+03 Watts/m2, 4.3e+21 quanta/[sec-m2]
 Pixel size is 1.24 by 1.24 um
 Pixel area is 1.53 um
 Mean retinal illuminance at selected wavelength (550 nm) is 1.6e+15 quanta/[sec-m2]
-Mean optical image irradiance is 1.5e+15 quanta/[sec-m2-nm]; max is 1.2e+16
-</pre><h2>Pick an integration time to get photons<a name="14"></a></h2><pre class="codeinput">    theData.integrationTime_Sec = 0.050;
+Mean optical image irradiance is 1.6e+15 quanta/[sec-m2-nm]; max is 1.2e+16
+</pre><h2>Pick an integration time to get photons<a name="15"></a></h2><pre class="codeinput">    theData.integrationTime_Sec = 0.050;
     oiEnergy_PhotonsPerPixel = oiIrradiance_PhotonsPerSecPixel*theData.integrationTime_Sec;
-</pre><h2>Make image noise free at selected wavelength<a name="15"></a></h2><pre class="codeinput">    meanPhotons0 = double(oiEnergy_PhotonsPerPixel(:,:,oiWlIndex));
+</pre><h2>Make image noise free at selected wavelength<a name="16"></a></h2><pre class="codeinput">    meanPhotons0 = double(oiEnergy_PhotonsPerPixel(:,:,oiWlIndex));
     scaledMeanPhotons0 = meanScalar*meanPhotons0/mean(meanPhotons0(:));
     <span class="keyword">if</span> (runTimeParams.generatePlots)
         figure; clf;
@@ -207,7 +215,7 @@ Mean optical image irradiance is 1.5e+15 quanta/[sec-m2-nm]; max is 1.2e+16
         imwrite(scaledMeanPhotons0(cropRows,cropCols,:).^displayGamma,<span class="keyword">...</span>
             fullfile(outputDir,[mfilename <span class="string">'_NoNoiseImageAtWavelength.png'</span>]),<span class="string">'png'</span>);
     <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_04.png" alt=""> <h2>Make images for different irradiance levels<a name="16"></a></h2><pre class="codeinput">    <span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_04.png" alt=""> <h2>Make images for different irradiance levels<a name="17"></a></h2><pre class="codeinput">    <span class="keyword">if</span> (runTimeParams.generatePlots)
         noiseFigure = figure; clf;
         set(gcf,<span class="string">'Position'</span>,[81 114 1100 1100]);
     <span class="keyword">end</span>
@@ -231,7 +239,7 @@ Mean optical image irradiance is 1.5e+15 quanta/[sec-m2-nm]; max is 1.2e+16
                 <span class="string">'FontName'</span>,figParams.fontName,<span class="string">'FontSize'</span>,figParams.titleFontSize-2);
         <span class="keyword">end</span>
 
-        <span class="comment">% Check.  Isetbio can gives us a photon noised image, so when the scale</span>
+        <span class="comment">% Check.  Isetbio can give us a photon noise image, so when the scale</span>
         <span class="comment">% factor is unity we generate that too and have a look.  That returns</span>
         <span class="comment">% the value for a 50 msec integration time and one pixel.</span>
         CHECK = false;
@@ -265,22 +273,120 @@ Mean optical image irradiance is 1.5e+15 quanta/[sec-m2-nm]; max is 1.2e+16
         <span class="comment">% Save the PDF</span>
         FigureSave(fullfile(outputDir,[mfilename <span class="string">'_NoiseImageFigure'</span>]),noiseFigure,<span class="string">'png'</span>);
     <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_05.png" alt=""> <h2>Save validation data<a name="17"></a></h2><p>Strip out some of the really big stuff.</p><pre class="codeinput">    theData = rmfield(theData,<span class="string">'scene'</span>);
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_05.png" alt=""> <h2>Make some explanatory figures that illustrate properties of the Poisson distribution.<a name="18"></a></h2><p>First figure just shows Poisson PDF for two different means, to give the general idea.</p><pre class="codeinput">    data.mean1 = 10;
+    data.mean2 = 100;
+    data.xValues = 0:2*data.mean2;
+    data.probMean1 = poisspdf(data.xValues,data.mean1);
+    data.probMean2 = poisspdf(data.xValues,data.mean2);
+    <span class="keyword">if</span> (runTimeParams.generatePlots)
+        [poissPDFFig,figParams] = cbFigInit;
+        figParams.xLimLow = 0;
+        figParams.xLimHigh = 150;
+        figParams.xTicks = [0 50 100 150];
+        figParams.xTickLabels = {<span class="string">'^{ }0_{ }'</span> <span class="string">'^{ }50_{ }'</span> <span class="string">'^{ }100_{ }'</span> <span class="string">'^{ }150_{ }'</span>};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 0.15;
+        figParams.yTicks = [0 .05 .10 .15];
+        figParams.yTickLabels = {<span class="string">'  0.00 '</span> <span class="string">'  0.05 '</span> <span class="string">' 0.10 '</span> <span class="string">' 0.15 '</span>};
+
+        plot(data.xValues,data.probMean1,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+        plot(data.xValues,data.probMean2,<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+
+        xlabel(<span class="string">'Value'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        ylabel(<span class="string">'Probability'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        title(<span class="string">'Poisson PDF'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+        cbFigAxisSet(poissPDFFig,figParams);
+
+        <span class="comment">% Legend, with tweak to make lines long enough so that dash shows.</span>
+        <span class="comment">% Note the extra spaces that preface the actual legend text. Ugh.</span>
+        [~,legendChildObjs] = legend({[<span class="string">'^{ }'</span> figParams.legendExtraSpaceStr <span class="string">'  Mean '</span> num2str(data.mean1) <span class="string">' '</span>],[ <span class="string">'^{ }'</span> figParams.legendExtraSpaceStr <span class="string">'  Mean '</span> num2str(data.mean2) <span class="string">' '</span>]},<span class="keyword">...</span>
+            <span class="string">'Location'</span>,<span class="string">'NorthEast'</span>,<span class="string">'FontSize'</span>,figParams.legendFontSize);
+        lineObjs = findobj(legendChildObjs, <span class="string">'Type'</span>, <span class="string">'line'</span>);
+        xCoords = get(lineObjs, <span class="string">'XData'</span>) ;
+        <span class="keyword">for</span> lineIdx = 1:length(xCoords)
+            <span class="keyword">if</span> (length(xCoords{lineIdx}) ~= 2), <span class="keyword">continue</span>; <span class="keyword">end</span>
+            set(lineObjs(lineIdx), <span class="string">'XData'</span>, xCoords{lineIdx} + [0 figParams.legendLineTweak])
+        <span class="keyword">end</span>
+
+        <span class="comment">% Save the plot</span>
+        FigureSave(fullfile(outputDir,[mfilename <span class="string">'_PoissonPDF'</span>]),poissPDFFig,figParams.figType);
+    <span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_06.png" alt=""> <h2>Second explanatory figure plots Poisson SD as function of mean<a name="19"></a></h2><p>This is a measure of how big a signal has to be against a background to be an equivalent amount above the noise.  OK, so it is a simple plot.  But I stil like it.</p><pre class="codeinput">    data.decades = 6;
+    data.theMeans = logspace(0,data.decades,1000);
+    data.theSDs = sqrt(data.theMeans);
+    <span class="keyword">if</span> (runTimeParams.generatePlots)
+        [poissSDMeanRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {<span class="string">'^{ }10^{0}_{ }'</span> <span class="string">'^{ }10^{1}_{ }'</span> <span class="string">'^{ }10^{2}_{ }'</span> <span class="string">'^{ }10^{3}_{ }'</span> <span class="string">'^{ }10^{4}_{ }'</span> <span class="string">'^{ }10^{5}_{ }'</span> <span class="string">'^{ }10^{6}_{ }'</span>};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1000;
+        figParams.yTicks = [0 200 400 600 800 1000];
+        figParams.yTickLabels = {<span class="string">'    0 '</span> <span class="string">'   200 '</span> <span class="string">'  400 '</span> <span class="string">'  600 '</span> <span class="string">'  800 '</span> <span class="string">' 1000 '</span>};
+
+        <span class="comment">% For semilog, need hold off for first plot, otherwise don't get</span>
+        <span class="comment">% seimilog axis.  Go figure.</span>
+        hold <span class="string">off</span>;
+        semilogx(data.theMeans,data.theSDs,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+        hold <span class="string">on</span>;
+
+        xlabel(<span class="string">'Intensity'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        ylabel(<span class="string">'Standard Deviation'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        title(<span class="string">'Poisson Noise Limits'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanRatio,figParams);
+
+        <span class="comment">% Save the plot</span>
+        FigureSave(fullfile(outputDir,[mfilename <span class="string">'_PoissonMeanSDRatio'</span>]),poissSDMeanRatio,figParams.figType);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Can slso look at how the standard deviation over the mean grows,</span>
+    <span class="comment">% which is how threshold would vary when expressed as contrast.</span>
+    <span class="keyword">if</span> (runTimeParams.generatePlots)
+        [poissSDMeanContrastRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {<span class="string">'^{ }10^{0}_{ }'</span> <span class="string">'^{ }10^{1}_{ }'</span> <span class="string">'^{ }10^{2}_{ }'</span> <span class="string">'^{ }10^{3}_{ }'</span> <span class="string">'^{ }10^{4}_{ }'</span> <span class="string">'^{ }10^{5}_{ }'</span> <span class="string">'^{ }10^{6}_{ }'</span>};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1;
+        figParams.yTicks = [0 0.2 0.4 0.6 0.8 1];
+        figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">'  0.2 '</span> <span class="string">'  0.4 '</span> <span class="string">'  0.6 '</span> <span class="string">'  0.8 '</span> <span class="string">'  1.0 '</span>};
+
+        <span class="comment">% For semilog, need hold off for first plot, otherwise don't get</span>
+        <span class="comment">% seimilog axis.  Go figure.</span>
+        hold <span class="string">off</span>;
+        semilogx(data.theMeans,data.theSDs./data.theMeans,<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+        hold <span class="string">on</span>;
+
+        xlabel(<span class="string">'Intensity'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        ylabel(<span class="string">'Ratio of Standard Deviation To Mean'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+        title(<span class="string">'Poisson Noise Limits'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanContrastRatio,figParams);
+
+        <span class="comment">% Save the plot</span>
+        FigureSave(fullfile(outputDir,[mfilename <span class="string">'_PoissonMeanSDContrastRatio'</span>]),poissSDMeanContrastRatio,figParams.figType);
+    <span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_07.png" alt=""> <img vspace="5" hspace="5" src="cbOpticsImage_PoissonNoiseImages_08.png" alt=""> <h2>Save validation data<a name="20"></a></h2><p>Strip out some of the really big stuff.</p><pre class="codeinput">    theData = rmfield(theData,<span class="string">'scene'</span>);
     theData = rmfield(theData,<span class="string">'oi'</span>);
     theData.partialIrradiance = theData.oiIrradiance_PhotonsPerSecM2Nm(1:10,100:110,8);
     theData = rmfield(theData,<span class="string">'oiIrradiance_PhotonsPerSecM2Nm'</span>);
     UnitTest.validationData(<span class="string">'theData'</span>, theData);
-</pre><h2>Restore warning state<a name="18"></a></h2><pre class="codeinput">    warning(warnS.state,warnS.identifier);
+</pre><h2>Restore warning state<a name="21"></a></h2><pre class="codeinput">    warning(warnS.state,warnS.identifier);
 </pre><pre class="codeinput"><span class="keyword">catch</span> err
-</pre><h2>Restore warning state<a name="20"></a></h2><pre class="codeinput">    warning(warnS.state,warnS.identifier);
-</pre><h2>Rethrow error<a name="21"></a></h2><pre class="codeinput">    rethrow(err);
+</pre><h2>Restore warning state<a name="23"></a></h2><pre class="codeinput">    warning(warnS.state,warnS.identifier);
+</pre><h2>Rethrow error<a name="24"></a></h2><pre class="codeinput">    rethrow(err);
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 function varargout = cbOpticsImage_PoissonNoiseImages(varargin)
 %
-% Illustrate magnitude of Poisson noise as a function of light level
+% Illustrate magnitude of Poisson noise as a function of light level.
+%
+% Produces images that show Poisson noise as a function of illuminant
+% irradiance.  Also produces some explanatory figures about the Poisson
+% distribution.
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
@@ -300,15 +406,23 @@ end
 
 %% Supress irritating warnings
 warnS = warning('off','images:initSize:adjustingMag');
-
 try
+    
     %% Frozen noise, so that we can validate OK
     randomSeedValue = 26;
     rng(randomSeedValue);
 
     %% Load a hyperspectral scene in ISETBIO format.
+    %
+    % A set of such images is produced as part of the
+    % BLHyperspectralImageComputations project.  You will need
+    % to get that project and generate the images for this script to run.
     theHyperSceneDir = '/Volumes/Users1/Shared/Matlab/Analysis/hyperspectral-images/manchester_database';
     theHyperSceneName = 'isetbioSceneFor_scene7.mat';
+    if (~exist(theHyperSceneDir,'dir'))
+        fprintf('You need to get the hyperspectral image data to run this script.\n');
+        return;
+    end
     theData = load(fullfile(theHyperSceneDir,theHyperSceneName));
     theData.sceneRGBImage = sceneGet(theData.scene,'rgb image');
     % vcAddAndSelectObject(theData.scene); sceneWindow;
@@ -359,6 +473,7 @@ try
         FigureSave(fullfile(outputDir,[mfilename '_IlluminantQuantalUnits']),illumSpdFig,figParams.figType);
     end
     
+    % Print out some information.
     UnitTest.assertIsZero(max(abs(sceneIlluminantXYZ(:)-ourSceneIlluminantXYZ(:))),'Check on XYZ computation',0.1);
     sceneFov = sceneGet(theData.scene,'horizontal fov');
     fprintf('Scene field of view (horizontal) is %0.1f degrees\n',sceneFov);
@@ -478,7 +593,7 @@ try
                 'FontName',figParams.fontName,'FontSize',figParams.titleFontSize-2);
         end
         
-        % Check.  Isetbio can gives us a photon noised image, so when the scale
+        % Check.  Isetbio can give us a photon noise image, so when the scale
         % factor is unity we generate that too and have a look.  That returns
         % the value for a 50 msec integration time and one pixel.
         CHECK = false;
@@ -513,6 +628,111 @@ try
         FigureSave(fullfile(outputDir,[mfilename '_NoiseImageFigure']),noiseFigure,'png');
     end
     
+    %% Make some explanatory figures that illustrate properties of the Poisson distribution.
+    %
+    % First figure just shows Poisson PDF for two different means, to give
+    % the general idea.
+    data.mean1 = 10;
+    data.mean2 = 100;
+    data.xValues = 0:2*data.mean2;
+    data.probMean1 = poisspdf(data.xValues,data.mean1);
+    data.probMean2 = poisspdf(data.xValues,data.mean2);
+    if (runTimeParams.generatePlots)
+        [poissPDFFig,figParams] = cbFigInit;
+        figParams.xLimLow = 0;
+        figParams.xLimHigh = 150;
+        figParams.xTicks = [0 50 100 150];
+        figParams.xTickLabels = {'^{ }0_{ }' '^{ }50_{ }' '^{ }100_{ }' '^{ }150_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 0.15;
+        figParams.yTicks = [0 .05 .10 .15];
+        figParams.yTickLabels = {'  0.00 ' '  0.05 ' ' 0.10 ' ' 0.15 '};
+        
+        plot(data.xValues,data.probMean1,'r','LineWidth',figParams.lineWidth);
+        plot(data.xValues,data.probMean2,'b','LineWidth',figParams.lineWidth);
+        
+        xlabel('Value','FontSize',figParams.labelFontSize);
+        ylabel('Probability','FontSize',figParams.labelFontSize);
+        title('Poisson PDF','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissPDFFig,figParams);
+        
+        % Legend, with tweak to make lines long enough so that dash shows.
+        % Note the extra spaces that preface the actual legend text. Ugh.
+        [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Mean ' num2str(data.mean1) ' '],[ '^{ }' figParams.legendExtraSpaceStr '  Mean ' num2str(data.mean2) ' ']},...
+            'Location','NorthEast','FontSize',figParams.legendFontSize);
+        lineObjs = findobj(legendChildObjs, 'Type', 'line');
+        xCoords = get(lineObjs, 'XData') ;
+        for lineIdx = 1:length(xCoords)
+            if (length(xCoords{lineIdx}) ~= 2), continue; end
+            set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+        end
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonPDF']),poissPDFFig,figParams.figType); 
+    end
+    
+    %% Second explanatory figure plots Poisson SD as function of mean
+    % 
+    % This is a measure of how big a signal has to be against a background
+    % to be an equivalent amount above the noise.  OK, so it is a simple
+    % plot.  But I stil like it.
+    data.decades = 6;
+    data.theMeans = logspace(0,data.decades,1000);
+    data.theSDs = sqrt(data.theMeans);
+    if (runTimeParams.generatePlots)
+        [poissSDMeanRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {'^{ }10^{0}_{ }' '^{ }10^{1}_{ }' '^{ }10^{2}_{ }' '^{ }10^{3}_{ }' '^{ }10^{4}_{ }' '^{ }10^{5}_{ }' '^{ }10^{6}_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1000;
+        figParams.yTicks = [0 200 400 600 800 1000];
+        figParams.yTickLabels = {'    0 ' '   200 ' '  400 ' '  600 ' '  800 ' ' 1000 '};
+        
+        % For semilog, need hold off for first plot, otherwise don't get
+        % seimilog axis.  Go figure.
+        hold off;
+        semilogx(data.theMeans,data.theSDs,'r','LineWidth',figParams.lineWidth);
+        hold on; 
+        
+        xlabel('Intensity','FontSize',figParams.labelFontSize);
+        ylabel('Standard Deviation','FontSize',figParams.labelFontSize);
+        title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanRatio,figParams);
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonMeanSDRatio']),poissSDMeanRatio,figParams.figType); 
+    end
+    
+    % Can slso look at how the standard deviation over the mean grows,
+    % which is how threshold would vary when expressed as contrast.
+    if (runTimeParams.generatePlots)
+        [poissSDMeanContrastRatio,figParams] = cbFigInit;
+        figParams.xLimLow = 10^0;
+        figParams.xLimHigh = 10^6;
+        figParams.xTicks = [10^0 10^1 10^2 10^3 10^4 10^5 10^6];
+        figParams.xTickLabels = {'^{ }10^{0}_{ }' '^{ }10^{1}_{ }' '^{ }10^{2}_{ }' '^{ }10^{3}_{ }' '^{ }10^{4}_{ }' '^{ }10^{5}_{ }' '^{ }10^{6}_{ }'};
+        figParams.yLimLow = 0;
+        figParams.yLimHigh = 1;
+        figParams.yTicks = [0 0.2 0.4 0.6 0.8 1];
+        figParams.yTickLabels = {' 0.0 ' '  0.2 ' '  0.4 ' '  0.6 ' '  0.8 ' '  1.0 '};
+        
+        % For semilog, need hold off for first plot, otherwise don't get
+        % seimilog axis.  Go figure.
+        hold off;
+        semilogx(data.theMeans,data.theSDs./data.theMeans,'r','LineWidth',figParams.lineWidth);
+        hold on; 
+        
+        xlabel('Intensity','FontSize',figParams.labelFontSize);
+        ylabel('Ratio of Standard Deviation To Mean','FontSize',figParams.labelFontSize);
+        title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
+        cbFigAxisSet(poissSDMeanContrastRatio,figParams);
+        
+        % Save the plot
+        FigureSave(fullfile(outputDir,[mfilename '_PoissonMeanSDContrastRatio']),poissSDMeanContrastRatio,figParams.figType); 
+    end
+    
     %% Save validation data
     %
     % Strip out some of the really big stuff.
@@ -520,8 +740,7 @@ try
     theData = rmfield(theData,'oi');
     theData.partialIrradiance = theData.oiIrradiance_PhotonsPerSecM2Nm(1:10,100:110,8);
     theData = rmfield(theData,'oiIrradiance_PhotonsPerSecM2Nm');
-    UnitTest.validationData('theData', theData);
-    
+    UnitTest.validationData('theData', theData); 
     
     %% Restore warning state
     warning(warnS.state,warnS.identifier);

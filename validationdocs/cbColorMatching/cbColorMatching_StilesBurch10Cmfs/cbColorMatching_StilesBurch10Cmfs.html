@@ -1,0 +1,663 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>cbColorMatching_StilesBurch10Cmfs</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-08-03"><meta name="DC.source" content="cbColorMatching_StilesBurch10Cmfs.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Function implementing the isetbio validation code</a></li><li><a href="#4">Hello</a></li><li><a href="#5">Get and plot Stiles-Burch 10-degree color matching functions</a></li><li><a href="#6">Load Stockman-Sharpe 10-degree cone fundamentals</a></li><li><a href="#7">Find the stimuli that isolate each of the cones.</a></li><li><a href="#8">Get the cmf spectrum locus normalized to simplex</a></li><li><a href="#9">Get the cone isolating dirs normalized to the simplex</a></li><li><a href="#10">Make a 3D plot of the spectrum locus</a></li><li><a href="#12">Plot where the cone isolating dirs lie on the simplex</a></li><li><a href="#14">Plot in the r-g chromaticity plane</a></li><li><a href="#16">Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.</a></li><li><a href="#17">Plot where the cone isolating dirs lie on the diagram</a></li><li><a href="#19">Save validation data</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
+<span class="comment">%</span>
+<span class="comment">% Connections between color matching functions and cone fundamentals, Stiles-Burch 10.</span>
+<span class="comment">%</span>
+<span class="comment">% Shows that Stockman-Sharpe 10 degree fundamentals are a linear</span>
+<span class="comment">% transformation of the Stiles-Burch 10 degree Cmfs, and illustrates how</span>
+<span class="comment">% the cone isolating vectors and spectrum locus look in the RGB and rg</span>
+<span class="comment">% diagrams.</span>
+<span class="comment">%</span>
+<span class="comment">% The Stiles-Burch Cmfs are expressed with respect to primaries at</span>
+<span class="comment">% 645.16, 526.32, 444.44 nm.</span>
+<span class="comment">%</span>
+<span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
+
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+<span class="keyword">end</span>
+</pre><h2>Function implementing the isetbio validation code<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> ValidationFunction(runTimeParams)
+</pre><h2>Hello<a name="4"></a></h2><pre class="codeinput">UnitTest.validationRecord(<span class="string">'SIMPLE_MESSAGE'</span>, sprintf(<span class="string">'%s'</span>,mfilename));
+outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
+<span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
+    mkdir(outputDir);
+<span class="keyword">end</span>
+</pre><h2>Get and plot Stiles-Burch 10-degree color matching functions<a name="5"></a></h2><p>Also spline to 1 nm and 10 nm sampling for plotting purposes.</p><pre class="codeinput">load <span class="string">T_stiles10</span>;
+data.wls = SToWls(S_stiles10);
+data.S_stiles10 = S_stiles10;
+data.T_stiles10 = T_stiles10;
+
+<span class="comment">% These splines go from 390 to 750, which seems sufficient</span>
+S_10nm = [390 10 37];
+data.wls_10nm = SToWls(S_10nm);
+data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
+S_1nm = [390 1 361];
+data.wls_1nm = SToWls(S_1nm);
+data.T_stiles10_1nm = SplineCmf(data.wls,data.T_stiles10,S_1nm);
+
+clear <span class="string">S_stiles10</span> <span class="string">T_stiles10</span>
+<span class="keyword">if</span> (runTimeParams.generatePlots)
+    [stilesBurch10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {<span class="string">'^{ }350_{ }'</span> <span class="string">'^{ }400_{ }'</span> <span class="string">'^{ }450_{ }'</span> <span class="string">'^{ }500_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }550_{ }'</span> <span class="string">'^{ }600_{ }'</span> <span class="string">'^{ }650_{ }'</span> <span class="string">'^{ }700_{ }'</span> <span class="string">'^{ }750_{ }'</span>};
+        figParams.yLimLow = -1;
+    figParams.yLimHigh = 4;
+    figParams.yTicks = [-1 0 1 2 3 4];
+    figParams.yTickLabels = {<span class="string">'-1.0 '</span> <span class="string">' 0.0 '</span> <span class="string">' 1.0 '</span> <span class="string">' 2.0 '</span> <span class="string">' 3.0 '</span> <span class="string">' 4.0 '</span>};
+
+    plot(data.wls_1nm,data.T_stiles10_1nm(1,:)',<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_stiles10_1nm(2,:)',<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_stiles10_1nm(3,:)',<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+
+    xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'CMF (energy units)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    title(<span class="string">'Stiles-Burch 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    cbFigAxisSet(stilesBurch10Fig,figParams);
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_Cmfs'</span>]),stilesBurch10Fig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_01.png" alt=""> <h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="6"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
+data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
+
+<span class="comment">% Fit with linear transform of cmf's, just to show that it works.</span>
+data.M_CmfToCones = ((data.T_stiles10_1nm')\(data.T_cones10_1nm'))';
+data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
+<span class="keyword">if</span> (runTimeParams.generatePlots)
+    [stockmanSharpe10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {<span class="string">'^{ }350_{ }'</span> <span class="string">'^{ }400_{ }'</span> <span class="string">'^{ }450_{ }'</span> <span class="string">'^{ }500_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }550_{ }'</span> <span class="string">'^{ }600_{ }'</span> <span class="string">'^{ }650_{ }'</span> <span class="string">'^{ }700_{ }'</span> <span class="string">'^{ }750_{ }'</span>};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span>};
+
+    <span class="comment">% Plot the fundamentals.</span>
+    plot(data.wls_1nm,data.T_cones10_1nm(1,:)',<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(2,:)',<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(3,:)',<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+
+    <span class="comment">% Pop on top the fit from Stiles-Burch 10 degree cmfs.</span>
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(1,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(2,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(3,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+
+    xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'Cone Fundamental (energy units)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    title(<span class="string">'Stiles-Burch 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    cbFigAxisSet(stockmanSharpe10Fig,figParams);
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_TransformToSS10ConeFundamentals'</span>]),stockmanSharpe10Fig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_02.png" alt=""> <h2>Find the stimuli that isolate each of the cones.<a name="7"></a></h2><p>Get the isolating directions using straightforward linear algebra.</p><pre class="codeinput">data.MConesToCmf = inv(data.M_CmfToCones);
+data.coneIsolatingCmfDirs = data.MConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+</pre><h2>Get the cmf spectrum locus normalized to simplex<a name="8"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+<span class="keyword">end</span>
+<span class="keyword">for</span> i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+<span class="keyword">end</span>
+</pre><h2>Get the cone isolating dirs normalized to the simplex<a name="9"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:size(data.coneIsolatingCmfDirs,2);
+    data.coneIsolatingCmfDirs_simplex(:,i) = data.coneIsolatingCmfDirs(:,i)/sum(data.coneIsolatingCmfDirs(:,i));
+<span class="keyword">end</span>
+</pre><h2>Make a 3D plot of the spectrum locus<a name="10"></a></h2><p>This is a pretty complicated plot.  It shows the spectrum locus in the RGB color matching space as well as projected onto the simplex (plane defined by R+G+B = 1).</p><p>It also shows the three cone isolating directions, both in the positive (+cone isomeriation) and negative (-cone isomerization) directions. Positive is solid lines, negative dashed lines.  These directions contain negaive primary power and are not physically realizable.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><pre class="codeinput">    [stilesBurch10SpectrumLocusFig,figParams] = cbFigInit;
+    figParams.xLimLow = -3;
+    figParams.xLimHigh = 4;
+    figParams.xTicks = [-3 -2 -1 0 1 2 3 4];
+    figParams.xTickLabels = {<span class="string">'-3.0 '</span> <span class="string">'-2.0 '</span> <span class="string">'-1.0 '</span> <span class="string">' 0.0 '</span> <span class="string">' 1.0 '</span> <span class="string">' 2.0 '</span> <span class="string">' 3.0 '</span> <span class="string">' 4.0 '</span>};
+    figParams.yLimLow = -0.5;
+    figParams.yLimHigh = 3.0;
+    figParams.yTicks = [-0.5 0 0.5 1.0 1.5 2.0 2.5 3.0];
+    figParams.yTickLabels = {<span class="string">'-0.5 '</span> <span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span> <span class="string">' 1.5 '</span> <span class="string">'2.0 '</span> <span class="string">' 2.5 '</span> <span class="string">' 3.0 '</span>};
+    figParams.zLimLow = -0.5;
+    figParams.zLimHigh = 2.0;
+    figParams.zTicks = [-0.5 0 0.5 1.0 1.5 2.0 ];
+    figParams.zTickLabels = {<span class="string">'-0.5'</span> <span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span> <span class="string">' 1.5 '</span> <span class="string">' 2.0 '</span>};
+
+    <span class="comment">% Plot the spectrum locus</span>
+    plot3(data.T_stiles10_1nm(1,:)',data.T_stiles10_1nm(2,:)',data.T_stiles10_1nm(3,:)', <span class="keyword">...</span>
+        <span class="string">'k'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot3(data.T_stiles10_10nm(1,:)',data.T_stiles10_10nm(2,:)',data.T_stiles10_10nm(3,:)', <span class="keyword">...</span>
+        <span class="string">'ko'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'k'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-14);
+
+    <span class="comment">% Plot the spectrum locus on the simplex plane</span>
+    plot3(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)',data.T_stiles10_1nm_simplex(3,:)', <span class="keyword">...</span>
+        <span class="string">'y'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    <span class="comment">% plot3(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)',data.T_stiles10_10nm_simplex(3,:)', ...</span>
+    <span class="comment">%    'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);</span>
+
+    <span class="comment">% Plot the cone isolating directions</span>
+    plot3([0 data.coneIsolatingCmfDirs(1,1)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(2,1)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(3,1)], <span class="keyword">...</span>
+        <span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+    plot3([0 data.coneIsolatingCmfDirs(1,2)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(2,2)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(3,2)], <span class="keyword">...</span>
+        <span class="string">'g'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+    plot3([0 data.coneIsolatingCmfDirs(1,3)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(2,3)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs(3,3)], <span class="keyword">...</span>
+        <span class="string">'b'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,1) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(2,1) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(3,1) 0], <span class="keyword">...</span>
+        <span class="string">'r--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,2) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(2,2) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(3,2) 0], <span class="keyword">...</span>
+        <span class="string">'g--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,3) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(2,3) 0], <span class="keyword">...</span>
+        [-data.coneIsolatingCmfDirs(3,3) 0], <span class="keyword">...</span>
+        <span class="string">'b--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_03.png" alt=""> <h2>Plot where the cone isolating dirs lie on the simplex<a name="12"></a></h2><p>L and S directions intersect the plane on their positive excursions, while M intersects the plane on its negative excursion.  Indicate this graphically by not filling in the M cone point.</p><pre class="codeinput">     plot3([0 data.coneIsolatingCmfDirs_simplex(1,1)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(2,1)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(3,1)], <span class="keyword">...</span>
+        <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+    plot3([0 data.coneIsolatingCmfDirs_simplex(1,2)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(2,2)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(3,2)], <span class="keyword">...</span>
+        <span class="string">'go'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+    plot3([0 data.coneIsolatingCmfDirs_simplex(1,3)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(2,3)], <span class="keyword">...</span>
+        [0 data.coneIsolatingCmfDirs_simplex(3,3)], <span class="keyword">...</span>
+        <span class="string">'bo'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'b'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+
+    <span class="comment">% Fill in simplex plane as a transparent light gray surface.</span>
+    <span class="comment">% I fussed quite a bit by hand to define the points so that the</span>
+    <span class="comment">% resulting plane more or less fills the graph.</span>
+    fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],<span class="string">'EdgeColor'</span>,<span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.75);
+
+    <span class="comment">% This latex magic puts a bar over the labels, which we want here.  But</span>
+    <span class="comment">% it also changes their font.  Not sure how to get the font to stay put</span>
+    <span class="comment">% while still putting an overbar over the symbols.</span>
+    xlabel(<span class="string">'$$\bar{r}$$'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize,<span class="string">'interpreter'</span>,<span class="string">'latex'</span>);
+    ylabel(<span class="string">'$$\bar{g}$$'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize,<span class="string">'interpreter'</span>,<span class="string">'latex'</span>);
+    zlabel(<span class="string">'$$\bar{b}$$'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize,<span class="string">'interpreter'</span>,<span class="string">'latex'</span>);
+    title(<span class="string">'Stiles-Burch 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
+    zlim([figParams.zLimLow figParams.zLimHigh]);
+    set(gca,<span class="string">'ZTick'</span>,figParams.zTicks);
+    set(gca,<span class="string">'ZTickLabel'</span>,figParams.zTickLabels);
+    set(gca,<span class="string">'XDir'</span>,<span class="string">'Reverse'</span>);
+    set(gca,<span class="string">'YDir'</span>,<span class="string">'Reverse'</span>);
+    az = -51; el = 34; view(az,el);
+    grid <span class="string">on</span>
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_RGB3D'</span>]),stilesBurch10SpectrumLocusFig,<span class="string">'png'</span>);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_04.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Plot in the r-g chromaticity plane<a name="14"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><pre class="codeinput">    [chromaticityFig,figParams] = cbFigInit;
+    figParams.xLimLow = -2.5;
+    figParams.xLimHigh = 3;
+    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {<span class="string">'^{ }-2.5_{ }'</span> <span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span> <span class="string">'^{ }2.5_{ }'</span> <span class="string">'^{ }3.0_{ }'</span>};
+    figParams.yLimLow = -2.5;
+    figParams.yLimHigh = 3;
+    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {<span class="string">'^{ }-2.5_{ }'</span> <span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span> <span class="string">'^{ }2.5_{ }'</span> <span class="string">'^{ }3.0_{ }'</span>};
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_05.png" alt=""> <h2>Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.<a name="16"></a></h2><p>Get a whole bunch of feasible points</p><pre class="codeinput">    weights = rand(3,50000);
+    randRGB = data.coneIsolatingCmfDirs*weights;
+
+    <span class="comment">% Convert to rg chromaticity.</span>
+    <span class="comment">%</span>
+    <span class="comment">% XYZToxyY is designed for CIE 1931 conventins, but calculation of</span>
+    <span class="comment">% first two coordinates is exactly what we want here (r = R/(R+G+B), g = g/(R+G+B)</span>
+    randrgY = XYZToxyY(randRGB);
+    randrg = randrgY(1:2,:);
+
+    <span class="comment">% Split the points into those with r chromaticity less than that of L's</span>
+    <span class="comment">% and those with r chromaticity greater than that of M's.  These are</span>
+    <span class="comment">% the two groups we see if we plot them all.</span>
+    group1index = find(randrg(1,:) &lt;= data.coneIsolatingCmfDirs_simplex(1,1));
+    group2index = find(randrg(1,:) &gt;= data.coneIsolatingCmfDirs_simplex(1,2));
+    UnitTest.assert(length(group1index)+length(group2index) == length(randrg(1,:)),<span class="string">'all points accounted for'</span>);
+
+    <span class="comment">% Find convex hull of each group and plot as a transparent plane</span>
+    dt1 = delaunayTriangulation(randrg(1,group1index)',randrg(2,group1index)');
+    k1 = convexHull(dt1);
+    fill(dt1.Points(k1,1),dt1.Points(k1,2),[0.75 0.75 0.75],<span class="string">'EdgeColor'</span>,<span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.75);
+    dt2 = delaunayTriangulation(randrg(1,group2index)',randrg(2,group2index)');
+    k2 = convexHull(dt2);
+    fill(dt2.Points(k2,1),dt2.Points(k2,2),[0.75 0.75 0.75],<span class="string">'EdgeColor'</span>,<span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.75);
+
+    <span class="comment">% Plot the spectrum locus on the diagram</span>
+    plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', <span class="keyword">...</span>
+        <span class="string">'k'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', <span class="keyword">...</span>
+       <span class="string">'ko'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'y'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-14);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_06.png" alt=""> <h2>Plot where the cone isolating dirs lie on the diagram<a name="17"></a></h2><p>The M-cone chromaticity corresponds to the negative direction of the primary, so it's plotted without a fill.</p><pre class="codeinput">     plot([data.coneIsolatingCmfDirs_simplex(1,1)], <span class="keyword">...</span>
+        [data.coneIsolatingCmfDirs_simplex(2,1)], <span class="keyword">...</span>
+        <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+    plot([data.coneIsolatingCmfDirs_simplex(1,2)], <span class="keyword">...</span>
+        [data.coneIsolatingCmfDirs_simplex(2,2)], <span class="keyword">...</span>
+        <span class="string">'go'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+    plot([data.coneIsolatingCmfDirs_simplex(1,3)], <span class="keyword">...</span>
+        [data.coneIsolatingCmfDirs_simplex(2,3)], <span class="keyword">...</span>
+        <span class="string">'bo'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'b'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
+
+    xlabel(<span class="string">'r chromaticity'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'g chromaticity'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    title(<span class="string">'Stiles-Burch 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    cbFigAxisSet(chromaticityFig,figParams);
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_rgChrom'</span>]),chromaticityFig,figParams.figType);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_07.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>Save validation data<a name="19"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+<span class="comment">% Legend, with tweak to make lines long enough so that dash shows.</span>
+<span class="comment">% Note the extra spaces that preface the actual legend text. Ugh.</span>
+<span class="comment">% [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...</span>
+<span class="comment">%     'Location','NorthWest','FontSize',figParams.legendFontSize);</span>
+<span class="comment">% lineObjs = findobj(legendChildObjs, 'Type', 'line');</span>
+<span class="comment">% xCoords = get(lineObjs, 'XData') ;</span>
+<span class="comment">% for lineIdx = 1:length(xCoords)</span>
+<span class="comment">%     if (length(xCoords{lineIdx}) ~= 2), continue; end</span>
+<span class="comment">%     set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])</span>
+<span class="comment">% end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
+%
+% Connections between color matching functions and cone fundamentals, Stiles-Burch 10.
+%
+% Shows that Stockman-Sharpe 10 degree fundamentals are a linear
+% transformation of the Stiles-Burch 10 degree Cmfs, and illustrates how
+% the cone isolating vectors and spectrum locus look in the RGB and rg
+% diagrams.
+%
+% The Stiles-Burch Cmfs are expressed with respect to primaries at 
+% 645.16, 526.32, 444.44 nm.
+%
+% (c) David Brainard and Andrew Stockman, 2015
+
+    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+%% Function implementing the isetbio validation code
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+
+%% Get and plot Stiles-Burch 10-degree color matching functions
+%
+% Also spline to 1 nm and 10 nm sampling for plotting purposes.
+load T_stiles10;
+data.wls = SToWls(S_stiles10);
+data.S_stiles10 = S_stiles10;
+data.T_stiles10 = T_stiles10;
+
+% These splines go from 390 to 750, which seems sufficient
+S_10nm = [390 10 37];
+data.wls_10nm = SToWls(S_10nm);
+data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
+S_1nm = [390 1 361];
+data.wls_1nm = SToWls(S_1nm);
+data.T_stiles10_1nm = SplineCmf(data.wls,data.T_stiles10,S_1nm);
+
+clear S_stiles10 T_stiles10
+if (runTimeParams.generatePlots)
+    [stilesBurch10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
+        figParams.yLimLow = -1;
+    figParams.yLimHigh = 4;
+    figParams.yTicks = [-1 0 1 2 3 4];
+    figParams.yTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
+    
+    plot(data.wls_1nm,data.T_stiles10_1nm(1,:)','r','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_stiles10_1nm(2,:)','g','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_stiles10_1nm(3,:)','b','LineWidth',figParams.lineWidth);
+    
+    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
+    ylabel('CMF (energy units)','FontSize',figParams.labelFontSize);
+    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(stilesBurch10Fig,figParams);
+ 
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_Cmfs']),stilesBurch10Fig,figParams.figType);
+end
+
+%% Load Stockman-Sharpe 10-degree cone fundamentals
+load T_cones_ss10
+data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
+
+% Fit with linear transform of cmf's, just to show that it works.
+data.M_CmfToCones = ((data.T_stiles10_1nm')\(data.T_cones10_1nm'))';
+data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
+if (runTimeParams.generatePlots)
+    [stockmanSharpe10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 '};
+    
+    % Plot the fundamentals.
+    plot(data.wls_1nm,data.T_cones10_1nm(1,:)','r','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(2,:)','g','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(3,:)','b','LineWidth',figParams.lineWidth);
+    
+    % Pop on top the fit from Stiles-Burch 10 degree cmfs.
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(1,:)','k:','LineWidth',figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(2,:)','k:','LineWidth',figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_fit_1nm(3,:)','k:','LineWidth',figParams.lineWidth-1); 
+    
+    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
+    ylabel('Cone Fundamental (energy units)','FontSize',figParams.labelFontSize);
+    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(stockmanSharpe10Fig,figParams);
+    
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_TransformToSS10ConeFundamentals']),stockmanSharpe10Fig,figParams.figType);
+end
+
+%% Find the stimuli that isolate each of the cones.
+%
+% Get the isolating directions using straightforward linear algebra.
+data.MConesToCmf = inv(data.M_CmfToCones);
+data.coneIsolatingCmfDirs = data.MConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+
+%% Get the cmf spectrum locus normalized to simplex
+for i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+end
+
+%% Get the cone isolating dirs normalized to the simplex
+for i = 1:size(data.coneIsolatingCmfDirs,2);
+    data.coneIsolatingCmfDirs_simplex(:,i) = data.coneIsolatingCmfDirs(:,i)/sum(data.coneIsolatingCmfDirs(:,i));
+end
+
+%% Make a 3D plot of the spectrum locus
+%
+% This is a pretty complicated plot.  It shows the spectrum locus
+% in the RGB color matching space as well as projected onto the 
+% simplex (plane defined by R+G+B = 1).
+%
+% It also shows the three cone isolating directions, both in the positive
+% (+cone isomeriation) and negative (-cone isomerization) directions.
+% Positive is solid lines, negative dashed lines.  These directions contain
+% negaive primary power and are not physically realizable.
+if (runTimeParams.generatePlots)
+    [stilesBurch10SpectrumLocusFig,figParams] = cbFigInit;
+    figParams.xLimLow = -3;
+    figParams.xLimHigh = 4;
+    figParams.xTicks = [-3 -2 -1 0 1 2 3 4];
+    figParams.xTickLabels = {'-3.0 ' '-2.0 ' '-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
+    figParams.yLimLow = -0.5;
+    figParams.yLimHigh = 3.0;
+    figParams.yTicks = [-0.5 0 0.5 1.0 1.5 2.0 2.5 3.0];
+    figParams.yTickLabels = {'-0.5 ' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' '2.0 ' ' 2.5 ' ' 3.0 '};
+    figParams.zLimLow = -0.5;
+    figParams.zLimHigh = 2.0;
+    figParams.zTicks = [-0.5 0 0.5 1.0 1.5 2.0 ];
+    figParams.zTickLabels = {'-0.5' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' ' 2.0 '};
+    
+    % Plot the spectrum locus
+    plot3(data.T_stiles10_1nm(1,:)',data.T_stiles10_1nm(2,:)',data.T_stiles10_1nm(3,:)', ...
+        'k','LineWidth',figParams.lineWidth);
+    plot3(data.T_stiles10_10nm(1,:)',data.T_stiles10_10nm(2,:)',data.T_stiles10_10nm(3,:)', ...
+        'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-14);
+    
+    % Plot the spectrum locus on the simplex plane
+    plot3(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)',data.T_stiles10_1nm_simplex(3,:)', ...
+        'y','LineWidth',figParams.lineWidth);
+    % plot3(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)',data.T_stiles10_10nm_simplex(3,:)', ...
+    %    'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
+    
+    % Plot the cone isolating directions
+    plot3([0 data.coneIsolatingCmfDirs(1,1)], ...
+        [0 data.coneIsolatingCmfDirs(2,1)], ...
+        [0 data.coneIsolatingCmfDirs(3,1)], ...
+        'r','LineWidth',figParams.lineWidth+1);
+    plot3([0 data.coneIsolatingCmfDirs(1,2)], ...
+        [0 data.coneIsolatingCmfDirs(2,2)], ...
+        [0 data.coneIsolatingCmfDirs(3,2)], ...
+        'g','LineWidth',figParams.lineWidth+1);
+    plot3([0 data.coneIsolatingCmfDirs(1,3)], ...
+        [0 data.coneIsolatingCmfDirs(2,3)], ...
+        [0 data.coneIsolatingCmfDirs(3,3)], ...
+        'b','LineWidth',figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,1) 0], ...
+        [-data.coneIsolatingCmfDirs(2,1) 0], ...
+        [-data.coneIsolatingCmfDirs(3,1) 0], ...
+        'rREPLACE_WITH_DASH_DASH','LineWidth',figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,2) 0], ...
+        [-data.coneIsolatingCmfDirs(2,2) 0], ...
+        [-data.coneIsolatingCmfDirs(3,2) 0], ...
+        'gREPLACE_WITH_DASH_DASH','LineWidth',figParams.lineWidth+1);
+    plot3([-data.coneIsolatingCmfDirs(1,3) 0], ...
+        [-data.coneIsolatingCmfDirs(2,3) 0], ...
+        [-data.coneIsolatingCmfDirs(3,3) 0], ...
+        'bREPLACE_WITH_DASH_DASH','LineWidth',figParams.lineWidth+1);
+    
+    %% Plot where the cone isolating dirs lie on the simplex
+    % 
+    % L and S directions intersect the plane on their positive
+    % excursions, while M intersects the plane on its negative
+    % excursion.  Indicate this graphically by not filling in
+    % the M cone point.
+     plot3([0 data.coneIsolatingCmfDirs_simplex(1,1)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(2,1)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(3,1)], ...
+        'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
+    plot3([0 data.coneIsolatingCmfDirs_simplex(1,2)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(2,2)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(3,2)], ...
+        'go','MarkerSize',figParams.markerSize-10);
+    plot3([0 data.coneIsolatingCmfDirs_simplex(1,3)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(2,3)], ...
+        [0 data.coneIsolatingCmfDirs_simplex(3,3)], ...
+        'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
+    
+    % Fill in simplex plane as a transparent light gray surface.  
+    % I fussed quite a bit by hand to define the points so that the
+    % resulting plane more or less fills the graph.
+    fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
+    
+    % This latex magic puts a bar over the labels, which we want here.  But
+    % it also changes their font.  Not sure how to get the font to stay put
+    % while still putting an overbar over the symbols.
+    xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
+    zlim([figParams.zLimLow figParams.zLimHigh]);
+    set(gca,'ZTick',figParams.zTicks);
+    set(gca,'ZTickLabel',figParams.zTickLabels);
+    set(gca,'XDir','Reverse');
+    set(gca,'YDir','Reverse');
+    az = -51; el = 34; view(az,el);
+    grid on
+ 
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_RGB3D']),stilesBurch10SpectrumLocusFig,'png');
+end
+
+%% Plot in the r-g chromaticity plane
+if (runTimeParams.generatePlots)
+    [chromaticityFig,figParams] = cbFigInit;
+    figParams.xLimLow = -2.5;
+    figParams.xLimHigh = 3;
+    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
+    figParams.yLimLow = -2.5;
+    figParams.yLimHigh = 3;
+    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
+   
+    %% Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.
+    %
+    % Get a whole bunch of feasible points
+    weights = rand(3,50000);
+    randRGB = data.coneIsolatingCmfDirs*weights;
+    
+    % Convert to rg chromaticity.
+    %
+    % XYZToxyY is designed for CIE 1931 conventins, but calculation of
+    % first two coordinates is exactly what we want here (r = R/(R+G+B), g = g/(R+G+B) 
+    randrgY = XYZToxyY(randRGB);
+    randrg = randrgY(1:2,:);
+    
+    % Split the points into those with r chromaticity less than that of L's
+    % and those with r chromaticity greater than that of M's.  These are
+    % the two groups we see if we plot them all.
+    group1index = find(randrg(1,:) <= data.coneIsolatingCmfDirs_simplex(1,1));
+    group2index = find(randrg(1,:) >= data.coneIsolatingCmfDirs_simplex(1,2));
+    UnitTest.assert(length(group1index)+length(group2index) == length(randrg(1,:)),'all points accounted for');
+    
+    % Find convex hull of each group and plot as a transparent plane
+    dt1 = delaunayTriangulation(randrg(1,group1index)',randrg(2,group1index)');
+    k1 = convexHull(dt1);
+    fill(dt1.Points(k1,1),dt1.Points(k1,2),[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
+    dt2 = delaunayTriangulation(randrg(1,group2index)',randrg(2,group2index)');
+    k2 = convexHull(dt2);
+    fill(dt2.Points(k2,1),dt2.Points(k2,2),[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
+    
+    % Plot the spectrum locus on the diagram
+    plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
+        'k','LineWidth',figParams.lineWidth);
+    plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
+       'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
+    
+    %% Plot where the cone isolating dirs lie on the diagram
+    % 
+    % The M-cone chromaticity corresponds to the negative direction
+    % of the primary, so it's plotted without a fill.
+     plot([data.coneIsolatingCmfDirs_simplex(1,1)], ...
+        [data.coneIsolatingCmfDirs_simplex(2,1)], ...
+        'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
+    plot([data.coneIsolatingCmfDirs_simplex(1,2)], ...
+        [data.coneIsolatingCmfDirs_simplex(2,2)], ...
+        'go','MarkerSize',figParams.markerSize-10);
+    plot([data.coneIsolatingCmfDirs_simplex(1,3)], ...
+        [data.coneIsolatingCmfDirs_simplex(2,3)], ...
+        'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
+    
+    xlabel('r chromaticity','FontSize',figParams.labelFontSize);
+    ylabel('g chromaticity','FontSize',figParams.labelFontSize);
+    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(chromaticityFig,figParams);
+    
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_rgChrom']),chromaticityFig,figParams.figType);
+end
+
+%% Save validation data
+UnitTest.validationData('validateDataStruct', data);
+
+end
+
+% Legend, with tweak to make lines long enough so that dash shows.
+% Note the extra spaces that preface the actual legend text. Ugh.
+% [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...
+%     'Location','NorthWest','FontSize',figParams.legendFontSize);
+% lineObjs = findobj(legendChildObjs, 'Type', 'line');
+% xCoords = get(lineObjs, 'XData') ;
+% for lineIdx = 1:length(xCoords)
+%     if (length(xCoords{lineIdx}) ~= 2), continue; end
+%     set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
+% end
+
+
+
+##### SOURCE END #####
+--></body></html>
