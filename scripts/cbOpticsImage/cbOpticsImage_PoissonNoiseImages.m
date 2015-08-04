@@ -314,8 +314,8 @@ try
         semilogx(data.theMeans,data.theSDs,'r','LineWidth',figParams.lineWidth);
         hold on; 
         
-        xlabel('Intensity','FontSize',figParams.labelFontSize);
-        ylabel('Standard Deviation','FontSize',figParams.labelFontSize);
+        xlabel('Background Quanta','FontSize',figParams.labelFontSize);
+        ylabel('Standard Deviation (quanta in \DELTAt)','FontSize',figParams.labelFontSize);
         title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
         cbFigAxisSet(poissSDMeanRatio,figParams);
         
@@ -342,7 +342,7 @@ try
         semilogx(data.theMeans,data.theSDs./data.theMeans,'r','LineWidth',figParams.lineWidth);
         hold on; 
         
-        xlabel('Intensity','FontSize',figParams.labelFontSize);
+        xlabel('Background Quanta','FontSize',figParams.labelFontSize);
         ylabel('Ratio of Standard Deviation To Mean','FontSize',figParams.labelFontSize);
         title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
         cbFigAxisSet(poissSDMeanContrastRatio,figParams);
