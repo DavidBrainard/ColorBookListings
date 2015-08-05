@@ -138,7 +138,7 @@ data.primaryWls = [645, 526, 444];
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_Cmfs'</span>]),stilesBurch10Fig,figParams.figType);
 <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_01.png" alt=""> <h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="8"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
+</pre><h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="8"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
 data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
 
 <span class="comment">% Fit with linear transform of cmf's, just to show that it works.</span>
@@ -174,7 +174,7 @@ data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_TransformToSS10ConeFundamentals'</span>]),stockmanSharpe10Fig,figParams.figType);
 <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_02.png" alt=""> <h2>Find the stimuli that isolate each of the cones.<a name="9"></a></h2><p>Get the isolating directions. We have the transformation for cmfs to cones spectral sensitivies. This is also the transformation between tristimulus coordinates and cone excitations. Invert this to get transformation between cone excitations and tristimulus coordinates.  Then apply to the unit cone excitation vectors to get the cone isolating tristimulus vectors.</p><p>Make a normalized version of the vectors for plotting.</p><pre class="codeinput">data.M_ConesToCmf = inv(data.M_CmfToCones);
+</pre><h2>Find the stimuli that isolate each of the cones.<a name="9"></a></h2><p>Get the isolating directions. We have the transformation for cmfs to cones spectral sensitivies. This is also the transformation between tristimulus coordinates and cone excitations. Invert this to get transformation between cone excitations and tristimulus coordinates.  Then apply to the unit cone excitation vectors to get the cone isolating tristimulus vectors.</p><p>Make a normalized version of the vectors for plotting.</p><pre class="codeinput">data.M_ConesToCmf = inv(data.M_CmfToCones);
 data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
 <span class="keyword">for</span> i = 1:size(data.coneIsolatingRGBDirs,2)
     data.coneIsolatingRGBDirsNorm(:,i) = data.coneIsolatingRGBDirs(:,i)/norm(data.coneIsolatingRGBDirs(:,i));
@@ -274,7 +274,7 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
         scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,3) 0], <span class="keyword">...</span>
         scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,3) 0], <span class="keyword">...</span>
         <span class="string">'b--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_03.png" alt=""> <h2>Plot where the cone isolating dirs lie on the simplex<a name="15"></a></h2><p>L and S directions intersect the plane on their positive excursions, while M intersects the plane on its negative excursion.  Indicate this graphically by not filling in the M cone point.</p><pre class="codeinput">     plot3([0 data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
+</pre><h2>Plot where the cone isolating dirs lie on the simplex<a name="15"></a></h2><p>L and S directions intersect the plane on their positive excursions, while M intersects the plane on its negative excursion.  Indicate this graphically by not filling in the M cone point.</p><pre class="codeinput">     plot3([0 data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
         [0 data.coneIsolatingRGBDirs_simplex(2,1)], <span class="keyword">...</span>
         [0 data.coneIsolatingRGBDirs_simplex(3,1)], <span class="keyword">...</span>
         <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
@@ -314,7 +314,7 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% to have fig version so that you can load back into Matlab and rotate dynamically.</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_RGB3D'</span>]),stilesBurch10SpectrumLocusFig,<span class="string">'png'</span>);
     saveas(stilesBurch10SpectrumLocusFig,fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_RGB3D'</span>]),<span class="string">'fig'</span>);
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_04.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><h2>3D RGB plot of cone response vectors and isolating dirs.<a name="17"></a></h2><p>This is much like the 3D plot of the spectrum locus, except that we get rid of the locus and add the cone response vectors.</p><p>This plot shows the orthogonality between cone isolating vecto for one cone class and the response vectors for the other two.</p><p>Here the isolating vectors are shown as solid and the response vectors as dashed.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
     [stilesBurch10ConeIsolatingFig,figParams] = cbFigInit;
     figParams.xLimLow = -1;
@@ -400,9 +400,9 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% Saving as pdf does not work well for 3D plots; use png here  Also useful</span>
     <span class="comment">% to have fig version so that you can load back into Matlab and rotate dynamically.</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_ConeIsolating_RGB3D'</span>]),stilesBurch10ConeIsolatingFig,<span class="string">'png'</span>);
-    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename <span class="string">'__ConeIsolating_RGB3D'</span>]),<span class="string">'fig'</span>);
+    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename <span class="string">'_ConeIsolating_RGB3D'</span>]),<span class="string">'fig'</span>);
 <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_05.png" alt=""> <h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="18"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="18"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
     [chromaticityFig,figParams] = cbFigInit;
     figParams.xLimLow = -2.5;
     figParams.xLimHigh = 3;
@@ -474,7 +474,7 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_rgChrom'</span>]),chromaticityFig,figParams.figType);
 <span class="keyword">end</span>
-</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_06.png" alt=""> <h2>Save validation data<a name="19"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><h2>Save validation data<a name="19"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
 </pre><pre class="codeinput"><span class="keyword">end</span>
 
 <span class="comment">% Legend, with tweak to make lines long enough so that dash shows.</span>
@@ -904,7 +904,7 @@ if (runTimeParams.generatePlots)
     % Saving as pdf does not work well for 3D plots; use png here  Also useful
     % to have fig version so that you can load back into Matlab and rotate dynamically.
     FigureSave(fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),stilesBurch10ConeIsolatingFig,'png');
-    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '__ConeIsolating_RGB3D']),'fig');
+    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),'fig');
 end
 
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
