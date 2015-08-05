@@ -413,7 +413,7 @@ if (runTimeParams.generatePlots)
     % Saving as pdf does not work well for 3D plots; use png here  Also useful
     % to have fig version so that you can load back into Matlab and rotate dynamically.
     FigureSave(fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),stilesBurch10ConeIsolatingFig,'png');
-    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '__ConeIsolating_RGB3D']),'fig');
+    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),'fig');
 end
 
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
@@ -487,7 +487,7 @@ if (runTimeParams.generatePlots)
     
     xlabel('r','FontSize',figParams.labelFontSize);
     ylabel('g','FontSize',figParams.labelFontSize);
-    title('Spectrum Locas and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
+    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(chromaticityFig,figParams);
     
     % Save the figure
