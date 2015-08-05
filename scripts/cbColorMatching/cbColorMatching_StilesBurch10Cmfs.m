@@ -285,7 +285,7 @@ if (runTimeParams.generatePlots)
     xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
     ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
     zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
     zlim([figParams.zLimLow figParams.zLimHigh]);
     set(gca,'ZTick',figParams.zTicks);
@@ -297,8 +297,8 @@ if (runTimeParams.generatePlots)
  
     % Save the figure
     %
-    % PDF save does not work well for 3D plots.  Also useful to have .fig
-    % version so that you can load into Matlab and rotate dynamically.
+    % Saving as pdf does not work well for 3D plots; use png here  Also useful
+    % to have fig version so that you can load back into Matlab and rotate dynamically.
     FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_RGB3D']),stilesBurch10SpectrumLocusFig,'png');
     saveas(stilesBurch10SpectrumLocusFig,fullfile(outputDir,[mfilename '_SpectrumLocus_RGB3D']),'fig');
 end
@@ -383,7 +383,7 @@ if (runTimeParams.generatePlots)
     xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
     ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
     zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    title('Cone Isolating and Response Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
     zlim([figParams.zLimLow figParams.zLimHigh]);
     set(gca,'ZTick',figParams.zTicks);
@@ -394,7 +394,11 @@ if (runTimeParams.generatePlots)
     grid on
  
     % Save the figure
+    %  %
+    % Saving as pdf does not work well for 3D plots; use png here  Also useful
+    % to have fig version so that you can load back into Matlab and rotate dynamically.
     FigureSave(fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),stilesBurch10ConeIsolatingFig,'png');
+    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '__ConeIsolating_RGB3D']),'fig');
 end
 
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
@@ -466,7 +470,7 @@ if (runTimeParams.generatePlots)
     
     xlabel('r chromaticity','FontSize',figParams.labelFontSize);
     ylabel('g chromaticity','FontSize',figParams.labelFontSize);
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    title('Spectrum Locas and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(chromaticityFig,figParams);
     
     % Save the figure
