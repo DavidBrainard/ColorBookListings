@@ -315,7 +315,7 @@ try
         hold on; 
         
         xlabel('Background Quanta','FontSize',figParams.labelFontSize);
-        ylabel('Standard Deviation (quanta in \DELTAt)','FontSize',figParams.labelFontSize);
+        ylabel('Standard Deviation (quanta)','FontSize',figParams.labelFontSize);
         title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
         cbFigAxisSet(poissSDMeanRatio,figParams);
         
@@ -343,7 +343,7 @@ try
         hold on; 
         
         xlabel('Background Quanta','FontSize',figParams.labelFontSize);
-        ylabel('Ratio of Standard Deviation To Mean','FontSize',figParams.labelFontSize);
+        ylabel('Standard Deviation (contrast)','FontSize',figParams.labelFontSize);
         title('Poisson Noise Limits','FontSize',figParams.titleFontSize);
         cbFigAxisSet(poissSDMeanContrastRatio,figParams);
         

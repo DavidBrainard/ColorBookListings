@@ -1,13 +1,19 @@
 function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
 %
-% Connections between color matching functions and cone fundamentals, Stiles-Burch 10.
+% Connections between color matching functions and cone fundamentals.
+%
+% These are illustrated Stiles-Burch 10 degree fundamentals and the
+% Stockman-Sharpe 10 degree cone fundamentals, but the principles
+% would apply to any tristimulus system and cone fundamentals that
+% were a linear transfomration of the color matching functions.
 %
 % Shows that Stockman-Sharpe 10 degree fundamentals are a linear
 % transformation of the Stiles-Burch 10 degree Cmfs, and illustrates how
-% the cone isolating vectors and spectrum locus look in the RGB and rg
+% the spectrum locus, cone isolating stimulus directions, and cone response
+% mechanism vectors look in the RGB tristimulus and rg chromaticity
 % diagrams.
 %
-% The Stiles-Burch Cmfs are expressed with respect to primaries at 
+% The Stiles-Burch 10-degree Cmfs are expressed with respect to primaries at 
 % 645.16, 526.32, 444.44 nm.
 %
 % (c) David Brainard and Andrew Stockman, 2015
@@ -217,6 +223,13 @@ if (runTimeParams.generatePlots)
     figParams.zTicks = [-0.5 0 0.5 1.0 1.5 2.0 ];
     figParams.zTickLabels = {'-0.5' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' ' 2.0 '};
     
+    % Plot equal energy white in RGB and on the simplex
+    equalEnergy_1nm = ones(S_1nm(3),1);
+    equalEnergyRGB = data.T_stiles10_1nm*equalEnergy_1nm;
+    equalEnergyRGB_simplex = equalEnergyRGB/sum(equalEnergyRGB);
+    plot3(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),equalEnergyRGB_simplex(3),...
+        'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
+    
     % Plot the spectrum locus
     plot3(data.T_stiles10_1nm(1,:)',data.T_stiles10_1nm(2,:)',data.T_stiles10_1nm(3,:)', ...
         'k','LineWidth',figParams.lineWidth);
@@ -229,30 +242,32 @@ if (runTimeParams.generatePlots)
     % plot3(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)',data.T_stiles10_10nm_simplex(3,:)', ...
     %    'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
     
-    % Plot the normalized cone isolating directions
-    plot3([0 data.coneIsolatingRGBDirsNorm(1,1)], ...
-        [0 data.coneIsolatingRGBDirsNorm(2,1)], ...
-        [0 data.coneIsolatingRGBDirsNorm(3,1)], ...
+    % Plot the normalized cone isolating directions, scaled for nicer
+    % viewing
+    scaleFactor = 2;
+    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,1)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,1)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,1)], ...
         'r','LineWidth',figParams.lineWidth+1);
-    plot3([0 data.coneIsolatingRGBDirsNorm(1,2)], ...
-        [0 data.coneIsolatingRGBDirsNorm(2,2)], ...
-        [0 data.coneIsolatingRGBDirsNorm(3,2)], ...
+    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,2)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,2)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,2)], ...
         'g','LineWidth',figParams.lineWidth+1);
-    plot3([0 data.coneIsolatingRGBDirsNorm(1,3)], ...
-        [0 data.coneIsolatingRGBDirsNorm(2,3)], ...
-        [0 data.coneIsolatingRGBDirsNorm(3,3)], ...
+    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,3)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,3)], ...
+        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,3)], ...
         'b','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneIsolatingRGBDirsNorm(1,1) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(2,1) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(3,1) 0], ...
+    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,1) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,1) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,1) 0], ...
         'r--','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneIsolatingRGBDirsNorm(1,2) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(2,2) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(3,2) 0], ...
+    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,2) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,2) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,2) 0], ...
         'g--','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneIsolatingRGBDirsNorm(1,3) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(2,3) 0], ...
-        [-data.coneIsolatingRGBDirsNorm(3,3) 0], ...
+    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,3) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,3) 0], ...
+        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,3) 0], ...
         'b--','LineWidth',figParams.lineWidth+1);
     
     %% Plot where the cone isolating dirs lie on the simplex
@@ -282,9 +297,9 @@ if (runTimeParams.generatePlots)
     % This latex magic puts a bar over the labels, which we want here.  But
     % it also changes their font.  Not sure how to get the font to stay put
     % while still putting an overbar over the symbols.
-    xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    xlabel('R','FontSize',figParams.labelFontSize);
+    ylabel('G','FontSize',figParams.labelFontSize);
+    zlabel('B','FontSize',figParams.labelFontSize);
     title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
     zlim([figParams.zLimLow figParams.zLimHigh]);
@@ -380,9 +395,9 @@ if (runTimeParams.generatePlots)
     % This latex magic puts a bar over the labels, which we want here.  But
     % it also changes their font.  Not sure how to get the font to stay put
     % while still putting an overbar over the symbols.
-    xlabel('$$\bar{r}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    ylabel('$$\bar{g}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
-    zlabel('$$\bar{b}$$','FontSize',figParams.labelFontSize,'interpreter','latex');
+    xlabel('R','FontSize',figParams.labelFontSize);
+    ylabel('G','FontSize',figParams.labelFontSize);
+    zlabel('B','FontSize',figParams.labelFontSize);
     title('Cone Isolating and Response Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
     zlim([figParams.zLimLow figParams.zLimHigh]);
@@ -433,7 +448,7 @@ if (runTimeParams.generatePlots)
     randrgY = XYZToxyY(randRGB);
     randrg = randrgY(1:2,:);
     
-    % ... Pplit the points into those with r chromaticity less than that of L's
+    % ... Split the points into those with r chromaticity less than that of L's
     % and those with r chromaticity greater than that of M's.  These are
     % the two groups we see if we plot them all....
     group1index = find(randrg(1,:) <= data.coneIsolatingRGBDirs_simplex(1,1));
@@ -448,11 +463,13 @@ if (runTimeParams.generatePlots)
     k2 = convexHull(dt2);
     fill(dt2.Points(k2,1),dt2.Points(k2,2),[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
     
-    % Plot the spectrum locus on the diagram
+    % Plot the spectrum locus on the diagram along with equal energy white.
     plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
         'k','LineWidth',figParams.lineWidth);
     plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
        'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
+   plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
+        'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
     
     % Plot where the cone isolating dirs lie on the diagram
     % 
@@ -468,8 +485,8 @@ if (runTimeParams.generatePlots)
         [data.coneIsolatingRGBDirs_simplex(2,3)], ...
         'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
     
-    xlabel('r chromaticity','FontSize',figParams.labelFontSize);
-    ylabel('g chromaticity','FontSize',figParams.labelFontSize);
+    xlabel('r','FontSize',figParams.labelFontSize);
+    ylabel('g','FontSize',figParams.labelFontSize);
     title('Spectrum Locas and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(chromaticityFig,figParams);
     
