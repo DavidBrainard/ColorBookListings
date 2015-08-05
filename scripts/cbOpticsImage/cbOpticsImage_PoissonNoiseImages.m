@@ -269,8 +269,8 @@ try
         plot(data.xValues,data.probMean1,'r','LineWidth',figParams.lineWidth);
         plot(data.xValues,data.probMean2,'b','LineWidth',figParams.lineWidth);
         
-        xlabel('Value','FontSize',figParams.labelFontSize);
-        ylabel('Probability','FontSize',figParams.labelFontSize);
+        xlabel('Quanta','FontSize',figParams.labelFontSize);
+        ylabel('Pr(q)','FontSize',figParams.labelFontSize);
         title('Poisson PDF','FontSize',figParams.titleFontSize);
         cbFigAxisSet(poissPDFFig,figParams);
         
