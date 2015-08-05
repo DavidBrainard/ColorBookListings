@@ -1,20 +1,21 @@
-function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
+function varargout = cbColorMatching_KonigFundamentals(varargin)
 %
-% Connections between color matching functions and cone fundamentals.
+% Illustrate the ideas underlying Konig fundamentals.
 %
-% These are illustrated Stiles-Burch 10 degree cmfs and the
+% Shows how to use dichromatic confusion data to estimate cone fundamentals
+% from color matching functions.  This is done Stiles-Burch 10 degree cmfs and the
 % Stockman-Sharpe 10 degree cone fundamentals, but the principles
 % would apply to any tristimulus system and cone fundamentals that
 % were a linear transfomration of the color matching functions.
 %
-% Shows that Stockman-Sharpe 10 degree fundamentals are a linear
-% transformation of the Stiles-Burch 10 degree Cmfs, and illustrates how
-% the spectrum locus, cone isolating stimulus directions, and cone response
-% mechanism vectors look in the RGB tristimulus and rg chromaticity
-% diagrams.
+% This routine isn't based on real data, the dichromatic confusion data are
+% syntehsized using the 'known' cone fundamentals.  What this routine shows
+% is how such data lock donw the desired transformation.
 %
 % The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at 
 % 645.16, 526.32, 444.44 nm.
+%
+% See also cbColorMatching_StilesBurch10Cmfs.
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
@@ -49,6 +50,14 @@ S_10nm = [390 10 37];
 data.wls_10nm = SToWls(S_10nm);
 data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
 
+%% Get the cmf spectrum locus normalized to simplex
+for i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+end
+
 %% Create the color matching primaries
 % Round to nearest nm which is not exact but appears to
 % work to within about 1 percent numerically in various
@@ -60,32 +69,6 @@ for i = 1:3
     data.B_1nm(wlIndex,i) = 1;
 end
 
-%% Plot of the color matching functions
-if (runTimeParams.generatePlots)
-    [stilesBurch10Fig,figParams] = cbFigInit;
-    figParams.xLimLow = 350;
-    figParams.xLimHigh = 750;
-    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
-    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
-        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
-        figParams.yLimLow = -1;
-    figParams.yLimHigh = 4;
-    figParams.yTicks = [-1 0 1 2 3 4];
-    figParams.yTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
-    
-    plot(data.wls_1nm,data.T_stiles10_1nm(1,:)','r','LineWidth',figParams.lineWidth);
-    plot(data.wls_1nm,data.T_stiles10_1nm(2,:)','g','LineWidth',figParams.lineWidth);
-    plot(data.wls_1nm,data.T_stiles10_1nm(3,:)','b','LineWidth',figParams.lineWidth);
-    
-    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
-    ylabel('CMF (energy units)','FontSize',figParams.labelFontSize);
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(stilesBurch10Fig,figParams);
- 
-    % Save the figure
-    FigureSave(fullfile(outputDir,[mfilename '_Cmfs']),stilesBurch10Fig,figParams.figType);
-end
-
 %% Load Stockman-Sharpe 10-degree cone fundamentals
 load T_cones_ss10
 data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
@@ -93,36 +76,6 @@ data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
 % Fit with linear transform of cmf's, just to show that it works.
 data.M_CmfToCones = ((data.T_stiles10_1nm')\(data.T_cones10_1nm'))';
 data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
-if (runTimeParams.generatePlots)
-    [stockmanSharpe10Fig,figParams] = cbFigInit;
-    figParams.xLimLow = 350;
-    figParams.xLimHigh = 750;
-    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
-    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
-        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
-    figParams.yLimLow = 0;
-    figParams.yLimHigh = 1;
-    figParams.yTicks = [0 0.5 1];
-    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 '};
-    
-    % Plot the fundamentals.
-    plot(data.wls_1nm,data.T_cones10_1nm(1,:)','r','LineWidth',figParams.lineWidth);
-    plot(data.wls_1nm,data.T_cones10_1nm(2,:)','g','LineWidth',figParams.lineWidth);
-    plot(data.wls_1nm,data.T_cones10_1nm(3,:)','b','LineWidth',figParams.lineWidth);
-    
-    % Pop on top the fit from Stiles-Burch 10 degree cmfs.
-    plot(data.wls_1nm,data.T_cones10_fit_1nm(1,:)','k:','LineWidth',figParams.lineWidth-1);
-    plot(data.wls_1nm,data.T_cones10_fit_1nm(2,:)','k:','LineWidth',figParams.lineWidth-1);
-    plot(data.wls_1nm,data.T_cones10_fit_1nm(3,:)','k:','LineWidth',figParams.lineWidth-1); 
-    
-    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
-    ylabel('Cone Fundamental (energy units)','FontSize',figParams.labelFontSize);
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(stockmanSharpe10Fig,figParams);
-    
-    % Save the figure
-    FigureSave(fullfile(outputDir,[mfilename '_TransformToSS10ConeFundamentals']),stockmanSharpe10Fig,figParams.figType);
-end
 
 %% Find the stimuli that isolate each of the cones.
 %
@@ -140,16 +93,6 @@ data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
 for i = 1:size(data.coneIsolatingRGBDirs,2)
     data.coneIsolatingRGBDirsNorm(:,i) = data.coneIsolatingRGBDirs(:,i)/norm(data.coneIsolatingRGBDirs(:,i));
 end
-
-% Check.  Reconstruct spectra and compute cone responses from fundamentals.
-% These should be the three unit vectors within numerial tolerance if
-% everything is working right.  The fact that it works is a pretty good
-% check that things are sensible.
-data.coneIsolatingSpectra = data.B_1nm*data.coneIsolatingRGBDirs;
-data.coneIsolatingSpectraLMS = data.T_cones10_1nm*data.coneIsolatingSpectra;
-tolerance = 0.01;
-quantity = data.coneIsolatingSpectraLMS-eye(3,3);
-UnitTest.assertIsZero(max(abs(quantity)),'Cone isolating spectra LMS check',tolerance);
 
 %% Find the cone sensitivity vectors in RGB tristimulus space.
 % These are unit vectors such that when you project onto them, you
@@ -174,17 +117,6 @@ for i = 1:size(data.coneResponseRGBVectors,1)
     data.coneResponseRGBVectorsNorm(i,:) = data.coneResponseRGBVectors(i,:)/norm(data.coneResponseRGBVectors(i,:));
 end
 
-% Check.  Generate a bunch of random spectra as linear combinations of the
-% color matching primaries, and compute cone responses directly from
-% fundamentals and from the tristimulus values.
-randomTristim = rand(3,100);
-randomSpectra = data.B_1nm*randomTristim;
-randomConeExcitationsDirect = data.T_cones10_1nm*randomSpectra;
-randomConeExcitationsFromTristim = data.coneResponseRGBVectors*randomTristim;
-tolerance = 0.01;
-UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitationsFromTristim(:))), ...
-    'Cone response vector check',tolerance);
-
 %% Get the cmf spectrum locus normalized to simplex
 for i = 1:size(data.T_stiles10_1nm,2);
     data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
@@ -198,124 +130,91 @@ for i = 1:size(data.coneIsolatingRGBDirs,2);
     data.coneIsolatingRGBDirs_simplex(:,i) = data.coneIsolatingRGBDirs(:,i)/sum(data.coneIsolatingRGBDirs(:,i));
 end
 
-%% Make a 3D RGB plot of the spectrum locus and cone isolating vectors
+%% Get confusion lines.
 %
-% This is a pretty complicated plot.  It shows the spectrum locus
-% in the RGB color matching space as well as projected onto the 
-% simplex (plane defined by R+G+B = 1).
+% We can generate these by adding the L cone isolating direction to
+% to any stimulus.  So let's add it to each stimulus on the spectrum
+% locus.
+% 
+% These converge on the chromaticity of the isolating 
+% direction for each missing cone class.
+whichConfusionLine = 2;
+switch (whichConfusionLine)
+    % Protanope
+    case 1
+        whichConfusionColor = 'r';
+        confusionLineLengthFactor = 1;
+    % Deuteranope
+    case 2
+        whichConfusionColor = 'g';  
+        confusionLineLengthFactor = -3;
+    % Tritanope
+    case 3
+        whichConfusionColor = 'b';
+        confusionLineLengthFactor = 30;
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    nConfusionPoints = 100;
+    for j = 1:nConfusionPoints
+            confusionLine{i}(:,j) = data.T_stiles10_10nm(:,i) + ...
+                confusionLineLengthFactor*((j-1)/nConfusionPoints)*data.coneIsolatingRGBDirs(:,whichConfusionLine);
+            confusionLine_simplex{i}(:,j) = confusionLine{i}(:,j)/sum(confusionLine{i}(:,j));
+    end
+end
+
+%% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
 %
-% It also shows the three cone isolating directions, both in the positive
-% (+cone isomeriation) and negative (-cone isomerization) directions.
-% Positive is solid lines, negative dashed lines.  These directions contain
-% negaive primary power and are not physically realizable.
+% This includes a little empirical calculation of the gamut we can obtain
+% with positive combinations of the isolating vectors.  This is a bit 
+% non-intuitive, to me at least.
 if (runTimeParams.generatePlots)
-    [stilesBurch10SpectrumLocusFig,figParams] = cbFigInit;
-    figParams.xLimLow = -3;
-    figParams.xLimHigh = 4;
-    figParams.xTicks = [-3 -2 -1 0 1 2 3 4];
-    figParams.xTickLabels = {'-3.0 ' '-2.0 ' '-1.0 ' ' 0.0 ' ' 1.0 ' ' 2.0 ' ' 3.0 ' ' 4.0 '};
-    figParams.yLimLow = -0.5;
-    figParams.yLimHigh = 3.0;
-    figParams.yTicks = [-0.5 0 0.5 1.0 1.5 2.0 2.5 3.0];
-    figParams.yTickLabels = {'-0.5 ' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' '2.0 ' ' 2.5 ' ' 3.0 '};
-    figParams.zLimLow = -0.5;
-    figParams.zLimHigh = 2.0;
-    figParams.zTicks = [-0.5 0 0.5 1.0 1.5 2.0 ];
-    figParams.zTickLabels = {'-0.5' ' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 ' ' 2.0 '};
+    [chromaticityFig,figParams] = cbFigInit;
+    figParams.xLimLow = -2.5;
+    figParams.xLimHigh = 3;
+    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
+    figParams.yLimLow = -2.5;
+    figParams.yLimHigh = 3;
+    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
     
-    % Plot equal energy white in RGB and on the simplex
-    equalEnergy_1nm = ones(S_1nm(3),1);
-    equalEnergyRGB = data.T_stiles10_1nm*equalEnergy_1nm;
-    equalEnergyRGB_simplex = equalEnergyRGB/sum(equalEnergyRGB);
-    plot3(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),equalEnergyRGB_simplex(3),...
-        'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
-    
-    % Plot the spectrum locus
-    plot3(data.T_stiles10_1nm(1,:)',data.T_stiles10_1nm(2,:)',data.T_stiles10_1nm(3,:)', ...
+    % Plot the spectrum locus on the diagram along with equal energy white.
+    plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
         'k','LineWidth',figParams.lineWidth);
-    plot3(data.T_stiles10_10nm(1,:)',data.T_stiles10_10nm(2,:)',data.T_stiles10_10nm(3,:)', ...
-        'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-14);
+    plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
+       'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
     
-    % Plot the spectrum locus on the simplex plane
-    plot3(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)',data.T_stiles10_1nm_simplex(3,:)', ...
-        'y','LineWidth',figParams.lineWidth);
-    % plot3(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)',data.T_stiles10_10nm_simplex(3,:)', ...
-    %    'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
-    
-    % Plot the normalized cone isolating directions, scaled for nicer
-    % viewing
-    scaleFactor = 2;
-    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,1)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,1)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,1)], ...
-        'r','LineWidth',figParams.lineWidth+1);
-    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,2)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,2)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,2)], ...
-        'g','LineWidth',figParams.lineWidth+1);
-    plot3(scaleFactor*[0 data.coneIsolatingRGBDirsNorm(1,3)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(2,3)], ...
-        scaleFactor*[0 data.coneIsolatingRGBDirsNorm(3,3)], ...
-        'b','LineWidth',figParams.lineWidth+1);
-    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,1) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,1) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,1) 0], ...
-        'r--','LineWidth',figParams.lineWidth+1);
-    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,2) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,2) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,2) 0], ...
-        'g--','LineWidth',figParams.lineWidth+1);
-    plot3(scaleFactor*[-data.coneIsolatingRGBDirsNorm(1,3) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,3) 0], ...
-        scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,3) 0], ...
-        'b--','LineWidth',figParams.lineWidth+1);
-    
-    %% Plot where the cone isolating dirs lie on the simplex
+    % Plot where the cone isolating dirs lie on the diagram
     % 
-    % L and S directions intersect the plane on their positive
-    % excursions, while M intersects the plane on its negative
-    % excursion.  Indicate this graphically by not filling in
-    % the M cone point.
-     plot3([0 data.coneIsolatingRGBDirs_simplex(1,1)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(2,1)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(3,1)], ...
+    % The M-cone chromaticity corresponds to the negative direction
+    % of the primary, so it's plotted without a fill.
+     plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
+        [data.coneIsolatingRGBDirs_simplex(2,1)], ...
         'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
-    plot3([0 data.coneIsolatingRGBDirs_simplex(1,2)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(2,2)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(3,2)], ...
+    plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
+        [data.coneIsolatingRGBDirs_simplex(2,2)], ...
         'go','MarkerSize',figParams.markerSize-10);
-    plot3([0 data.coneIsolatingRGBDirs_simplex(1,3)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(2,3)], ...
-        [0 data.coneIsolatingRGBDirs_simplex(3,3)], ...
+    plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
+        [data.coneIsolatingRGBDirs_simplex(2,3)], ...
         'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
     
-    % Fill in simplex plane as a transparent light gray surface.  
-    % I fussed quite a bit by hand to define the points so that the
-    % resulting plane more or less fills the graph.
-    fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
-    
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
-    xlabel('R','FontSize',figParams.labelFontSize);
-    ylabel('G','FontSize',figParams.labelFontSize);
-    zlabel('B','FontSize',figParams.labelFontSize);
-    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
-    set(gca,'XDir','Reverse');
-    set(gca,'YDir','Reverse');
-    az = -51; el = 34; view(az,el);
-    grid on
- 
-    % Save the figure
+    % Plot the confusion lines
     %
-    % Saving as pdf does not work well for 3D plots; use png here  Also useful
-    % to have fig version so that you can load back into Matlab and rotate dynamically.
-    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_RGB3D']),stilesBurch10SpectrumLocusFig,'png');
-    saveas(stilesBurch10SpectrumLocusFig,fullfile(outputDir,[mfilename '_SpectrumLocus_RGB3D']),'fig');
+    % Getting the length of each of these right is a little tricky
+    for i = 1:size(data.T_stiles10_10nm,2);
+        plot(confusionLine_simplex{i}(1,:),confusionLine_simplex{i}(2,:),whichConfusionColor,'LineWidth',1);
+    end
+
+    % Labels
+    xlabel('r','FontSize',figParams.labelFontSize);
+    ylabel('g','FontSize',figParams.labelFontSize);
+    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(chromaticityFig,figParams);
+    
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_rgChrom']),chromaticityFig,figParams.figType);
 end
 
 %% 3D RGB plot of cone response vectors and isolating dirs.
@@ -498,6 +397,5 @@ end
 UnitTest.validationData('validateDataStruct', data);
 
 end
-
 
 
