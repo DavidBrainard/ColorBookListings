@@ -191,9 +191,10 @@ data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
     negB = -confusionLineFit{w}(2,:)';
     data.conpunctalPoint{w} = M\negB;
 <span class="keyword">end</span>
-</pre><h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="14"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput">[chromaticityFig,figParams] = cbFigInit;
-set(gcf,<span class="string">'Position'</span>,[100 254 1200 600]);
-<span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="14"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+    [chromaticityFig,figParams] = cbFigInit;
+    set(gcf,<span class="string">'Position'</span>,[100 254 1200 600]);
+
     figParams.xLimLow = -2;
     figParams.xLimHigh = 2;
     figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
@@ -309,7 +310,7 @@ T_cones10_1nm_copunctalDerivedRaw = data.M_CmfsToCones_copunctalDerived*data.T_s
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_KonigDerivedConeFundamentals'</span>]),stockmanSharpe10Fig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Save validation data<a name="17"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_KonigFundamentals_02.png" alt=""> <h2>Save validation data<a name="17"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
@@ -532,9 +533,10 @@ end
 % This includes a little empirical calculation of the gamut we can obtain
 % with positive combinations of the isolating vectors.  This is a bit
 % non-intuitive, to me at least.
-[chromaticityFig,figParams] = cbFigInit;
-set(gcf,'Position',[100 254 1200 600]);
 if (runTimeParams.generatePlots)
+    [chromaticityFig,figParams] = cbFigInit;
+    set(gcf,'Position',[100 254 1200 600]);
+
     figParams.xLimLow = -2;
     figParams.xLimHigh = 2;
     figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
