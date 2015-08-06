@@ -80,6 +80,7 @@ outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
 <span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
     mkdir(outputDir);
 <span class="keyword">end</span>
+close <span class="string">all</span>; drawnow;
 </pre><h2>Set parameters<a name="5"></a></h2><pre class="codeinput">calcParams.eyeDiameterMm = 24;
 calcParams.theWavelengthNm = 550;
 calcParams.thePupilDiameterMm = 2;
@@ -185,6 +186,7 @@ outputDir = sprintf('%s_Output',mfilename);
 if (~exist(outputDir,'dir'))
     mkdir(outputDir);
 end
+close all; drawnow;
 
 %% Set parameters
 calcParams.eyeDiameterMm = 24;

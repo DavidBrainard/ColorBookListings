@@ -85,6 +85,7 @@ outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
 <span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
     mkdir(outputDir);
 <span class="keyword">end</span>
+close <span class="string">all</span>; drawnow;
 </pre><h2>Supress irritating warnings<a name="5"></a></h2><pre class="codeinput">warnS = warning(<span class="string">'off'</span>,<span class="string">'images:initSize:adjustingMag'</span>);
 <span class="keyword">try</span>
 </pre><h2>Frozen noise, so that we can validate OK<a name="7"></a></h2><pre class="codeinput">    rng(<span class="string">'default'</span>);
@@ -404,6 +405,7 @@ outputDir = sprintf('%s_Output',mfilename);
 if (~exist(outputDir,'dir'))
     mkdir(outputDir);
 end
+close all; drawnow;
 
 %% Supress irritating warnings
 warnS = warning('off','images:initSize:adjustingMag');
