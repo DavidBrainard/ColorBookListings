@@ -217,9 +217,10 @@ end
 % This includes a little empirical calculation of the gamut we can obtain
 % with positive combinations of the isolating vectors.  This is a bit
 % non-intuitive, to me at least.
-[chromaticityFig,figParams] = cbFigInit;
-set(gcf,'Position',[100 254 1163 446]);
 if (runTimeParams.generatePlots)
+    [chromaticityFig,figParams] = cbFigInit;
+    set(gcf,'Position',[100 254 1200 600]);
+
     figParams.xLimLow = -2;
     figParams.xLimHigh = 2;
     figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
@@ -233,10 +234,8 @@ if (runTimeParams.generatePlots)
     
     % Montage plot of confusion lines
     for w = 1:3
-        chromSubplotHandle(w) = subplot(1,3,w); hold on;
-        set(gca,'FontName',figParams.fontName,'FontSize', ...
-            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',1);
-        
+        chromSubplotHandle(w) = subplot_tight(1,3,w,0.06); hold on;
+
         % Plot the confusion lines
         switch (w)
             case 1
@@ -287,6 +286,8 @@ if (runTimeParams.generatePlots)
         title(titleStr,'FontSize',figParams.titleFontSize-figParams.subplotFontShrink);
         axis('square');
         cbFigAxisSet(chromSubplotHandle(w),figParams);
+        set(gca,'FontName',figParams.fontName,'FontSize', ...
+            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',1);      
     end
     
     % Save the figure

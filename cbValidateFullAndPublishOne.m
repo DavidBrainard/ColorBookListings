@@ -11,7 +11,7 @@ UnitTest.usePreferencesForProject('cbScripts', 'reset');
 UnitTest.setPref('onRunTimeErrorBehavior', 'catchExceptionAndContinue');
 
 % Plot generation
-UnitTest.setPref('generatePlots',  false);
+UnitTest.setPref('generatePlots',  true);
 UnitTest.setPref('closeFigsOnInit', true);
 
 %% Verbosity Level
