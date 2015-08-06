@@ -12,14 +12,14 @@ function varargout = cbColorMatching_KonigFundamentals(varargin)
 % syntehsized using the 'known' cone fundamentals.  What this routine shows
 % is how such data lock donw the desired transformation.
 %
-% The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at 
+% The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at
 % 645.16, 526.32, 444.44 nm.
 %
 % See also cbColorMatching_StilesBurch10Cmfs.
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
-    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
 end
 
 %% Function implementing the isetbio validation code
@@ -81,7 +81,7 @@ data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
 %
 % Get the isolating directions.
 % We have the transformation for cmfs to cones spectral sensitivies.
-% This is also the transformation between tristimulus coordinates 
+% This is also the transformation between tristimulus coordinates
 % and cone excitations. Invert this to get transformation between
 % cone excitations and tristimulus coordinates.  Then apply to the
 % unit cone excitation vectors to get the cone isolating tristimulus
@@ -117,7 +117,7 @@ for i = 1:size(data.coneResponseRGBVectors,1)
     data.coneResponseRGBVectorsNorm(i,:) = data.coneResponseRGBVectors(i,:)/norm(data.coneResponseRGBVectors(i,:));
 end
 
-%% Get the cmf spectrum locus normalized to simplex
+%% Get the cmf spectrum locus normalized to simplex (R + G + B = 1)
 for i = 1:size(data.T_stiles10_1nm,2);
     data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
 end
@@ -130,12 +130,12 @@ for i = 1:size(data.coneIsolatingRGBDirs,2);
     data.coneIsolatingRGBDirs_simplex(:,i) = data.coneIsolatingRGBDirs(:,i)/sum(data.coneIsolatingRGBDirs(:,i));
 end
 
-%% Get dichromatic confusion lines.
+%% Get dichromatic confusion lines
 %
 % We can generate these by adding the cone isolating direction to
 % to any stimulus.  So let's add it to each stimulus on the spectrum
 % locus.
-% 
+%
 % These converge on the chromaticity of the isolating direction for each
 % My intuition for this is that as you add more and more of the stimulus in
 % the cone isolating direction, it dominates the tristimulus coordinates
@@ -144,7 +144,10 @@ end
 % isolating stimulus.
 %
 % To make these plot nicely, we chose a scale factor for each type of
-% dichromat differently.
+% dichromat differently.  For the M cone isolating direction, it's the
+% negative excursion that intersects the simplex; plotting the confusion
+% lines looks nicer if we use the negative rather than the positive
+% excusion.
 for w = 1:3
     switch (w)
         % Protanope
@@ -171,11 +174,11 @@ for w = 1:3
 end
 
 %% If we have measured the confusion lines, we know the cone isolating directions.
-% 
+%
 % This is trivial in the case that we measure them in the full tristimulus
 % space -- we just need to find the direction of the confusion line for any
 % base stimulus and we have it.  As we'll show below, having the direction
-% of the cone isolating stimulus for each cone class is enough to lock 
+% of the cone isolating stimulus for each cone class is enough to lock
 % down the transformation from tristimulus coordinates to cone exciations,
 % and this together with the color matching functions is enough to give us
 % the cone fundamentals.  There is a free scaling parameter left for each
@@ -185,7 +188,7 @@ end
 % each type of dichromat.  Then we can still do what we need.  This isn't
 % too hard, but is a little less trivial.  We use the confusion lines for
 % each type of dichromat to find where they intersect.  This "copunctal point"
-% gives us the chromaticity of the cone isolating directions, and from there 
+% gives us the chromaticity of the cone isolating directions, and from there
 % we can get the tristimulus coordinates the cone isolating directions up
 % to a free scale factor.  Let's illustrate that.
 %
@@ -195,136 +198,77 @@ end
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
 %
 % This includes a little empirical calculation of the gamut we can obtain
-% with positive combinations of the isolating vectors.  This is a bit 
+% with positive combinations of the isolating vectors.  This is a bit
 % non-intuitive, to me at least.
+[chromaticityFig,figParams] = cbFigInit;
+set(gcf,'Position',[100 254 1163 446]);
 if (runTimeParams.generatePlots)
-    [chromaticityFig,figParams] = cbFigInit;
     figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 3;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
-    figParams.yLimLow = -2.5;
+    figParams.xLimHigh = 1.5;
+    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5];
+    figParams.xTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }'};
+    figParams.yLimLow = -1;
     figParams.yLimHigh = 3;
-    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
         '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
     
-    % Plot the spectrum locus on the diagram along with equal energy white.
-    plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
-        'k','LineWidth',figParams.lineWidth);
-    plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
-       'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
-    
-    % Plot where the cone isolating dirs lie on the diagram
-    % 
-    % The M-cone chromaticity corresponds to the negative direction
-    % of the primary, so it's plotted without a fill.
-     plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,1)], ...
-        'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
-    plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,2)], ...
-        'go','MarkerSize',figParams.markerSize-10);
-    plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,3)], ...
-        'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
-    
-    % Plot the confusion lines
-    %
-    % Getting the length of each of these right is a little tricky
-    for i = 1:size(data.T_stiles10_10nm,2);
-        plot(confusionLine_simplex{i}(1,:),confusionLine_simplex{i}(2,:),whichConfusionColor,'LineWidth',1);
+    % Montage plot of confusion lines
+    for w = 1:3
+        subplotHandle = subplot(1,3,w); hold on;
+        set(gca,'FontName',figParams.fontName,'FontSize', ...
+            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',figParams.axisLineWidth);
+        
+        % Plot the confusion lines
+        switch (w)
+            case 1
+                % Protanope
+                whichConfusionColor = 'r';
+                titleStr = 'Protan';
+            case 2
+                % Deuteranope
+                whichConfusionColor = 'g';
+                titleStr = 'Deutan';
+            case 3
+                % Tritanope
+                titleStr = 'Tritan';
+                whichConfusionColor = 'b';
+        end
+        for i = 1:size(data.T_stiles10_10nm,2);
+            plot(confusionLine_simplex{w,i}(1,:),confusionLine_simplex{w,i}(2,:),whichConfusionColor,'LineWidth',1);
+        end
+        
+        % Plot the spectrum locus on the diagram along with equal energy white.
+        plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
+            'k','LineWidth',figParams.lineWidth);
+        plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
+            'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-14);
+        
+        % Plot where the cone isolating dirs lie on the diagram
+        %
+        % The M-cone chromaticity corresponds to the negative direction
+        % of the primary, so it's plotted without a fill.
+        plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,1)], ...
+            'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
+        plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,2)], ...
+            'go','MarkerSize',figParams.markerSize-10);
+        plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,3)], ...
+            'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
+        
+        % Labels
+        xlabel('r','FontSize',figParams.labelFontSize-figParams.subplotFontShrink);
+        ylabel('g','FontSize',figParams.labelFontSize-figParams.subplotFontShrink);
+        title(titleStr,'FontSize',figParams.titleFontSize-figParams.subplotFontShrink);
+        axis('square');
+        cbFigAxisSet(subplotHandle,figParams);
     end
-
-    % Labels
-    xlabel('r','FontSize',figParams.labelFontSize);
-    ylabel('g','FontSize',figParams.labelFontSize);
-    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(chromaticityFig,figParams);
     
     % Save the figure
-    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_rgChrom']),chromaticityFig,figParams.figType);
-end
-
-
-
-%% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
-%
-% This includes a little empirical calculation of the gamut we can obtain
-% with positive combinations of the isolating vectors.  This is a bit 
-% non-intuitive, to me at least.
-if (runTimeParams.generatePlots)
-    [chromaticityFig,figParams] = cbFigInit;
-    figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 3;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
-    figParams.yLimLow = -2.5;
-    figParams.yLimHigh = 3;
-    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
-   
-    % Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.
-    %
-    % Get a whole bunch of feasible points.
-    weights = rand(3,50000);
-    randRGB = data.coneIsolatingRGBDirs*weights;
-    
-    % ... Convert to rg chromaticity.
-    %
-    % XYZToxyY is designed for CIE 1931 conventins, but calculation of
-    % first two coordinates is exactly what we want here (r = R/(R+G+B), g
-    % = g/(R+G+B)).
-    randrgY = XYZToxyY(randRGB);
-    randrg = randrgY(1:2,:);
-    
-    % ... Split the points into those with r chromaticity less than that of L's
-    % and those with r chromaticity greater than that of M's.  These are
-    % the two groups we see if we plot them all....
-    group1index = find(randrg(1,:) <= data.coneIsolatingRGBDirs_simplex(1,1));
-    group2index = find(randrg(1,:) >= data.coneIsolatingRGBDirs_simplex(1,2));
-    UnitTest.assert(length(group1index)+length(group2index) == length(randrg(1,:)),'all points accounted for');
-    
-    % ... Finally, find convex hull of each group and plot as a transparent plane
-    dt1 = delaunayTriangulation(randrg(1,group1index)',randrg(2,group1index)');
-    k1 = convexHull(dt1);
-    fill(dt1.Points(k1,1),dt1.Points(k1,2),[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
-    dt2 = delaunayTriangulation(randrg(1,group2index)',randrg(2,group2index)');
-    k2 = convexHull(dt2);
-    fill(dt2.Points(k2,1),dt2.Points(k2,2),[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
-    
-    % Plot the spectrum locus on the diagram along with equal energy white.
-    plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
-        'k','LineWidth',figParams.lineWidth);
-    plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
-       'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
-   plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
-        'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
-    
-    % Plot where the cone isolating dirs lie on the diagram
-    % 
-    % The M-cone chromaticity corresponds to the negative direction
-    % of the primary, so it's plotted without a fill.
-     plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,1)], ...
-        'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
-    plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,2)], ...
-        'go','MarkerSize',figParams.markerSize-10);
-    plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
-        [data.coneIsolatingRGBDirs_simplex(2,3)], ...
-        'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
-    
-    xlabel('r','FontSize',figParams.labelFontSize);
-    ylabel('g','FontSize',figParams.labelFontSize);
-    title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(chromaticityFig,figParams);
-    
-    % Save the figure
-    FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_rgChrom']),chromaticityFig,figParams.figType);
+    FigureSave(fullfile(outputDir,[mfilename '_ConfusionLines_rgChrom']),chromaticityFig,figParams.figType);
 end
 
 %% Save validation data
