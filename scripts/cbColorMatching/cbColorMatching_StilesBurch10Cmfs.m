@@ -117,7 +117,7 @@ if (runTimeParams.generatePlots)
     
     xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
     ylabel('Cone Fundamental (energy units)','FontSize',figParams.labelFontSize);
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    title('Stockman-Sharpe 10-degree CMFs','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stockmanSharpe10Fig,figParams);
     
     % Save the figure
