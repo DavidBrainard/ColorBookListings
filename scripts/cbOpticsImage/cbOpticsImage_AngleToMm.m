@@ -21,6 +21,7 @@ outputDir = sprintf('%s_Output',mfilename);
 if (~exist(outputDir,'dir'))
     mkdir(outputDir);
 end
+close all; drawnow;
 
 %% Set parameters
 %

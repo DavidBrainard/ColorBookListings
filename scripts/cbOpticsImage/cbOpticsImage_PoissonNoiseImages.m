@@ -21,12 +21,14 @@ outputDir = sprintf('%s_Output',mfilename);
 if (~exist(outputDir,'dir'))
     mkdir(outputDir);
 end
+close all; drawnow;
 
 %% Supress irritating warnings
 warnS = warning('off','images:initSize:adjustingMag');
 try
     
     %% Frozen noise, so that we can validate OK
+    rng('default');
     randomSeedValue = 26;
     rng(randomSeedValue);
 
