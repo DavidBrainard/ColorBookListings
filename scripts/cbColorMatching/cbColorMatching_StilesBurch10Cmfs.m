@@ -294,9 +294,7 @@ if (runTimeParams.generatePlots)
     % resulting plane more or less fills the graph.
     fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
     
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
+    % Labels
     xlabel('R','FontSize',figParams.labelFontSize);
     ylabel('G','FontSize',figParams.labelFontSize);
     zlabel('B','FontSize',figParams.labelFontSize);
@@ -392,9 +390,7 @@ if (runTimeParams.generatePlots)
         ]',...
         [0.75 0 0.75],'EdgeColor','None','FaceAlpha',0.75);
     
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
+    % Labels
     xlabel('R','FontSize',figParams.labelFontSize);
     ylabel('G','FontSize',figParams.labelFontSize);
     zlabel('B','FontSize',figParams.labelFontSize);

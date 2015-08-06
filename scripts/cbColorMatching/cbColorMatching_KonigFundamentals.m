@@ -130,37 +130,67 @@ for i = 1:size(data.coneIsolatingRGBDirs,2);
     data.coneIsolatingRGBDirs_simplex(:,i) = data.coneIsolatingRGBDirs(:,i)/sum(data.coneIsolatingRGBDirs(:,i));
 end
 
-%% Get confusion lines.
+%% Get dichromatic confusion lines.
 %
-% We can generate these by adding the L cone isolating direction to
+% We can generate these by adding the cone isolating direction to
 % to any stimulus.  So let's add it to each stimulus on the spectrum
 % locus.
 % 
-% These converge on the chromaticity of the isolating 
-% direction for each missing cone class.
-whichConfusionLine = 2;
-switch (whichConfusionLine)
-    % Protanope
-    case 1
-        whichConfusionColor = 'r';
-        confusionLineLengthFactor = 1;
-    % Deuteranope
-    case 2
-        whichConfusionColor = 'g';  
-        confusionLineLengthFactor = -3;
-    % Tritanope
-    case 3
-        whichConfusionColor = 'b';
-        confusionLineLengthFactor = 30;
-end
-for i = 1:size(data.T_stiles10_10nm,2);
-    nConfusionPoints = 100;
-    for j = 1:nConfusionPoints
-            confusionLine{i}(:,j) = data.T_stiles10_10nm(:,i) + ...
-                confusionLineLengthFactor*((j-1)/nConfusionPoints)*data.coneIsolatingRGBDirs(:,whichConfusionLine);
-            confusionLine_simplex{i}(:,j) = confusionLine{i}(:,j)/sum(confusionLine{i}(:,j));
+% These converge on the chromaticity of the isolating direction for each
+% My intuition for this is that as you add more and more of the stimulus in
+% the cone isolating direction, it dominates the tristimulus coordinates
+% more and more, swamping whatever it was being added to.  In the limit,
+% then, the chromaticity of the summed stimulus will be that of the cone
+% isolating stimulus.
+%
+% To make these plot nicely, we chose a scale factor for each type of
+% dichromat differently.
+for w = 1:3
+    switch (w)
+        % Protanope
+        case 1
+            whichConfusionColor = 'r';
+            confusionLineLengthFactor = 1;
+            % Deuteranope
+        case 2
+            whichConfusionColor = 'g';
+            confusionLineLengthFactor = -3;
+            % Tritanope
+        case 3
+            whichConfusionColor = 'b';
+            confusionLineLengthFactor = 30;
+    end
+    for i = 1:size(data.T_stiles10_10nm,2);
+        nConfusionPoints = 100;
+        for j = 1:nConfusionPoints
+            confusionLine{w,i}(:,j) = data.T_stiles10_10nm(:,i) + ...
+                confusionLineLengthFactor*((j-1)/nConfusionPoints)*data.coneIsolatingRGBDirs(:,w);
+            confusionLine_simplex{w,i}(:,j) = confusionLine{w,i}(:,j)/sum(confusionLine{w,i}(:,j));
+        end
     end
 end
+
+%% If we have measured the confusion lines, we know the cone isolating directions.
+% 
+% This is trivial in the case that we measure them in the full tristimulus
+% space -- we just need to find the direction of the confusion line for any
+% base stimulus and we have it.  As we'll show below, having the direction
+% of the cone isolating stimulus for each cone class is enough to lock 
+% down the transformation from tristimulus coordinates to cone exciations,
+% and this together with the color matching functions is enough to give us
+% the cone fundamentals.  There is a free scaling parameter left for each
+% fundamental, that has to be locked down some other way.
+%
+% What if we have just the chromaticities of several confusion lines for
+% each type of dichromat.  Then we can still do what we need.  This isn't
+% too hard, but is a little less trivial.  We use the confusion lines for
+% each type of dichromat to find where they intersect.  This "copunctal point"
+% gives us the chromaticity of the cone isolating directions, and from there 
+% we can get the tristimulus coordinates the cone isolating directions up
+% to a free scale factor.  Let's illustrate that.
+%
+% We can express each confusion line as g = a*r+b.   First step is to find
+% a and b for each confusion line.
 
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
 %
@@ -217,103 +247,7 @@ if (runTimeParams.generatePlots)
     FigureSave(fullfile(outputDir,[mfilename '_SpectrumLocus_rgChrom']),chromaticityFig,figParams.figType);
 end
 
-%% 3D RGB plot of cone response vectors and isolating dirs.
-%
-% This is much like the 3D plot of the spectrum locus, except
-% that we get rid of the locus and add the cone response vectors.
-%
-% This plot shows the orthogonality between cone isolating vectors
-% for one cone class and the response vectors for the other two.
-%
-% Here the isolating vectors are shown as solid and the response
-% vectors as dashed.
-if (runTimeParams.generatePlots)
-    [stilesBurch10ConeIsolatingFig,figParams] = cbFigInit;
-    figParams.xLimLow = -1;
-    figParams.xLimHigh = 1;
-    figParams.xTicks = [-1 0 1];
-    figParams.xTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 '};
-    figParams.yLimLow = -1;
-    figParams.yLimHigh = 1;
-    figParams.yTicks = [-1 0 1];
-    figParams.yTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 '};
-    figParams.zLimLow = -1;
-    figParams.zLimHigh = 1;
-    figParams.zTicks = [-1 0 1];
-    figParams.zTickLabels = {'-1.0 ' ' 0.0 ' ' 1.0 '};
-    
-    % Plot the normalized cone isolating directions
-    plot3([-data.coneIsolatingRGBDirsNorm(1,1) data.coneIsolatingRGBDirsNorm(1,1)], ...
-        [-data.coneIsolatingRGBDirsNorm(2,1) data.coneIsolatingRGBDirsNorm(2,1)], ...
-        [-data.coneIsolatingRGBDirsNorm(3,1) data.coneIsolatingRGBDirsNorm(3,1)], ...
-        'r','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneIsolatingRGBDirsNorm(1,2) data.coneIsolatingRGBDirsNorm(1,2)], ...
-        [-data.coneIsolatingRGBDirsNorm(2,2) data.coneIsolatingRGBDirsNorm(2,2)], ...
-        [-data.coneIsolatingRGBDirsNorm(3,2) data.coneIsolatingRGBDirsNorm(3,2)], ...
-        'g','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneIsolatingRGBDirsNorm(1,3) data.coneIsolatingRGBDirsNorm(1,3)], ...
-        [-data.coneIsolatingRGBDirsNorm(2,3) data.coneIsolatingRGBDirsNorm(2,3)], ...
-        [-data.coneIsolatingRGBDirsNorm(3,3) data.coneIsolatingRGBDirsNorm(3,3)], ...
-        'b','LineWidth',figParams.lineWidth+1);
-        
-    % Plot the normalized response vectors.
-    %
-    % Remember, these are in the rows.
-    plot3([-data.coneResponseRGBVectorsNorm(1,1) data.coneResponseRGBVectorsNorm(1,1)], ...
-        [-data.coneResponseRGBVectorsNorm(1,2) data.coneResponseRGBVectorsNorm(1,2)], ...
-        [-data.coneResponseRGBVectorsNorm(1,3) data.coneResponseRGBVectorsNorm(1,3)], ...
-        'r--','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneResponseRGBVectorsNorm(2,1) data.coneResponseRGBVectorsNorm(2,1)], ...
-        [-data.coneResponseRGBVectorsNorm(2,2) data.coneResponseRGBVectorsNorm(2,2)], ...
-        [-data.coneResponseRGBVectorsNorm(2,3) data.coneResponseRGBVectorsNorm(2,3)], ...
-        'g--','LineWidth',figParams.lineWidth+1);
-    plot3([-data.coneResponseRGBVectorsNorm(3,1) data.coneResponseRGBVectorsNorm(3,1)], ...
-        [-data.coneResponseRGBVectorsNorm(3,2) data.coneResponseRGBVectorsNorm(3,2)], ...
-        [-data.coneResponseRGBVectorsNorm(3,3) data.coneResponseRGBVectorsNorm(3,3)], ...
-        'b--','LineWidth',figParams.lineWidth+1);
-    
-    % Fill in the plane that contains the red and green response vectors. 
-    % This should be orthogonal to the green isolating direction.
-    fill3([-data.coneResponseRGBVectorsNorm(1,1)-data.coneResponseRGBVectorsNorm(3,1) ...
-        -data.coneResponseRGBVectorsNorm(1,1)+data.coneResponseRGBVectorsNorm(3,1) ...
-        data.coneResponseRGBVectorsNorm(1,1)+data.coneResponseRGBVectorsNorm(3,1) ...
-        data.coneResponseRGBVectorsNorm(1,1)-data.coneResponseRGBVectorsNorm(3,1) ...
-        ]',...
-        [-data.coneResponseRGBVectorsNorm(1,2)-data.coneResponseRGBVectorsNorm(3,2) ...
-        -data.coneResponseRGBVectorsNorm(1,2)+data.coneResponseRGBVectorsNorm(3,2) ...
-        data.coneResponseRGBVectorsNorm(1,2)+data.coneResponseRGBVectorsNorm(3,2) ...
-        data.coneResponseRGBVectorsNorm(1,2)-data.coneResponseRGBVectorsNorm(3,2) ...
-        ]',...
-        [-data.coneResponseRGBVectorsNorm(1,3)-data.coneResponseRGBVectorsNorm(3,3) ...
-        -data.coneResponseRGBVectorsNorm(1,3)+data.coneResponseRGBVectorsNorm(3,3) ...
-        data.coneResponseRGBVectorsNorm(1,3)+data.coneResponseRGBVectorsNorm(3,3) ...
-        data.coneResponseRGBVectorsNorm(1,3)-data.coneResponseRGBVectorsNorm(3,3) ...
-        ]',...
-        [0.75 0 0.75],'EdgeColor','None','FaceAlpha',0.75);
-    
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
-    xlabel('R','FontSize',figParams.labelFontSize);
-    ylabel('G','FontSize',figParams.labelFontSize);
-    zlabel('B','FontSize',figParams.labelFontSize);
-    title('Cone Isolating and Response Vectors','FontSize',figParams.titleFontSize);
-    cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
-    set(gca,'XDir','Reverse');
-    set(gca,'YDir','Reverse');
-    az = -51; el = 34; view(az,el);
-    grid on
- 
-    % Save the figure
-    %  %
-    % Saving as pdf does not work well for 3D plots; use png here  Also useful
-    % to have fig version so that you can load back into Matlab and rotate dynamically.
-    FigureSave(fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),stilesBurch10ConeIsolatingFig,'png');
-    saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename '_ConeIsolating_RGB3D']),'fig');
-end
+
 
 %% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
 %
