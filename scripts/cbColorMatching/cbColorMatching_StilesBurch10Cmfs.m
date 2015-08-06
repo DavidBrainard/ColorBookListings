@@ -300,9 +300,9 @@ if (runTimeParams.generatePlots)
     zlabel('B','FontSize',figParams.labelFontSize);
     title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
+    %zlim([figParams.zLimLow figParams.zLimHigh]);
+    %set(gca,'ZTick',figParams.zTicks);
+    %set(gca,'ZTickLabel',figParams.zTickLabels);
     set(gca,'XDir','Reverse');
     set(gca,'YDir','Reverse');
     az = -51; el = 34; view(az,el);
@@ -396,9 +396,9 @@ if (runTimeParams.generatePlots)
     zlabel('B','FontSize',figParams.labelFontSize);
     title('Cone Isolating and Response Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
+    %zlim([figParams.zLimLow figParams.zLimHigh]);
+    %set(gca,'ZTick',figParams.zTicks);
+    %set(gca,'ZTickLabel',figParams.zTickLabels);
     set(gca,'XDir','Reverse');
     set(gca,'YDir','Reverse');
     az = -51; el = 34; view(az,el);
@@ -418,16 +418,16 @@ end
 % with positive combinations of the isolating vectors.  This is a bit 
 % non-intuitive, to me at least.
 if (runTimeParams.generatePlots)
-    [chromaticityFig,figParams] = cbFigInit;
-    figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 3;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.xTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
-    figParams.yLimLow = -2.5;
+    [chromaticityFig,figParams] = cbFigInit; 
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {'^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }'};
+    figParams.yLimLow = -1;
     figParams.yLimHigh = 3;
-    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
         '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
    
     % Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.
@@ -464,7 +464,7 @@ if (runTimeParams.generatePlots)
         'k','LineWidth',figParams.lineWidth);
     plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
        'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
-   plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
+    plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
         'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
     
     % Plot where the cone isolating dirs lie on the diagram

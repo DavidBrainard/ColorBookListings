@@ -15,7 +15,10 @@ function varargout = cbColorMatching_KonigFundamentals(varargin)
 % The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at
 % 645.16, 526.32, 444.44 nm.
 %
-% See also cbColorMatching_StilesBurch10Cmfs.
+% See also cbColorMatching_StilesBurch10Cmfs.  Indeed, understanding that
+% script is probably a prerequisit for understanding this one, as that
+% script goes through in more detail some of the calculations used in
+% passing here.
 %
 % (c) David Brainard and Andrew Stockman, 2015
 
@@ -185,7 +188,7 @@ end
 % fundamental, that has to be locked down some other way.
 %
 % What if we have just the chromaticities of several confusion lines for
-% each type of dichromat.  Then we can still do what we need.  This isn't
+% each type of dichromat?  Then we can still do what we need.  This isn't
 % too hard, but is a little less trivial.  We use the confusion lines for
 % each type of dichromat to find where they intersect.  This "copunctal point"
 % gives us the chromaticity of the cone isolating directions, and from there
@@ -203,11 +206,11 @@ end
 [chromaticityFig,figParams] = cbFigInit;
 set(gcf,'Position',[100 254 1163 446]);
 if (runTimeParams.generatePlots)
-    figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 1.5;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5];
-    figParams.xTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }'};
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {'^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }'};
     figParams.yLimLow = -1;
     figParams.yLimHigh = 3;
     figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
@@ -218,7 +221,7 @@ if (runTimeParams.generatePlots)
     for w = 1:3
         subplotHandle = subplot(1,3,w); hold on;
         set(gca,'FontName',figParams.fontName,'FontSize', ...
-            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',figParams.axisLineWidth);
+            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',1);
         
         % Plot the confusion lines
         switch (w)
@@ -236,14 +239,15 @@ if (runTimeParams.generatePlots)
                 whichConfusionColor = 'b';
         end
         for i = 1:size(data.T_stiles10_10nm,2);
-            plot(confusionLine_simplex{w,i}(1,:),confusionLine_simplex{w,i}(2,:),whichConfusionColor,'LineWidth',1);
+            plot(confusionLine_simplex{w,i}(1,:),confusionLine_simplex{w,i}(2,:),whichConfusionColor,...
+                'LineWidth',figParams.lineWidth-figParams.subplotLineShrink);
         end
         
         % Plot the spectrum locus on the diagram along with equal energy white.
         plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
-            'k','LineWidth',figParams.lineWidth);
+            'k','LineWidth',figParams.lineWidth-1);
         plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
-            'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-14);
+            'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink-2);
         
         % Plot where the cone isolating dirs lie on the diagram
         %
@@ -251,13 +255,13 @@ if (runTimeParams.generatePlots)
         % of the primary, so it's plotted without a fill.
         plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
             [data.coneIsolatingRGBDirs_simplex(2,1)], ...
-            'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
+            'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
         plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
             [data.coneIsolatingRGBDirs_simplex(2,2)], ...
-            'go','MarkerSize',figParams.markerSize-10);
+            'go','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
         plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
             [data.coneIsolatingRGBDirs_simplex(2,3)], ...
-            'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-10);
+            'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
         
         % Labels
         xlabel('r','FontSize',figParams.labelFontSize-figParams.subplotFontShrink);
