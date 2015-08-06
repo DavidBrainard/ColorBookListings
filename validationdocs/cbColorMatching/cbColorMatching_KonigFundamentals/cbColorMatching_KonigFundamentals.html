@@ -1,0 +1,677 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>cbColorMatching_KonigFundamentals</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-08-06"><meta name="DC.source" content="cbColorMatching_KonigFundamentals.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Function implementing the isetbio validation code</a></li><li><a href="#4">Hello</a></li><li><a href="#5">Get and plot Stiles-Burch 10-degree color matching functions</a></li><li><a href="#6">Get the cmf spectrum locus normalized to simplex</a></li><li><a href="#7">Load Stockman-Sharpe 10-degree cone fundamentals</a></li><li><a href="#8">Find the stimuli that isolate each of the cones.</a></li><li><a href="#9">Find the cone sensitivity vectors in RGB tristimulus space.</a></li><li><a href="#10">Get the cmf spectrum locus normalized to simplex (R + G + B = 1)</a></li><li><a href="#11">Get the cone isolating dirs normalized to the simplex</a></li><li><a href="#12">Get dichromatic confusion lines</a></li><li><a href="#13">If we have measured the confusion lines, we can get the cone isolating directions.</a></li><li><a href="#14">Plot spectrum locus and isolating vectors in the r-g chromaticity plane</a></li><li><a href="#15">Use the recovered copunctal points to get the cones from the color matching functions</a></li><li><a href="#16">Plot actual and derived cone fundamentals</a></li><li><a href="#17">Save validation data</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = cbColorMatching_KonigFundamentals(varargin)
+<span class="comment">%</span>
+<span class="comment">% Illustrate the ideas underlying Konig fundamentals.</span>
+<span class="comment">%</span>
+<span class="comment">% Shows how to use dichromatic confusion data to estimate cone fundamentals</span>
+<span class="comment">% from color matching functions.  This is done for Stiles-Burch 10 degree cmfs</span>
+<span class="comment">% and the Stockman-Sharpe 10 degree cone fundamentals, but the principles</span>
+<span class="comment">% would apply to any tristimulus system and cone fundamentals that</span>
+<span class="comment">% were a linear transfomration of the color matching functions.</span>
+<span class="comment">%</span>
+<span class="comment">% This routine isn't based on real data, the dichromatic confusion data are</span>
+<span class="comment">% syntehsized using the 'known' Stockman-Shapre cone fundamentals.  What this</span>
+<span class="comment">% routine shows is how such data lock down the desired transformation.</span>
+<span class="comment">%</span>
+<span class="comment">% Note also that the Stockman-Sharpe fundamentals were not derived in this way,</span>
+<span class="comment">% data other than dichromatic confusion lines were broght to bear when</span>
+<span class="comment">% Stockman and Sharpe determined the transformation between the</span>
+<span class="comment">% Stiles-Burch cmfs and cone fundamentals.  So this script is just</span>
+<span class="comment">% demonstrating how dichromatic confusion data are sufficient to derive a</span>
+<span class="comment">% set of cone fundamentals, and that when the confusion data correspond to</span>
+<span class="comment">% the fundamentals is all works correctly.</span>
+<span class="comment">%</span>
+<span class="comment">% See also cbColorMatching_StilesBurch10Cmfs.  Indeed, understanding that</span>
+<span class="comment">% script is probably a prerequisit for understanding this one, as that</span>
+<span class="comment">% script goes through in more detail some of the calculations used in</span>
+<span class="comment">% passing here.</span>
+<span class="comment">%</span>
+<span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
+
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+<span class="keyword">end</span>
+</pre><h2>Function implementing the isetbio validation code<a name="2"></a></h2><pre class="codeinput"><span class="keyword">function</span> ValidationFunction(runTimeParams)
+</pre><h2>Hello<a name="4"></a></h2><pre class="codeinput">UnitTest.validationRecord(<span class="string">'SIMPLE_MESSAGE'</span>, sprintf(<span class="string">'%s'</span>,mfilename));
+outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
+<span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
+    mkdir(outputDir);
+<span class="keyword">end</span>
+close <span class="string">all</span>; drawnow;
+</pre><h2>Get and plot Stiles-Burch 10-degree color matching functions<a name="5"></a></h2><p>Also spline to 1 nm and 10 nm sampling for plotting purposes.</p><pre class="codeinput">load <span class="string">T_stiles10</span>;
+data.wls = SToWls(S_stiles10);
+data.S_stiles10 = S_stiles10;
+data.T_stiles10 = T_stiles10;
+clear <span class="string">S_stiles10</span> <span class="string">T_stiles10</span>
+
+<span class="comment">% These splines go from 390 to 750, which seems sufficient</span>
+S_1nm = [390 1 361];
+data.wls_1nm = SToWls(S_1nm);
+data.T_stiles10_1nm = SplineCmf(data.wls,data.T_stiles10,S_1nm);
+S_10nm = [390 10 37];
+data.wls_10nm = SToWls(S_10nm);
+data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
+</pre><h2>Get the cmf spectrum locus normalized to simplex<a name="6"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+<span class="keyword">end</span>
+<span class="keyword">for</span> i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+<span class="keyword">end</span>
+</pre><h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="7"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
+data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
+
+<span class="comment">% Fit with linear transform of cmf's, just to show that it works.</span>
+data.M_CmfToCones = ((data.T_stiles10_1nm')\(data.T_cones10_1nm'))';
+data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
+</pre><h2>Find the stimuli that isolate each of the cones.<a name="8"></a></h2><p>Get the isolating directions. We have the transformation for cmfs to cones spectral sensitivies. This is also the transformation between tristimulus coordinates and cone excitations. Invert this to get transformation between cone excitations and tristimulus coordinates.  Then apply to the unit cone excitation vectors to get the cone isolating tristimulus vectors.</p><p>Make a normalized version of the vectors for plotting.</p><pre class="codeinput">data.M_ConesToCmf = inv(data.M_CmfToCones);
+data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+<span class="keyword">for</span> i = 1:size(data.coneIsolatingRGBDirs,2)
+    data.coneIsolatingRGBDirsNorm(:,i) = data.coneIsolatingRGBDirs(:,i)/norm(data.coneIsolatingRGBDirs(:,i));
+<span class="keyword">end</span>
+</pre><h2>Find the cone sensitivity vectors in RGB tristimulus space.<a name="9"></a></h2><p>These are unit vectors such that when you project onto them, you get the L, M, and S responses.  When we work in cone space, thesr are just the unit vectors, which are conceptually best expressed as row vectors, since then multiplying tristimulus coordinates from the left with such a vector directly gives cone excitation.</p><p>Since cone excitations themselves must be independent of the space we compute them in, we seek a row vector r such that r*t = u*c, where r is the response row vector in RGB, t is the tristimulus column vector, u is a unit row vector and c is a cone excitation column vector.  We also have t = M*c with M being the M_ConesToCmf computed above.  Thus we must have r = u*M_inv = u*M_CmfToCones. Note that r does not necessarily have unit length -- it is only in the cone excitation space where the response vectors are guaranteed to be the unit vectors and to have unit length.</p><p>Also produce normalized version for plotting.</p><pre class="codeinput">data.coneResponseRGBVectors = [ [1 0 0] ; [0 1 0] ; [0 0 1] ]*data.M_CmfToCones;
+<span class="keyword">for</span> i = 1:size(data.coneResponseRGBVectors,1)
+    data.coneResponseRGBVectorsNorm(i,:) = data.coneResponseRGBVectors(i,:)/norm(data.coneResponseRGBVectors(i,:));
+<span class="keyword">end</span>
+</pre><h2>Get the cmf spectrum locus normalized to simplex (R + G + B = 1)<a name="10"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+<span class="keyword">end</span>
+<span class="keyword">for</span> i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+<span class="keyword">end</span>
+</pre><h2>Get the cone isolating dirs normalized to the simplex<a name="11"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:size(data.coneIsolatingRGBDirs,2);
+    data.coneIsolatingRGBDirs_simplex(:,i) = data.coneIsolatingRGBDirs(:,i)/sum(data.coneIsolatingRGBDirs(:,i));
+<span class="keyword">end</span>
+</pre><h2>Get dichromatic confusion lines<a name="12"></a></h2><p>We can generate these by adding the cone isolating direction to to any stimulus.  So let's add it to each stimulus on the spectrum locus.</p><p>These converge on the chromaticity of the isolating direction for each My intuition for this is that as you add more and more of the stimulus in the cone isolating direction, it dominates the tristimulus coordinates more and more, swamping whatever it was being added to.  In the limit, then, the chromaticity of the summed stimulus will be that of the cone isolating stimulus.</p><p>To make these plot nicely, we chose a scale factor for each type of dichromat differently.  For the M cone isolating direction, it's the negative excursion that intersects the simplex; plotting the confusion lines looks nicer if we use the negative rather than the positive excusion.</p><pre class="codeinput">nConfusionLines = size(data.T_stiles10_10nm,2);
+<span class="keyword">for</span> w = 1:3
+    <span class="keyword">switch</span> (w)
+        <span class="comment">% Protanope</span>
+        <span class="keyword">case</span> 1
+            whichConfusionColor = <span class="string">'r'</span>;
+            confusionLineLengthFactor = 1;
+            <span class="comment">% Deuteranope</span>
+        <span class="keyword">case</span> 2
+            whichConfusionColor = <span class="string">'g'</span>;
+            confusionLineLengthFactor = -3;
+            <span class="comment">% Tritanope</span>
+        <span class="keyword">case</span> 3
+            whichConfusionColor = <span class="string">'b'</span>;
+            confusionLineLengthFactor = 30;
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> i = 1:nConfusionLines;
+        nConfusionPoints = 100;
+        <span class="keyword">for</span> j = 1:nConfusionPoints
+            confusionLine{w,i}(:,j) = data.T_stiles10_10nm(:,i) + <span class="keyword">...</span>
+                confusionLineLengthFactor*((j-1)/nConfusionPoints)*data.coneIsolatingRGBDirs(:,w);
+            confusionLine_simplex{w,i}(:,j) = confusionLine{w,i}(:,j)/sum(confusionLine{w,i}(:,j));
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>If we have measured the confusion lines, we can get the cone isolating directions.<a name="13"></a></h2><p>This is trivial in the case that we measure them in the full tristimulus space -- we just need to find the direction of the confusion line for any base stimulus and we have the isolating direction directly.  As we'll show below, having the direction of the cone isolating stimulus for each cone class is enough to lock down the transformation from tristimulus coordinates to cone exciations, and this together with the color matching functions is enough to give us the cone fundamentals.  There is a free scaling parameter left for each fundamental, that has to be locked down some other way.</p><p>What if we have just the chromaticities of several confusion lines for each type of dichromat?  Then we can still do what we need.  This isn't too hard, but is a little less trivial.  We use the confusion lines for each type of dichromat to find where they intersect.  This "copunctal point" gives us the chromaticity of the cone isolating directions, and from there we can get the tristimulus coordinates the cone isolating directions up to a free scale factor.  Let's illustrate that.</p><p>We can express each confusion line as g = a*r+b.   First step is to find a and b for each confusion line.</p><pre class="codeinput"><span class="keyword">for</span> w = 1:3
+    <span class="keyword">for</span> i = 1:nConfusionLines;
+        xData = [confusionLine_simplex{w,i}(1,:)' ones(nConfusionPoints,1)];
+        yData = confusionLine_simplex{w,i}(2,:)';
+        confusionLineFit{w}(:,i) = xData\yData;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% With the fit to the set of lines, we can find the point where they</span>
+<span class="comment">% intersect.  We re-express the set of equations as a linear system in</span>
+<span class="comment">% r,g, of the form -b = a*r - g for each fit line, and then solve for</span>
+<span class="comment">% r,g.  The chromaticity plot shows these recovered points in yellow</span>
+<span class="comment">% for each type of dichromat, and they lie right over the actual</span>
+<span class="comment">% copunctal chromaticities.</span>
+<span class="keyword">for</span> w = 1:3
+    M = [confusionLineFit{w}(1,:)' -1*ones(nConfusionLines,1)];
+    negB = -confusionLineFit{w}(2,:)';
+    data.conpunctalPoint{w} = M\negB;
+<span class="keyword">end</span>
+</pre><h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="14"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput">[chromaticityFig,figParams] = cbFigInit;
+set(gcf,<span class="string">'Position'</span>,[100 254 1163 446]);
+<span class="keyword">if</span> (runTimeParams.generatePlots)
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {<span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span>};
+    figParams.yLimLow = -1;
+    figParams.yLimHigh = 3;
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {<span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span> <span class="string">'^{ }2.5_{ }'</span> <span class="string">'^{ }3.0_{ }'</span>};
+
+    <span class="comment">% Montage plot of confusion lines</span>
+    <span class="keyword">for</span> w = 1:3
+        chromSubplotHandle(w) = subplot(1,3,w); hold <span class="string">on</span>;
+        set(gca,<span class="string">'FontName'</span>,figParams.fontName,<span class="string">'FontSize'</span>, <span class="keyword">...</span>
+            figParams.axisFontSize-figParams.subplotFontShrink,<span class="string">'LineWidth'</span>,1);
+
+        <span class="comment">% Plot the confusion lines</span>
+        <span class="keyword">switch</span> (w)
+            <span class="keyword">case</span> 1
+                <span class="comment">% Protanope</span>
+                whichConfusionColor = <span class="string">'r'</span>;
+                titleStr = <span class="string">'Protan'</span>;
+            <span class="keyword">case</span> 2
+                <span class="comment">% Deuteranope</span>
+                whichConfusionColor = <span class="string">'g'</span>;
+                titleStr = <span class="string">'Deutan'</span>;
+            <span class="keyword">case</span> 3
+                <span class="comment">% Tritanope</span>
+                titleStr = <span class="string">'Tritan'</span>;
+                whichConfusionColor = <span class="string">'b'</span>;
+        <span class="keyword">end</span>
+        <span class="keyword">for</span> i = 1:size(data.T_stiles10_10nm,2);
+            plot(confusionLine_simplex{w,i}(1,:),confusionLine_simplex{w,i}(2,:),whichConfusionColor,<span class="keyword">...</span>
+                <span class="string">'LineWidth'</span>,figParams.lineWidth-figParams.subplotLineShrink);
+        <span class="keyword">end</span>
+
+        <span class="comment">% Plot the spectrum locus on the diagram along with equal energy white.</span>
+        plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', <span class="keyword">...</span>
+            <span class="string">'k'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+        plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', <span class="keyword">...</span>
+            <span class="string">'ko'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'k'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-figParams.subplotMarkerShrink-2);
+
+        <span class="comment">% Plot where the cone isolating dirs lie on the diagram</span>
+        <span class="comment">%</span>
+        <span class="comment">% The M-cone chromaticity corresponds to the negative direction</span>
+        <span class="comment">% of the primary, so it's plotted without a fill.</span>
+        plot([data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
+            [data.coneIsolatingRGBDirs_simplex(2,1)], <span class="keyword">...</span>
+            <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-figParams.subplotMarkerShrink);
+        plot([data.coneIsolatingRGBDirs_simplex(1,2)], <span class="keyword">...</span>
+            [data.coneIsolatingRGBDirs_simplex(2,2)], <span class="keyword">...</span>
+            <span class="string">'go'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-figParams.subplotMarkerShrink);
+        plot([data.coneIsolatingRGBDirs_simplex(1,3)], <span class="keyword">...</span>
+            [data.coneIsolatingRGBDirs_simplex(2,3)], <span class="keyword">...</span>
+            <span class="string">'bo'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'b'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-figParams.subplotMarkerShrink);
+
+        <span class="comment">% Plot the recovered copunctal point</span>
+        plot(data.conpunctalPoint{w}(1),data.conpunctalPoint{w}(2), <span class="keyword">...</span>
+            <span class="string">'yo'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'y'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-figParams.subplotMarkerShrink-4);
+
+        <span class="comment">% Labels</span>
+        xlabel(<span class="string">'r'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize-figParams.subplotFontShrink);
+        ylabel(<span class="string">'g'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize-figParams.subplotFontShrink);
+        title(titleStr,<span class="string">'FontSize'</span>,figParams.titleFontSize-figParams.subplotFontShrink);
+        axis(<span class="string">'square'</span>);
+        cbFigAxisSet(chromSubplotHandle(w),figParams);
+    <span class="keyword">end</span>
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_ConfusionLines_rgChrom'</span>]),chromaticityFig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_KonigFundamentals_01.png" alt=""> <h2>Use the recovered copunctal points to get the cones from the color matching functions<a name="15"></a></h2><p>Notice that above we got the isolating directions using the following line of code:   data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]']; This means that data.coneIsolatingRGBDirs = data.M_ConesToCmf, the multiplication by the identity matrix was just there for conceptual clarity.</p><p>So if we convert the copunctal chromaticities to RGB with an arbitrary length and then treat that as an M_ConesToCmfs matrix, we can invert it to get an M_CmfsToCones matrix.</p><pre class="codeinput"><span class="keyword">for</span> w = 1:3
+    copunctalrgY = [data.conpunctalPoint{w} ; 1];
+    copunctalRGB(:,w) = xyYToXYZ(copunctalrgY);
+<span class="keyword">end</span>
+data.M_CmfsToCones_copunctalDerived = inv(copunctalRGB);
+T_cones10_1nm_copunctalDerivedRaw = data.M_CmfsToCones_copunctalDerived*data.T_stiles10_1nm;
+
+<span class="comment">% The scale of the recovered sensitivities is arbitrary and could even be</span>
+<span class="comment">% negative.  Normalize so that peak of each one is 1.</span>
+<span class="keyword">for</span> w = 1:3
+    [~,index] = max(abs(T_cones10_1nm_copunctalDerivedRaw(w,:)));
+    data.T_cones10_1nm_copunctalDerived(w,:) = T_cones10_1nm_copunctalDerivedRaw(w,:)/T_cones10_1nm_copunctalDerivedRaw(w,index(1));
+<span class="keyword">end</span>
+</pre><h2>Plot actual and derived cone fundamentals<a name="16"></a></h2><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+    [stockmanSharpe10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {<span class="string">'^{ }350_{ }'</span> <span class="string">'^{ }400_{ }'</span> <span class="string">'^{ }450_{ }'</span> <span class="string">'^{ }500_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }550_{ }'</span> <span class="string">'^{ }600_{ }'</span> <span class="string">'^{ }650_{ }'</span> <span class="string">'^{ }700_{ }'</span> <span class="string">'^{ }750_{ }'</span>};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {<span class="string">' 0.0 '</span> <span class="string">' 0.5 '</span> <span class="string">' 1.0 '</span>};
+
+    <span class="comment">% Plot the fundamentals.</span>
+    plot(data.wls_1nm,data.T_cones10_1nm(1,:)',<span class="string">'r'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(2,:)',<span class="string">'g'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(3,:)',<span class="string">'b'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
+
+    <span class="comment">% Pop on top the fit derived from the simulated confusion lines.</span>
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(1,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(2,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(3,:)',<span class="string">'k:'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth-1);
+
+    xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    ylabel(<span class="string">'Cone Fundamental (energy units)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
+    title(<span class="string">'Target and Konig Derived Fundamentals'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    cbFigAxisSet(stockmanSharpe10Fig,figParams);
+
+    <span class="comment">% Save the figure</span>
+    FigureSave(fullfile(outputDir,[mfilename <span class="string">'_KonigDerivedConeFundamentals'</span>]),stockmanSharpe10Fig,figParams.figType);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_KonigFundamentals_02.png" alt=""> <h2>Save validation data<a name="17"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function varargout = cbColorMatching_KonigFundamentals(varargin)
+%
+% Illustrate the ideas underlying Konig fundamentals.
+%
+% Shows how to use dichromatic confusion data to estimate cone fundamentals
+% from color matching functions.  This is done for Stiles-Burch 10 degree cmfs
+% and the Stockman-Sharpe 10 degree cone fundamentals, but the principles
+% would apply to any tristimulus system and cone fundamentals that
+% were a linear transfomration of the color matching functions.
+%
+% This routine isn't based on real data, the dichromatic confusion data are
+% syntehsized using the 'known' Stockman-Shapre cone fundamentals.  What this
+% routine shows is how such data lock down the desired transformation.
+%
+% Note also that the Stockman-Sharpe fundamentals were not derived in this way,
+% data other than dichromatic confusion lines were broght to bear when
+% Stockman and Sharpe determined the transformation between the
+% Stiles-Burch cmfs and cone fundamentals.  So this script is just
+% demonstrating how dichromatic confusion data are sufficient to derive a
+% set of cone fundamentals, and that when the confusion data correspond to
+% the fundamentals is all works correctly.
+%
+% See also cbColorMatching_StilesBurch10Cmfs.  Indeed, understanding that
+% script is probably a prerequisit for understanding this one, as that
+% script goes through in more detail some of the calculations used in
+% passing here.
+%
+% (c) David Brainard and Andrew Stockman, 2015
+
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+%% Function implementing the isetbio validation code
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+close all; drawnow;
+
+%% Get and plot Stiles-Burch 10-degree color matching functions
+%
+% Also spline to 1 nm and 10 nm sampling for plotting purposes.
+load T_stiles10;
+data.wls = SToWls(S_stiles10);
+data.S_stiles10 = S_stiles10;
+data.T_stiles10 = T_stiles10;
+clear S_stiles10 T_stiles10
+
+% These splines go from 390 to 750, which seems sufficient
+S_1nm = [390 1 361];
+data.wls_1nm = SToWls(S_1nm);
+data.T_stiles10_1nm = SplineCmf(data.wls,data.T_stiles10,S_1nm);
+S_10nm = [390 10 37];
+data.wls_10nm = SToWls(S_10nm);
+data.T_stiles10_10nm = SplineCmf(data.wls,data.T_stiles10,S_10nm);
+
+%% Get the cmf spectrum locus normalized to simplex
+for i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+end
+
+%% Load Stockman-Sharpe 10-degree cone fundamentals
+load T_cones_ss10
+data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
+
+% Fit with linear transform of cmf's, just to show that it works.
+data.M_CmfToCones = ((data.T_stiles10_1nm')\(data.T_cones10_1nm'))';
+data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
+
+%% Find the stimuli that isolate each of the cones.
+%
+% Get the isolating directions.
+% We have the transformation for cmfs to cones spectral sensitivies.
+% This is also the transformation between tristimulus coordinates
+% and cone excitations. Invert this to get transformation between
+% cone excitations and tristimulus coordinates.  Then apply to the
+% unit cone excitation vectors to get the cone isolating tristimulus
+% vectors.
+%
+% Make a normalized version of the vectors for plotting.
+data.M_ConesToCmf = inv(data.M_CmfToCones);
+data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+for i = 1:size(data.coneIsolatingRGBDirs,2)
+    data.coneIsolatingRGBDirsNorm(:,i) = data.coneIsolatingRGBDirs(:,i)/norm(data.coneIsolatingRGBDirs(:,i));
+end
+
+%% Find the cone sensitivity vectors in RGB tristimulus space.
+% These are unit vectors such that when you project onto them, you
+% get the L, M, and S responses.  When we work in cone space, thesr
+% are just the unit vectors, which are conceptually best expressed
+% as row vectors, since then multiplying tristimulus coordinates
+% from the left with such a vector directly gives cone excitation.
+%
+% Since cone excitations themselves must be independent of the space
+% we compute them in, we seek a row vector r such that r*t = u*c,
+% where r is the response row vector in RGB, t is the tristimulus
+% column vector, u is a unit row vector and c is a cone excitation
+% column vector.  We also have t = M*c with M being the M_ConesToCmf
+% computed above.  Thus we must have r = u*M_inv = u*M_CmfToCones.
+% Note that r does not necessarily have unit length REPLACE_WITH_DASH_DASH it is only
+% in the cone excitation space where the response vectors are guaranteed
+% to be the unit vectors and to have unit length.
+%
+% Also produce normalized version for plotting.
+data.coneResponseRGBVectors = [ [1 0 0] ; [0 1 0] ; [0 0 1] ]*data.M_CmfToCones;
+for i = 1:size(data.coneResponseRGBVectors,1)
+    data.coneResponseRGBVectorsNorm(i,:) = data.coneResponseRGBVectors(i,:)/norm(data.coneResponseRGBVectors(i,:));
+end
+
+%% Get the cmf spectrum locus normalized to simplex (R + G + B = 1)
+for i = 1:size(data.T_stiles10_1nm,2);
+    data.T_stiles10_1nm_simplex(:,i) = data.T_stiles10_1nm(:,i)/sum(data.T_stiles10_1nm(:,i));
+end
+for i = 1:size(data.T_stiles10_10nm,2);
+    data.T_stiles10_10nm_simplex(:,i) = data.T_stiles10_10nm(:,i)/sum(data.T_stiles10_10nm(:,i));
+end
+
+%% Get the cone isolating dirs normalized to the simplex
+for i = 1:size(data.coneIsolatingRGBDirs,2);
+    data.coneIsolatingRGBDirs_simplex(:,i) = data.coneIsolatingRGBDirs(:,i)/sum(data.coneIsolatingRGBDirs(:,i));
+end
+
+%% Get dichromatic confusion lines
+%
+% We can generate these by adding the cone isolating direction to
+% to any stimulus.  So let's add it to each stimulus on the spectrum
+% locus.
+%
+% These converge on the chromaticity of the isolating direction for each
+% My intuition for this is that as you add more and more of the stimulus in
+% the cone isolating direction, it dominates the tristimulus coordinates
+% more and more, swamping whatever it was being added to.  In the limit,
+% then, the chromaticity of the summed stimulus will be that of the cone
+% isolating stimulus.
+%
+% To make these plot nicely, we chose a scale factor for each type of
+% dichromat differently.  For the M cone isolating direction, it's the
+% negative excursion that intersects the simplex; plotting the confusion
+% lines looks nicer if we use the negative rather than the positive
+% excusion.
+nConfusionLines = size(data.T_stiles10_10nm,2);
+for w = 1:3
+    switch (w)
+        % Protanope
+        case 1
+            whichConfusionColor = 'r';
+            confusionLineLengthFactor = 1;
+            % Deuteranope
+        case 2
+            whichConfusionColor = 'g';
+            confusionLineLengthFactor = -3;
+            % Tritanope
+        case 3
+            whichConfusionColor = 'b';
+            confusionLineLengthFactor = 30;
+    end
+    for i = 1:nConfusionLines;
+        nConfusionPoints = 100;
+        for j = 1:nConfusionPoints
+            confusionLine{w,i}(:,j) = data.T_stiles10_10nm(:,i) + ...
+                confusionLineLengthFactor*((j-1)/nConfusionPoints)*data.coneIsolatingRGBDirs(:,w);
+            confusionLine_simplex{w,i}(:,j) = confusionLine{w,i}(:,j)/sum(confusionLine{w,i}(:,j));
+        end
+    end
+end
+
+%% If we have measured the confusion lines, we can get the cone isolating directions.
+%
+% This is trivial in the case that we measure them in the full tristimulus
+% space REPLACE_WITH_DASH_DASH we just need to find the direction of the confusion line for any
+% base stimulus and we have the isolating direction directly.  As we'll show below,
+% having the direction of the cone isolating stimulus for each cone class is enough to lock
+% down the transformation from tristimulus coordinates to cone exciations,
+% and this together with the color matching functions is enough to give us
+% the cone fundamentals.  There is a free scaling parameter left for each
+% fundamental, that has to be locked down some other way.
+%
+% What if we have just the chromaticities of several confusion lines for
+% each type of dichromat?  Then we can still do what we need.  This isn't
+% too hard, but is a little less trivial.  We use the confusion lines for
+% each type of dichromat to find where they intersect.  This "copunctal point"
+% gives us the chromaticity of the cone isolating directions, and from there
+% we can get the tristimulus coordinates the cone isolating directions up
+% to a free scale factor.  Let's illustrate that.
+%
+% We can express each confusion line as g = a*r+b.   First step is to find
+% a and b for each confusion line.
+for w = 1:3
+    for i = 1:nConfusionLines;
+        xData = [confusionLine_simplex{w,i}(1,:)' ones(nConfusionPoints,1)];
+        yData = confusionLine_simplex{w,i}(2,:)';
+        confusionLineFit{w}(:,i) = xData\yData;      
+    end
+end
+
+% With the fit to the set of lines, we can find the point where they
+% intersect.  We re-express the set of equations as a linear system in
+% r,g, of the form -b = a*r - g for each fit line, and then solve for 
+% r,g.  The chromaticity plot shows these recovered points in yellow
+% for each type of dichromat, and they lie right over the actual
+% copunctal chromaticities.
+for w = 1:3
+    M = [confusionLineFit{w}(1,:)' -1*ones(nConfusionLines,1)];
+    negB = -confusionLineFit{w}(2,:)';
+    data.conpunctalPoint{w} = M\negB;
+end
+
+%% Plot spectrum locus and isolating vectors in the r-g chromaticity plane
+%
+% This includes a little empirical calculation of the gamut we can obtain
+% with positive combinations of the isolating vectors.  This is a bit
+% non-intuitive, to me at least.
+[chromaticityFig,figParams] = cbFigInit;
+set(gcf,'Position',[100 254 1163 446]);
+if (runTimeParams.generatePlots)
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {'^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }'};
+    figParams.yLimLow = -1;
+    figParams.yLimHigh = 3;
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
+    
+    % Montage plot of confusion lines
+    for w = 1:3
+        chromSubplotHandle(w) = subplot(1,3,w); hold on;
+        set(gca,'FontName',figParams.fontName,'FontSize', ...
+            figParams.axisFontSize-figParams.subplotFontShrink,'LineWidth',1);
+        
+        % Plot the confusion lines
+        switch (w)
+            case 1
+                % Protanope
+                whichConfusionColor = 'r';
+                titleStr = 'Protan';
+            case 2
+                % Deuteranope
+                whichConfusionColor = 'g';
+                titleStr = 'Deutan';
+            case 3
+                % Tritanope
+                titleStr = 'Tritan';
+                whichConfusionColor = 'b';
+        end
+        for i = 1:size(data.T_stiles10_10nm,2);
+            plot(confusionLine_simplex{w,i}(1,:),confusionLine_simplex{w,i}(2,:),whichConfusionColor,...
+                'LineWidth',figParams.lineWidth-figParams.subplotLineShrink);
+        end
+        
+        % Plot the spectrum locus on the diagram along with equal energy white.
+        plot(data.T_stiles10_1nm_simplex(1,:)',data.T_stiles10_1nm_simplex(2,:)', ...
+            'k','LineWidth',figParams.lineWidth-1);
+        plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
+            'ko','MarkerFaceColor','k','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink-2);
+        
+        % Plot where the cone isolating dirs lie on the diagram
+        %
+        % The M-cone chromaticity corresponds to the negative direction
+        % of the primary, so it's plotted without a fill.
+        plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,1)], ...
+            'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
+        plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,2)], ...
+            'go','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
+        plot([data.coneIsolatingRGBDirs_simplex(1,3)], ...
+            [data.coneIsolatingRGBDirs_simplex(2,3)], ...
+            'bo','MarkerFaceColor','b','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink);
+        
+        % Plot the recovered copunctal point
+        plot(data.conpunctalPoint{w}(1),data.conpunctalPoint{w}(2), ...
+            'yo','MarkerFaceColor','y','MarkerSize',figParams.markerSize-figParams.subplotMarkerShrink-4);
+        
+        % Labels
+        xlabel('r','FontSize',figParams.labelFontSize-figParams.subplotFontShrink);
+        ylabel('g','FontSize',figParams.labelFontSize-figParams.subplotFontShrink);
+        title(titleStr,'FontSize',figParams.titleFontSize-figParams.subplotFontShrink);
+        axis('square');
+        cbFigAxisSet(chromSubplotHandle(w),figParams);
+    end
+    
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_ConfusionLines_rgChrom']),chromaticityFig,figParams.figType);
+end
+
+%% Use the recovered copunctal points to get the cones from the color matching functions
+%
+% Notice that above we got the isolating directions using the following
+% line of code:
+%   data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
+% This means that data.coneIsolatingRGBDirs = data.M_ConesToCmf, the
+% multiplication by the identity matrix was just there for conceptual
+% clarity.
+%
+% So if we convert the copunctal chromaticities to RGB with an arbitrary
+% length and then treat that as an M_ConesToCmfs matrix, we can invert it
+% to get an M_CmfsToCones matrix.
+for w = 1:3
+    copunctalrgY = [data.conpunctalPoint{w} ; 1];
+    copunctalRGB(:,w) = xyYToXYZ(copunctalrgY);
+end
+data.M_CmfsToCones_copunctalDerived = inv(copunctalRGB);
+T_cones10_1nm_copunctalDerivedRaw = data.M_CmfsToCones_copunctalDerived*data.T_stiles10_1nm;
+
+% The scale of the recovered sensitivities is arbitrary and could even be
+% negative.  Normalize so that peak of each one is 1.
+for w = 1:3
+    [~,index] = max(abs(T_cones10_1nm_copunctalDerivedRaw(w,:)));
+    data.T_cones10_1nm_copunctalDerived(w,:) = T_cones10_1nm_copunctalDerivedRaw(w,:)/T_cones10_1nm_copunctalDerivedRaw(w,index(1));
+end
+
+%% Plot actual and derived cone fundamentals
+if (runTimeParams.generatePlots)
+    [stockmanSharpe10Fig,figParams] = cbFigInit;
+    figParams.xLimLow = 350;
+    figParams.xLimHigh = 750;
+    figParams.xTicks = [350 400 450 500 550 600 650 700 750];
+    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
+        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 '};
+    
+    % Plot the fundamentals.
+    plot(data.wls_1nm,data.T_cones10_1nm(1,:)','r','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(2,:)','g','LineWidth',figParams.lineWidth);
+    plot(data.wls_1nm,data.T_cones10_1nm(3,:)','b','LineWidth',figParams.lineWidth);
+    
+    % Pop on top the fit derived from the simulated confusion lines.
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(1,:)','k:','LineWidth',figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(2,:)','k:','LineWidth',figParams.lineWidth-1);
+    plot(data.wls_1nm,data.T_cones10_1nm_copunctalDerived(3,:)','k:','LineWidth',figParams.lineWidth-1); 
+    
+    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
+    ylabel('Cone Fundamental (energy units)','FontSize',figParams.labelFontSize);
+    title('Target and Konig Derived Fundamentals','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(stockmanSharpe10Fig,figParams);
+    
+    % Save the figure
+    FigureSave(fullfile(outputDir,[mfilename '_KonigDerivedConeFundamentals']),stockmanSharpe10Fig,figParams.figType);
+end
+
+%% Save validation data
+UnitTest.validationData('validateDataStruct', data);
+
+end
+
+
+
+##### SOURCE END #####
+--></body></html>

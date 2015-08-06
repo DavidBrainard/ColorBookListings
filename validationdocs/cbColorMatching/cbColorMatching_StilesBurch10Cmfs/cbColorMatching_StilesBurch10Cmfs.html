@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>cbColorMatching_StilesBurch10Cmfs</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-08-05"><meta name="DC.source" content="cbColorMatching_StilesBurch10Cmfs.m"><style type="text/css">
+      --><title>cbColorMatching_StilesBurch10Cmfs</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-08-06"><meta name="DC.source" content="cbColorMatching_StilesBurch10Cmfs.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -70,7 +70,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="comment">%</span>
 <span class="comment">% Connections between color matching functions and cone fundamentals.</span>
 <span class="comment">%</span>
-<span class="comment">% These are illustrated Stiles-Burch 10 degree fundamentals and the</span>
+<span class="comment">% These are illustrated Stiles-Burch 10 degree cmfs and the</span>
 <span class="comment">% Stockman-Sharpe 10 degree cone fundamentals, but the principles</span>
 <span class="comment">% would apply to any tristimulus system and cone fundamentals that</span>
 <span class="comment">% were a linear transfomration of the color matching functions.</span>
@@ -81,7 +81,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="comment">% mechanism vectors look in the RGB tristimulus and rg chromaticity</span>
 <span class="comment">% diagrams.</span>
 <span class="comment">%</span>
-<span class="comment">% The Stiles-Burch 10-degree Cmfs are expressed with respect to primaries at</span>
+<span class="comment">% The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at</span>
 <span class="comment">% 645.16, 526.32, 444.44 nm.</span>
 <span class="comment">%</span>
 <span class="comment">% (c) David Brainard and Andrew Stockman, 2015</span>
@@ -138,7 +138,7 @@ data.primaryWls = [645, 526, 444];
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_Cmfs'</span>]),stilesBurch10Fig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="8"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_01.png" alt=""> <h2>Load Stockman-Sharpe 10-degree cone fundamentals<a name="8"></a></h2><pre class="codeinput">load <span class="string">T_cones_ss10</span>
 data.T_cones10_1nm = SplineCmf(S_cones_ss10,T_cones_ss10,data.wls_1nm);
 
 <span class="comment">% Fit with linear transform of cmf's, just to show that it works.</span>
@@ -168,13 +168,13 @@ data.T_cones10_fit_1nm = data.M_CmfToCones*data.T_stiles10_1nm;
 
     xlabel(<span class="string">'Wavelength (nm)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     ylabel(<span class="string">'Cone Fundamental (energy units)'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
-    title(<span class="string">'Stiles-Burch 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
+    title(<span class="string">'Stockman-Sharpe 10-degree CMFs'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
     cbFigAxisSet(stockmanSharpe10Fig,figParams);
 
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_TransformToSS10ConeFundamentals'</span>]),stockmanSharpe10Fig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Find the stimuli that isolate each of the cones.<a name="9"></a></h2><p>Get the isolating directions. We have the transformation for cmfs to cones spectral sensitivies. This is also the transformation between tristimulus coordinates and cone excitations. Invert this to get transformation between cone excitations and tristimulus coordinates.  Then apply to the unit cone excitation vectors to get the cone isolating tristimulus vectors.</p><p>Make a normalized version of the vectors for plotting.</p><pre class="codeinput">data.M_ConesToCmf = inv(data.M_CmfToCones);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_02.png" alt=""> <h2>Find the stimuli that isolate each of the cones.<a name="9"></a></h2><p>Get the isolating directions. We have the transformation for cmfs to cones spectral sensitivies. This is also the transformation between tristimulus coordinates and cone excitations. Invert this to get transformation between cone excitations and tristimulus coordinates.  Then apply to the unit cone excitation vectors to get the cone isolating tristimulus vectors.</p><p>Make a normalized version of the vectors for plotting.</p><pre class="codeinput">data.M_ConesToCmf = inv(data.M_CmfToCones);
 data.coneIsolatingRGBDirs = data.M_ConesToCmf*[[1 0 0]', [0 1 0]', [0 0 1]'];
 <span class="keyword">for</span> i = 1:size(data.coneIsolatingRGBDirs,2)
     data.coneIsolatingRGBDirsNorm(:,i) = data.coneIsolatingRGBDirs(:,i)/norm(data.coneIsolatingRGBDirs(:,i));
@@ -274,7 +274,7 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
         scaleFactor*[-data.coneIsolatingRGBDirsNorm(2,3) 0], <span class="keyword">...</span>
         scaleFactor*[-data.coneIsolatingRGBDirsNorm(3,3) 0], <span class="keyword">...</span>
         <span class="string">'b--'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth+1);
-</pre><h2>Plot where the cone isolating dirs lie on the simplex<a name="15"></a></h2><p>L and S directions intersect the plane on their positive excursions, while M intersects the plane on its negative excursion.  Indicate this graphically by not filling in the M cone point.</p><pre class="codeinput">     plot3([0 data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_03.png" alt=""> <h2>Plot where the cone isolating dirs lie on the simplex<a name="15"></a></h2><p>L and S directions intersect the plane on their positive excursions, while M intersects the plane on its negative excursion.  Indicate this graphically by not filling in the M cone point.</p><pre class="codeinput">     plot3([0 data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
         [0 data.coneIsolatingRGBDirs_simplex(2,1)], <span class="keyword">...</span>
         [0 data.coneIsolatingRGBDirs_simplex(3,1)], <span class="keyword">...</span>
         <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
@@ -292,17 +292,15 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% resulting plane more or less fills the graph.</span>
     fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],<span class="string">'EdgeColor'</span>,<span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.75);
 
-    <span class="comment">% This latex magic puts a bar over the labels, which we want here.  But</span>
-    <span class="comment">% it also changes their font.  Not sure how to get the font to stay put</span>
-    <span class="comment">% while still putting an overbar over the symbols.</span>
+    <span class="comment">% Labels</span>
     xlabel(<span class="string">'R'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     ylabel(<span class="string">'G'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     zlabel(<span class="string">'B'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     title(<span class="string">'Spectrum Locus and Cone Isolating Vectors'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,<span class="string">'ZTick'</span>,figParams.zTicks);
-    set(gca,<span class="string">'ZTickLabel'</span>,figParams.zTickLabels);
+    <span class="comment">%zlim([figParams.zLimLow figParams.zLimHigh]);</span>
+    <span class="comment">%set(gca,'ZTick',figParams.zTicks);</span>
+    <span class="comment">%set(gca,'ZTickLabel',figParams.zTickLabels);</span>
     set(gca,<span class="string">'XDir'</span>,<span class="string">'Reverse'</span>);
     set(gca,<span class="string">'YDir'</span>,<span class="string">'Reverse'</span>);
     az = -51; el = 34; view(az,el);
@@ -314,8 +312,8 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% to have fig version so that you can load back into Matlab and rotate dynamically.</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_RGB3D'</span>]),stilesBurch10SpectrumLocusFig,<span class="string">'png'</span>);
     saveas(stilesBurch10SpectrumLocusFig,fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_RGB3D'</span>]),<span class="string">'fig'</span>);
-</pre><pre class="codeinput"><span class="keyword">end</span>
-</pre><h2>3D RGB plot of cone response vectors and isolating dirs.<a name="17"></a></h2><p>This is much like the 3D plot of the spectrum locus, except that we get rid of the locus and add the cone response vectors.</p><p>This plot shows the orthogonality between cone isolating vecto for one cone class and the response vectors for the other two.</p><p>Here the isolating vectors are shown as solid and the response vectors as dashed.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_04.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>3D RGB plot of cone response vectors and isolating dirs.<a name="17"></a></h2><p>This is much like the 3D plot of the spectrum locus, except that we get rid of the locus and add the cone response vectors.</p><p>This plot shows the orthogonality between cone isolating vectors for one cone class and the response vectors for the other two.</p><p>Here the isolating vectors are shown as solid and the response vectors as dashed.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
     [stilesBurch10ConeIsolatingFig,figParams] = cbFigInit;
     figParams.xLimLow = -1;
     figParams.xLimHigh = 1;
@@ -379,17 +377,15 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
         ]',<span class="keyword">...</span>
         [0.75 0 0.75],<span class="string">'EdgeColor'</span>,<span class="string">'None'</span>,<span class="string">'FaceAlpha'</span>,0.75);
 
-    <span class="comment">% This latex magic puts a bar over the labels, which we want here.  But</span>
-    <span class="comment">% it also changes their font.  Not sure how to get the font to stay put</span>
-    <span class="comment">% while still putting an overbar over the symbols.</span>
+    <span class="comment">% Labels</span>
     xlabel(<span class="string">'R'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     ylabel(<span class="string">'G'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     zlabel(<span class="string">'B'</span>,<span class="string">'FontSize'</span>,figParams.labelFontSize);
     title(<span class="string">'Cone Isolating and Response Vectors'</span>,<span class="string">'FontSize'</span>,figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,<span class="string">'ZTick'</span>,figParams.zTicks);
-    set(gca,<span class="string">'ZTickLabel'</span>,figParams.zTickLabels);
+    <span class="comment">%zlim([figParams.zLimLow figParams.zLimHigh]);</span>
+    <span class="comment">%set(gca,'ZTick',figParams.zTicks);</span>
+    <span class="comment">%set(gca,'ZTickLabel',figParams.zTickLabels);</span>
     set(gca,<span class="string">'XDir'</span>,<span class="string">'Reverse'</span>);
     set(gca,<span class="string">'YDir'</span>,<span class="string">'Reverse'</span>);
     az = -51; el = 34; view(az,el);
@@ -402,17 +398,17 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_ConeIsolating_RGB3D'</span>]),stilesBurch10ConeIsolatingFig,<span class="string">'png'</span>);
     saveas(stilesBurch10ConeIsolatingFig,fullfile(outputDir,[mfilename <span class="string">'_ConeIsolating_RGB3D'</span>]),<span class="string">'fig'</span>);
 <span class="keyword">end</span>
-</pre><h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="18"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_05.png" alt=""> <h2>Plot spectrum locus and isolating vectors in the r-g chromaticity plane<a name="18"></a></h2><p>This includes a little empirical calculation of the gamut we can obtain with positive combinations of the isolating vectors.  This is a bit non-intuitive, to me at least.</p><pre class="codeinput"><span class="keyword">if</span> (runTimeParams.generatePlots)
     [chromaticityFig,figParams] = cbFigInit;
-    figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 3;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {<span class="string">'^{ }-2.5_{ }'</span> <span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
-        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span> <span class="string">'^{ }2.5_{ }'</span> <span class="string">'^{ }3.0_{ }'</span>};
-    figParams.yLimLow = -2.5;
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {<span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+        <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span>};
+    figParams.yLimLow = -1;
     figParams.yLimHigh = 3;
-    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {<span class="string">'^{ }-2.5_{ }'</span> <span class="string">'^{ }-2.0_{ }'</span> <span class="string">'^{ }-1.5_{ }'</span> <span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {<span class="string">'^{ }-1.0_{ }'</span> <span class="string">'^{ }-0.5_{ }'</span> <span class="string">'^{ }0.0_{ }'</span> <span class="keyword">...</span>
         <span class="string">'^{ }0.5_{ }'</span> <span class="string">'^{ }1.0_{ }'</span> <span class="string">'^{ }1.5_{ }'</span> <span class="string">'^{ }2.0_{ }'</span> <span class="string">'^{ }2.5_{ }'</span> <span class="string">'^{ }3.0_{ }'</span>};
 
     <span class="comment">% Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.</span>
@@ -449,14 +445,14 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
         <span class="string">'k'</span>,<span class="string">'LineWidth'</span>,figParams.lineWidth);
     plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', <span class="keyword">...</span>
        <span class="string">'ko'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'y'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-14);
-   plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),<span class="keyword">...</span>
+    plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),<span class="keyword">...</span>
         <span class="string">'co'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'c'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-14);
 
     <span class="comment">% Plot where the cone isolating dirs lie on the diagram</span>
     <span class="comment">%</span>
     <span class="comment">% The M-cone chromaticity corresponds to the negative direction</span>
     <span class="comment">% of the primary, so it's plotted without a fill.</span>
-     plot([data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
+    plot([data.coneIsolatingRGBDirs_simplex(1,1)], <span class="keyword">...</span>
         [data.coneIsolatingRGBDirs_simplex(2,1)], <span class="keyword">...</span>
         <span class="string">'ro'</span>,<span class="string">'MarkerFaceColor'</span>,<span class="string">'r'</span>,<span class="string">'MarkerSize'</span>,figParams.markerSize-10);
     plot([data.coneIsolatingRGBDirs_simplex(1,2)], <span class="keyword">...</span>
@@ -474,26 +470,15 @@ UnitTest.assertIsZero(max(abs(randomConeExcitationsDirect(:)-randomConeExcitatio
     <span class="comment">% Save the figure</span>
     FigureSave(fullfile(outputDir,[mfilename <span class="string">'_SpectrumLocus_rgChrom'</span>]),chromaticityFig,figParams.figType);
 <span class="keyword">end</span>
-</pre><h2>Save validation data<a name="19"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
+</pre><img vspace="5" hspace="5" src="cbColorMatching_StilesBurch10Cmfs_06.png" alt=""> <h2>Save validation data<a name="19"></a></h2><pre class="codeinput">UnitTest.validationData(<span class="string">'validateDataStruct'</span>, data);
 </pre><pre class="codeinput"><span class="keyword">end</span>
-
-<span class="comment">% Legend, with tweak to make lines long enough so that dash shows.</span>
-<span class="comment">% Note the extra spaces that preface the actual legend text. Ugh.</span>
-<span class="comment">% [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...</span>
-<span class="comment">%     'Location','NorthWest','FontSize',figParams.legendFontSize);</span>
-<span class="comment">% lineObjs = findobj(legendChildObjs, 'Type', 'line');</span>
-<span class="comment">% xCoords = get(lineObjs, 'XData') ;</span>
-<span class="comment">% for lineIdx = 1:length(xCoords)</span>
-<span class="comment">%     if (length(xCoords{lineIdx}) ~= 2), continue; end</span>
-<span class="comment">%     set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])</span>
-<span class="comment">% end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
 %
 % Connections between color matching functions and cone fundamentals.
 %
-% These are illustrated Stiles-Burch 10 degree fundamentals and the
+% These are illustrated Stiles-Burch 10 degree cmfs and the
 % Stockman-Sharpe 10 degree cone fundamentals, but the principles
 % would apply to any tristimulus system and cone fundamentals that
 % were a linear transfomration of the color matching functions.
@@ -504,7 +489,7 @@ function varargout = cbColorMatching_StilesBurch10Cmfs(varargin)
 % mechanism vectors look in the RGB tristimulus and rg chromaticity
 % diagrams.
 %
-% The Stiles-Burch 10-degree Cmfs are expressed with respect to primaries at 
+% The Stiles-Burch 10-degree cmfs are expressed with respect to primaries at 
 % 645.16, 526.32, 444.44 nm.
 %
 % (c) David Brainard and Andrew Stockman, 2015
@@ -608,7 +593,7 @@ if (runTimeParams.generatePlots)
     
     xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
     ylabel('Cone Fundamental (energy units)','FontSize',figParams.labelFontSize);
-    title('Stiles-Burch 10-degree CMFs','FontSize',figParams.titleFontSize);
+    title('Stockman-Sharpe 10-degree CMFs','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stockmanSharpe10Fig,figParams);
     
     % Save the figure
@@ -785,17 +770,15 @@ if (runTimeParams.generatePlots)
     % resulting plane more or less fills the graph.
     fill3([2 -3 -6.5 -1.5]',[-0.5 -0.5 3 3]',[-0.5 4.5 4.5 -0.5],[0.75 0.75 0.75],'EdgeColor','None','FaceAlpha',0.75);
     
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
+    % Labels
     xlabel('R','FontSize',figParams.labelFontSize);
     ylabel('G','FontSize',figParams.labelFontSize);
     zlabel('B','FontSize',figParams.labelFontSize);
     title('Spectrum Locus and Cone Isolating Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
+    %zlim([figParams.zLimLow figParams.zLimHigh]);
+    %set(gca,'ZTick',figParams.zTicks);
+    %set(gca,'ZTickLabel',figParams.zTickLabels);
     set(gca,'XDir','Reverse');
     set(gca,'YDir','Reverse');
     az = -51; el = 34; view(az,el);
@@ -814,7 +797,7 @@ end
 % This is much like the 3D plot of the spectrum locus, except
 % that we get rid of the locus and add the cone response vectors.
 %
-% This plot shows the orthogonality between cone isolating vecto
+% This plot shows the orthogonality between cone isolating vectors
 % for one cone class and the response vectors for the other two.
 %
 % Here the isolating vectors are shown as solid and the response
@@ -883,17 +866,15 @@ if (runTimeParams.generatePlots)
         ]',...
         [0.75 0 0.75],'EdgeColor','None','FaceAlpha',0.75);
     
-    % This latex magic puts a bar over the labels, which we want here.  But
-    % it also changes their font.  Not sure how to get the font to stay put
-    % while still putting an overbar over the symbols.
+    % Labels
     xlabel('R','FontSize',figParams.labelFontSize);
     ylabel('G','FontSize',figParams.labelFontSize);
     zlabel('B','FontSize',figParams.labelFontSize);
     title('Cone Isolating and Response Vectors','FontSize',figParams.titleFontSize);
     cbFigAxisSet(stilesBurch10SpectrumLocusFig,figParams);
-    zlim([figParams.zLimLow figParams.zLimHigh]);
-    set(gca,'ZTick',figParams.zTicks);
-    set(gca,'ZTickLabel',figParams.zTickLabels);
+    %zlim([figParams.zLimLow figParams.zLimHigh]);
+    %set(gca,'ZTick',figParams.zTicks);
+    %set(gca,'ZTickLabel',figParams.zTickLabels);
     set(gca,'XDir','Reverse');
     set(gca,'YDir','Reverse');
     az = -51; el = 34; view(az,el);
@@ -913,16 +894,16 @@ end
 % with positive combinations of the isolating vectors.  This is a bit 
 % non-intuitive, to me at least.
 if (runTimeParams.generatePlots)
-    [chromaticityFig,figParams] = cbFigInit;
-    figParams.xLimLow = -2.5;
-    figParams.xLimHigh = 3;
-    figParams.xTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
-        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
-    figParams.yLimLow = -2.5;
+    [chromaticityFig,figParams] = cbFigInit; 
+    figParams.xLimLow = -2;
+    figParams.xLimHigh = 2;
+    figParams.xTicks = [-2 -1.5 -1 -0.5 0 0.5 1 1.5 2];
+    figParams.xTickLabels = {'^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+        '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }'};
+    figParams.yLimLow = -1;
     figParams.yLimHigh = 3;
-    figParams.yTicks = [-2.5 -2 -1.5 -1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
-    figParams.yTickLabels = {'^{ }-2.5_{ }' '^{ }-2.0_{ }' '^{ }-1.5_{ }' '^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
+    figParams.yTicks = [-1 -0.5 0 0.5 1 1.5 2 2.5 3.0];
+    figParams.yTickLabels = {'^{ }-1.0_{ }' '^{ }-0.5_{ }' '^{ }0.0_{ }' ...
         '^{ }0.5_{ }' '^{ }1.0_{ }' '^{ }1.5_{ }' '^{ }2.0_{ }' '^{ }2.5_{ }' '^{ }3.0_{ }'};
    
     % Figure out what chromaticities we can obtain with positive combinations of the cone isolating directions.
@@ -959,14 +940,14 @@ if (runTimeParams.generatePlots)
         'k','LineWidth',figParams.lineWidth);
     plot(data.T_stiles10_10nm_simplex(1,:)',data.T_stiles10_10nm_simplex(2,:)', ...
        'ko','MarkerFaceColor','y','MarkerSize',figParams.markerSize-14);
-   plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
+    plot(equalEnergyRGB_simplex(1),equalEnergyRGB_simplex(2),...
         'co','MarkerFaceColor','c','MarkerSize',figParams.markerSize-14);
     
     % Plot where the cone isolating dirs lie on the diagram
     % 
     % The M-cone chromaticity corresponds to the negative direction
     % of the primary, so it's plotted without a fill.
-     plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
+    plot([data.coneIsolatingRGBDirs_simplex(1,1)], ...
         [data.coneIsolatingRGBDirs_simplex(2,1)], ...
         'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-10);
     plot([data.coneIsolatingRGBDirs_simplex(1,2)], ...
@@ -990,16 +971,6 @@ UnitTest.validationData('validateDataStruct', data);
 
 end
 
-% Legend, with tweak to make lines long enough so that dash shows.
-% Note the extra spaces that preface the actual legend text. Ugh.
-% [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Linear '],[ '^{ }' figParams.legendExtraSpaceStr '  Model Eye Based ']},...
-%     'Location','NorthWest','FontSize',figParams.legendFontSize);
-% lineObjs = findobj(legendChildObjs, 'Type', 'line');
-% xCoords = get(lineObjs, 'XData') ;
-% for lineIdx = 1:length(xCoords)
-%     if (length(xCoords{lineIdx}) ~= 2), continue; end
-%     set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
-% end
 
 
 
