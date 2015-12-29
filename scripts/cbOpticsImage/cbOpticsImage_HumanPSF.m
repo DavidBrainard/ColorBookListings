@@ -1,196 +1,156 @@
-function varargout = cbOpticsImage_Fig_HumanPSF(varargin)
+function varargout = cbOpticsImage_HumanPSF(varargin)
 %
-% Compute PSF for human eye.
+% Illustrate human point spread functions.
 %
-% (c) David Brainard and Andrew Stockman, 2014-2015.
+% Uses population wavefront aberration data to make PSF images
+% for a series of pupil sizes.
+%
+% (c) David Brainard and Andrew Stockman, 2015
 
-    varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
 end
 
 %% Function implementing the isetbio validation code
-function ValidationFunction(runTimeParams)
+function ValidationFunction(runTimeParams) 
 
 %% Hello
+clear global; ieInit;
 UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+close all; drawnow;
 
-%% Set parameters
-eyeLengthMm = EyeLength('Human','Rodieck');
-wavelengthNm = 550;
-distanceToSourceMm = 2000;
-eqCriterionPSFFraction = 0.8;
-pupilDiametersMm = [0.05 0.1 0.2];
-nPupilDiameters = length(pupilDiametersMm);
+%% The tutorial only uses 1 wavelength at a time. So, for plotting, we use
+% this index.
+maxMM = 2;
+maxUM = 20;      
+pupilfuncrangeMM = 5;
 
-%% Compute diffraction blur for each pupil size
+%% Start by making pictures for a diffraction limited PSF
 %
-% The Psychtoolbox routine AiryPattern does the work.
+% Use wvfCreate to create a wavefront variable to explore with.
+%
+% This wavefront by default has the 0's for all zernike coeffs
+% Notice that the calcpupilMM is by default 3, meaning we are simulating
+% the wavefront PSF for a pupil of 3mm diameter.
+wvf0 = wvfCreate;
 
-% Set up radii to compute on.  Start by specifying the range in retinal mm
-% and then converting to degrees.
-retinalRadiiMm = 0.5;
-retinalRadiiDeg = RetinalMMToDegrees(retinalRadiiMm,eyeLengthMm);
-retinalRadiiRad = degtorad(retinalRadiiDeg);
+% Look at the plot of the normalized PSF within 1 mm of the center.
+% Variable maxUM is used to specify size of plot from center of the PSF.
+%
+% The plot shows an airy disk computed from the Zernike polynomials; that
+% is representing the diffraction-limited PSF obtained when the Zernike
+% coefficients are all zero.
+maxMinutes = 2;
+wl = wvfGet(wvf0,'calc wavelengths');
 
-% Set up grid matrices, so that we can convert radius to two-dimensional
-% image. Although it is probably inefficient to compute on all the radii of
-% a square image matrix (as opposed to computing for linear radii and then
-% propogating the andser onto an image), computers are fast enough that we
-% don't care.
-nPixels = 501;
-centerPixel = round(nPixels+1)/2;
-radiusMatrixRaw = MakeRadiusMat(nPixels,nPixels,centerPixel,centerPixel)/nPixels;
-radiusMatrixDegs = retinalRadiiDeg*radiusMatrixRaw;
-radiusMatrixRad = retinalRadiiRad*radiusMatrixRaw;
-radiusMatrixMm = retinalRadiiMm*radiusMatrixRaw;
-radiusLineMm = radiusMatrixMm(centerPixel,centerPixel:end);
+calcp = 2;
+wvf0 = wvfSet(wvf0,'calc pupil size',calcp);
+wvf0 = wvfComputePSF(wvf0);
+figure;
+subplot(4,3,1);
+wvfPlot(wvf0,'2d psf angle','min',wl,maxMinutes,'no window');
+title(sprintf('%d nm, %d mm pupil',wl,calcp));
 
-% Do the calculation for each pupil size and normalize volume of PSF to
-% unity.  Also extract 1d slice.
-for p = 1:length(pupilDiametersMm)
-    pupilDiameterMm = pupilDiametersMm(p);
-    diffractionPSFImage{p} = AiryPattern(radiusMatrixRad,pupilDiameterMm,wavelengthNm); 
-    diffractionPSFImage{p} = diffractionPSFImage{p}/sum(diffractionPSFImage{p}(:));
-    diffractionPSFSlice{p} = diffractionPSFImage{p}(centerPixel,centerPixel:end);
+calcp = 4;
+wvf0 = wvfSet(wvf0,'calc pupil size',calcp);
+wvf0 = wvfComputePSF(wvf0);
+subplot(4,3,4);
+wvfPlot(wvf0,'2d psf angle','min',wl,maxMinutes,'no window');
+title(sprintf('%d nm, %d mm pupil',wl,calcp));
+
+calcp = 6;
+wvf0 = wvfSet(wvf0,'calc pupil size',calcp);
+wvf0 = wvfComputePSF(wvf0);
+subplot(4,3,7);
+wvfPlot(wvf0,'2d psf angle','min',wl,maxMinutes,'no window');
+title(sprintf('%d nm, %d mm pupil',wl,calcp));
+
+calcp = 8;
+wvf0 = wvfSet(wvf0,'calc pupil size',calcp);
+wvf0 = wvfComputePSF(wvf0);
+subplot(4,3,10);
+wvfPlot(wvf0,'2d psf angle','min',wl,maxMinutes,'no window');
+title(sprintf('%d nm, %d mm pupil',wl,calcp));
+
+%% Wavefront measurements of human eyes and the effects of single-vision
+% corrective eyeglasses 
+%
+% We have access to measurements of the pupil function of real human eyes. The
+% optics of these eyes are not perfect, so they have interesting pupil functions
+% and PSF shapes.
+
+% Set up the wvf structure
+measMM = 6;
+calcMM = 3;
+maxMM = 3;
+theWavelengthNM = 550;
+wvfHuman0 = wvfCreate('measured pupil',measMM,'calculated pupil',calcMM);
+wvfHuman0 = wvfSet(wvfHuman0,'wavelength',theWavelengthNM);
+
+% Load in some measured data
+sDataFile = fullfile(wvfRootPath,'data','sampleZernikeCoeffs.txt');
+theZernikeCoeffs = importdata(sDataFile);
+whichSubjects = [3 7];
+theZernikeCoeffs = theZernikeCoeffs(:,whichSubjects);
+nSubjects = size(theZernikeCoeffs,2);
+nRows = ceil(sqrt(nSubjects));
+nCols = ceil(nSubjects/nRows);
+
+% Plot subject PSFs, one by one
+for ii = 1:nSubjects
+    fprintf('** Subject %d\n',whichSubjects(ii))
+
+    wvfHuman = wvfSet(wvfHuman0,'zcoeffs',theZernikeCoeffs(:,ii));
+    wvfHuman = wvfComputePSF(wvfHuman);
+    
+    vcNewGraphWin;
+    subplot(2,2,1);
+    wvfPlot(wvfHuman,'2d pupil amplitude space','mm',[],calcMM,'no window');
+    subplot(2,2,2);
+    wvfPlot(wvfHuman,'2d pupil phase space','mm',[],calcMM,'no window');
+    subplot(2,2,3:4);
+    wvfPlot(wvfHuman,'2d psf space','mm',[],maxMM,'no window');
 end
 
-%% Compute equivalent blur circle
-% For comparison with geometric blur, it is convenient to characterize the
-% diffraction limited PSF by an equivalent blur circle.  We do this by
-% finding the radius that contains a criterion fraction of the pupil
-% volume, and calling that the equivlent cirular psf. This is a rough and
-% ready approximation, but we find it conceptually convenient as a summary
-% of the size of the PSF.
-radiiMm = unique(radiusMatrixMm(:));
-for p = 1:length(pupilDiametersMm)
-    for i = 2:length(radiiMm)
-        index = find(radiusMatrixMm <= radiiMm(i));
-        volume(i) = sum(diffractionPSFImage{p}(index));
-        if (volume(i) > eqCriterionPSFFraction)
-            lambda = (eqCriterionPSFFraction-volume(i-1))/(volume(i)-volume(i-1));
-            eqDiffractionBlurCircleDiameterMm(p) = (1-lambda)*radiiMm(i-1) + lambda*radiiMm(i);
-            eqDiffractionBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqDiffractionBlurCircleDiameterMm(p),eyeLengthMm);
-            break;
-        end
-    end
-    
-    % Compute circular psfs at the equivalent diameters
-    %
-    % Build the image
-    eqDiffractionPSFImageMm{p} = ones(size(radiusMatrixMm));
-    index = find(radiusMatrixMm > eqDiffractionBlurCircleDiameterMm(p));
-    eqDiffractionPSFImageMm{p}(index) = 0;
-    
-    % Normalize volume and extract slice
-    eqDiffractionPSFImageMm{p} = eqDiffractionPSFImageMm{p}/sum(eqDiffractionPSFImageMm{p}(:));
-    eqDiffractionPSFSlice{p} = eqDiffractionPSFImageMm{p}(centerPixel,centerPixel:end);
-    
-    % Print summary of this calculation
-    fprintf('Pupil size %0.2f mm, diffraction equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
-        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqDiffractionBlurCircleDiameterMm(p),eqDiffractionBlurCircleDiameterDegs(p));
-end
-fprintf('\n');
-
-%% Plot a slice of the diffraction limited psf
-% The plot shows a slice through the center of the psf for two pupil sizes
-% (the smallest and largest that we compute for.).
+%% Single-vision eyewear generally corrects only the lowest-order
+% Zernike aberrations (defocus given in diopters) and astigmatism (cylinder
+% correction also given in diopters). The Zernike coefficients give us an
+% easy and convenient way to simulate corrective lenses; we can simply set
+% those Zernike coefficients to zero and see what the PSFs look like!
 %
-% The plot works better to compare shapes if we normalize PSFs to max of 1
-% rather than to unit volume, but be aware that the height of the volume
-% normalized PSF will be different as a function of pupil size.
+% Plot their corrected PSFs, one by one, How do the corrected PSFs compare
+% to the uncorrected ones? their peaks? their widths?
 %
-% The plot also shows radius of equivalent blur circle as dashed vertical
-% lines.
-if (runTimeParams.generatePlots)
-[diffractionSliceFig,diffractionSliceFigParams] = cbFigInit;
-diffractionSliceFigParams.xLimLow = 0;
-diffractionSliceFigParams.xLimHigh = 0.4;
-diffractionSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-diffractionSliceFigParams.xTickLabels = {};
-diffractionSliceFigParams.yLimLow = 0;
-diffractionSliceFigParams.yLimHigh = 1;
-diffractionSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-diffractionSliceFigParams.yTickLabels = {};
-plot(radiusLineMm,diffractionPSFSlice{1}/max(diffractionPSFSlice{1}),'r','LineWidth',diffractionSliceFigParams.lineWidth);
-plot(radiusLineMm,diffractionPSFSlice{end}/max(diffractionPSFSlice{end}),'b','LineWidth',diffractionSliceFigParams.lineWidth);
-plot([eqDiffractionBlurCircleDiameterMm(1) eqDiffractionBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-plot([eqDiffractionBlurCircleDiameterMm(end) eqDiffractionBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',diffractionSliceFigParams.lineWidth-1);
-xlabel('Retinal Radius (mm)','FontSize',diffractionSliceFigParams.labelFontSize);
-ylabel('Point Spread Function','FontSize',diffractionSliceFigParams.labelFontSize);
-title('Pinhole Camera - Diffraction Limited Blur','FontSize',diffractionSliceFigParams.titleFontSize);
-cbFigAxisSet(diffractionSliceFig,diffractionSliceFigParams);
-legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',diffractionSliceFigParams.legendFontSize);
-FigureSave('PinholeOpticsBlurDiffractionSlice',diffractionSliceFig,diffractionSliceFigParams.figType);
-if (runTimeParams.generatePlots)
-
-
-%% Compute geometric blur for a pinhole optics.
-% This depends on the distance to the object, and in the limit of a
-% infitely distant point source is just the pupil diameter directly.
+% Try changing the whichSubjects array above to look at other sample data. Do
+% eyeglasses help correct the aberrations in those subjects?
 %
-% We think that the distance dependence is also true of diffraction, in the
-% sense that using the Airy pattern as the PSF results from some
-% approximations that treat the arriving wavefront as planar at the pupil.
-%
-% In any case, we'll use a distance that is big with respect to the scale
-% of the model eye.
-for p = 1:length(pupilDiametersMm)
-    % Geometric calculation
-    geometricBlurCircleDiameterMm(p)  = ((distanceToSourceMm+eyeLengthMm)/distanceToSourceMm)*pupilDiametersMm(p);
+% If you were to spend thousands of dollars on laser eye surgery, would you
+% want them to only correct the first order of wavefront aberrations, like
+% eyeglasses, or do a full wavefront measurement?
+% 
+% Suppose you knew that such surgery would correct some of the lower order aberrations but some of the
+% higher order aberrations worse.  How would you compute the net effect of
+% something like that?
+for ii = 1:nSubjects
+    fprintf('** Subject %d corrected\n',whichSubjects(ii))
     
-    % For a really fair comparison with diffraction, should find the
-    % equivalent circle diameter, that contains the criterion fraction of
-    % the volume.
-    eqGeometricBlurCircleDiameterMm(p) = sqrt(eqCriterionPSFFraction)*geometricBlurCircleDiameterMm(p);
-    eqGeometricBlurCircleDiameterDegs(p) = RetinalMMToDegrees(eqGeometricBlurCircleDiameterMm(p),eyeLengthMm);
-    eqGeometricPSFImageMm{p} = ones(size(radiusMatrixMm));
-    index = find(radiusMatrixMm > geometricBlurCircleDiameterMm(p));
-    eqGeometricPSFImageMm{p}(index) = 0;
+    % Correct defocus and astigmatism
+    zCoeffs = theZernikeCoeffs(:,ii);
+    zCoeffs(4:6) = 0;
+    wvfHuman = wvfSet(wvfHuman0,'zcoeffs',zCoeffs);
+    wvfHuman = wvfComputePSF(wvfHuman);
     
-    % Normalize volume and extract slice
-    eqGeometricPSFImageMm{p} = eqGeometricPSFImageMm{p}/sum(eqGeometricPSFImageMm{p}(:));
-    eqGeometricPSFSlice{p} = eqGeometricPSFImageMm{p}(centerPixel,centerPixel:end);
-    
-     % Print summary of this calculation
-    fprintf('Pupil size %0.2f mm, geometric equiv blur cicle (%d%% volume) %0.3f mm, %0.3f deg\n',...
-        pupilDiametersMm(p),round(100*eqCriterionPSFFraction),eqGeometricBlurCircleDiameterMm(p),eqGeometricBlurCircleDiameterDegs(p));
-end
-fprintf('\n');
-
-%% Plot a slice through the geometric blur circle
-% The plot shows the geometry-limited PSF, which is just a circle. It
-% doesn't look quite like a circle because of numerical precision issues in
-% the 2D computation of the PSF implemented here, but the basic point is
-% clear.
-%
-% The plot also shows as a dashed line the radius that contains the same
-% criterion fraction of the PSF mass as for the diffraction limited
-% calculation.  This provides a metric that may be compared to the size of
-% the same metric for the diffraction limited PSF.
-[geometricSliceFig,geometricSliceFigParams] = cbFigInit;
-geometricSliceFigParams.xLimLow = 0;
-geometricSliceFigParams.xLimHigh = 0.4;
-geometricSliceFigParams.xTicks = [0 0.1 0.2 0.3 0.4];
-geometricSliceFigParams.xTickLabels = {};
-geometricSliceFigParams.yLimLow = 0;
-geometricSliceFigParams.yLimHigh = 1;
-geometricSliceFigParams.yTicks = [0.0 0.2 0.4 0.6 0.8 1];
-geometricSliceFigParams.yTickLabels = {};
-plot(radiusLineMm,eqGeometricPSFSlice{1}/max(eqGeometricPSFSlice{1}),'r','LineWidth',geometricSliceFigParams.lineWidth+1);
-plot(radiusLineMm,eqGeometricPSFSlice{end}/max(eqGeometricPSFSlice{end}),'b','LineWidth',geometricSliceFigParams.lineWidth);
-plot([eqGeometricBlurCircleDiameterMm(1) eqGeometricBlurCircleDiameterMm(1)],[0 0.5],'r:','LineWidth',geometricSliceFigParams.lineWidth-1);
-plot([eqGeometricBlurCircleDiameterMm(end) eqGeometricBlurCircleDiameterMm(end)],[0 0.5],'b:','LineWidth',geometricSliceFigParams.lineWidth-1);
-xlabel('Retinal Radius (mm)','FontSize',geometricSliceFigParams.labelFontSize);
-ylabel('Point Spread Function','FontSize',geometricSliceFigParams.labelFontSize);
-title('Pinhole Camera - Geometric Optics Limited Blur','FontSize',geometricSliceFigParams.titleFontSize);
-cbFigAxisSet(geometricSliceFig,geometricSliceFigParams);
-legend({sprintf('Pupil: %0.2f mm',pupilDiametersMm(1)) sprintf('Pupil: %0.2f mm',pupilDiametersMm(end))},'Location','NorthEast','FontSize',geometricSliceFigParams.legendFontSize);
-FigureSave('PinholeOpticsBlurgeometricSlice',geometricSliceFig,geometricSliceFigParams.figType);
-
+    vcNewGraphWin;
+    subplot(2,2,1);
+    wvfPlot(wvfHuman,'2d pupil amplitude space','mm',[],calcMM,'no window');
+    subplot(2,2,2);
+    wvfPlot(wvfHuman,'2d pupil phase space','mm',[],calcMM,'no window');
+    subplot(2,2,3:4);
+    wvfPlot(wvfHuman,'2d psf space','mm',[],maxMM,'no window');
 end
 
-
-
-
-
-
+end
 
