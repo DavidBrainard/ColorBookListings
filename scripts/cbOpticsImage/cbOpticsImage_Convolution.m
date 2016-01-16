@@ -116,12 +116,23 @@ data.blurredLineSmooth = blurredLineFit(data.smoothLineX')';
 %% Now do it in the frequency domain
 %
 % Take fft of the signal
-data.lineFFT = fftshift(fft(data.lineData)0;
+data.lineFFT = fftshift(fft(data.lineData));
 
-% Make a padded version of the PSF
+% Make a padded version of the PSF and take the fft of that
 psfPadded = zeros(size(data.lineData));
+smallCoords = data.linePsfLowPixels:data.linePsfHighPixels;
+fullCoords = -round(data.nLinePixels/2):round(data.nLinePixels/2);
+for i = 1:length(smallCoords)
+    index = find(smallCoords(i) == fullCoords);
+    if (~isempty(index))
+        psfPadded(index) = data.linePsf(i);
+    end
+end
+data.psfFFT = fftshift(fft(psfPadded));
 
-
+% Take produce and compute ifft
+data.blurredLineFFT = data.lineFFT .* data.psfFFT;
+data.fftBlurredLine = ifft(fftshift(data.blurredLineFFT));
 
 %% Make a figure of the line signal, psf, and blurred version.
 if (runTimeParams.generatePlots)
