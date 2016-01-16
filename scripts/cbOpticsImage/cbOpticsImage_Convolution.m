@@ -21,87 +21,175 @@ if (~exist(outputDir,'dir'))
 end
 close all; drawnow;
 
-%% Load in an image
+%% Freeze rng seed and other preamble
+rng(1);
+markerSizeDownAdjust = 14;
+
+%% Generate some line data
 %
-% Grab a hyperspectral scene from our archiva server
-% and go from there.
-
-% Load a scene and extract a normalized grayscale image
-client = RdtClient('isetbio');
-remotePath = 'resources/scenes/hyperspectral/manchester_database';
-client.crp(remotePath);
-[theScene, theSceneArtifact] = client.readArtifact('scene7', 'type', 'mat');
-imageData = theScene.scene.data.photons(:,:,15);
-
-% Quick and dirty tone map
-upFactor = 1.5;
-imageData = imageData/(upFactor*max(imageData(:)));
-imageData = sqrt(imageData);
-imageDdata = imageData.^2;
-imageData = imageData/max(imageData(:));
-
-% Extract line data
-nPixels = size(imageData,1);
-lineData = imageData(round(nPixels/2),:);
-
-% Take a look at the image, sanity check
-imshow(imageData);
-figure
-
-%% Make a figure of the spectrum and its fit for the box
-if (runTimeParams.generatePlots)
-    [spectralFig,figParams] = cbFigInit;
-    figParams.xLimLow = 1;
-    figParams.xLimHigh = nPixels;
-    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
-    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
-        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
-    figParams.yLimLow = 0;
-    figParams.yLimHigh = 1.5;
-    figParams.yTicks = [0 0.5 1 1.5];
-    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
-    
-    plot(data.theWls,data.theSpdIrradiance,'r','LineWidth',figParams.lineWidth);
-    plot(data.theWls,data.theSpdSynthesized,'k:','LineWidth',figParams.lineWidth-1);
-    
-    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
-    ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
-    cbFigAxisSet(spectralFig,figParams);
-    [~,legendChildObjs] = legend({['^{ }' figParams.legendExtraSpaceStr '  Spectrum  '],[ '^{ }' figParams.legendExtraSpaceStr '  Synthesized Spectrum']}, ...
-        'Location','NorthEast','FontSize',figParams.legendFontSize);
-    lineObjs = findobj(legendChildObjs, 'Type', 'line');
-    xCoords = get(lineObjs, 'XData') ;
-    for lineIdx = 1:length(xCoords)
-        if (length(xCoords{lineIdx}) ~= 2), continue; end
-        set(lineObjs(lineIdx), 'XData', xCoords{lineIdx} + [0 figParams.legendLineTweak])
-    end
-    FigureSave(fullfile(outputDir,[mfilename '_Spectrum']),spectralFig,figParams.figType);
+% Options:
+%   'delta': delta function
+%   'shifteddelta': shifted delta function
+%   'rand': uniform random noise
+%   'chirp: windowed sweep frequency grating
+%
+% The 'delta' and 'shifteddelta' options are to test that
+% everything works as expected for a simple case, while
+% the 'chirp' case is to generate an informative figure
+% for the book.
+data.nLinePixels = 101;
+data.smoothFitPoints = 1000;
+data.smoothLineX = linspace(0,data.nLinePixels-1,data.smoothFitPoints);
+data.lineType = 'chirp';
+switch (data.lineType)
+    case 'delta'
+        data.lineData = zeros(1,data.nLinePixels);
+        data.lineData(round(data.nLinePixels/2)) = 1;
+    case 'shifteddelta'
+        data.lineData = zeros(1,data.nLinePixels);
+        data.lineData(round(data.nLinePixels/2)+5) = 1;
+    case 'rand'   
+        data.lineData = rand(1,data.nLinePixels);
+    case 'chirp';
+        data.chirpLowFreq = 0;
+        data.chirpHighFreq = 0.4;
+        data.windowMean = round(data.nLinePixels/2);
+        data.windowSd = round(data.nLinePixels/5);
+        chirpData = 0.5*chirp(0:data.nLinePixels-1,data.chirpLowFreq,data.nLinePixels,data.chirpHighFreq) + 0.5;
+        windowData = normpdf(0:data.nLinePixels-1,data.windowMean,data.windowSd);
+        windowData = windowData/max(windowData(:));
+        data.lineData = chirpData.*windowData;
 end
 
-%% Figure of the scaled narrowband lights
-if (runTimeParams.generatePlots)
-    [narrowbandFig,figParams] = cbFigInit;
-    figParams.xLimLow = 350;
-    figParams.xLimHigh = 800;
-    figParams.xTicks = [350 400 450 500 550 600 650 700 750 800];
-    figParams.xTickLabels = {'^{ }350_{ }' '^{ }400_{ }' '^{ }450_{ }' '^{ }500_{ }' ...
-        '^{ }550_{ }' '^{ }600_{ }' '^{ }650_{ }' '^{ }700_{ }' '^{ }750_{ }' '^{ }800_{ }'};
-    figParams.yLimLow = 0;
-    figParams.yLimHigh = 1.5;
-    figParams.yTicks = [0 0.5 1 1.5];
-    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 ' ' 1.5 '};
-    
-    plot(data.theWls,data.scaledB,'LineWidth',figParams.lineWidth);
-    
-    xlabel('Wavelength (nm)','FontSize',figParams.labelFontSize);
-    ylabel('Irradiance (Watts/[m2-nm])','FontSize',figParams.labelFontSize);
-    cbFigAxisSet(spectralFig,figParams);
-    %legend({'Linear', 'Model Eye Based'},'Location','NorthWest','FontSize',figParams.legendFontSize);
-    FigureSave(fullfile(outputDir,[mfilename '_NarrowbandSpectra']),spectralFig,figParams.figType);
+% Smooth fit to line for plotting
+lineFit = fit((0:data.nLinePixels-1)',data.lineData','pchipinterp' );
+data.lineSmooth = lineFit(data.smoothLineX')';
+
+%% Generate a line psf.
+% 
+% Options:
+%   'delta': delta function
+%   'shifteddelta': shifted delta function
+%   'gamma': uniform random noise
+%
+% The 'delta' and 'shifteddelta' options are to test that
+% everything works as expected for a simple case, while
+% the 'gamma' case is to generate an informative figure
+% for the book.
+data.psfType = 'gamma';
+data.nLinePsfPixels = 17;
+data.linePsfLowPixels = -8;
+data.linePsfHighPixels = data.linePsfLowPixels+data.nLinePsfPixels-1;
+data.smoothPsfFitPoints = 1000;
+data.smoothPsfX = linspace(data.linePsfLowPixels,data.linePsfHighPixels,data.smoothPsfFitPoints);
+switch (data.psfType)
+    case 'delta'
+        data.linePsf = zeros(1,data.nLinePsfPixels);
+        data.linePsf(round(data.nLinePsfPixels/2)) = 1;
+    case 'shifteddelta'
+        data.linePsf = zeros(1,data.nLinePsfPixels);
+        data.linePsf(round(data.nLinePsfPixels/2)-5) = 1;
+    case 'gamma'
+        % Pdf of a gamma function.
+        % The various parameters allow one to shift and scale along the x-axis, as
+        % well as change the underlying parameters of the gamma itself.
+        %
+        % The particular parameter choices were made by eye to produce a psf that
+        % would work well for the example.  The resulting function is scaled to
+        % have a unity area.
+        data.linePsfGammaA = 2;
+        data.linePsfGammaB = 2.6;
+        data.linePsfShrink = 0.5;
+        data.linePsfGammaShift = -8;
+        data.linePsf = gampdf((data.linePsfLowPixels:data.linePsfHighPixels)/data.linePsfShrink-data.linePsfGammaShift, ...
+            data.linePsfGammaA,data.linePsfGammaB);
+        data.linePsf = data.linePsf/sum(data.linePsf(:));
 end
+linePsfFit = fit((data.linePsfLowPixels:data.linePsfHighPixels)',data.linePsf','pchipinterp' );
+data.linePsfSmooth = linePsfFit(data.smoothPsfX')';
+
+%% Convolve the signal with the psf
+data.blurredLineData = conv2(data.lineData,data.linePsf,'same');
+blurredLineFit = fit((0:data.nLinePixels-1)',data.blurredLineData','pchipinterp' );
+data.blurredLineSmooth = blurredLineFit(data.smoothLineX')';
+
+%% Now do it in the frequency domain
+%
+% Take fft of the signal
+data.lineFFT = fftshift(fft(data.lineData)0;
+
+% Make a padded version of the PSF
+psfPadded = zeros(size(data.lineData));
+
+
+
+%% Make a figure of the line signal, psf, and blurred version.
+if (runTimeParams.generatePlots)
+    % The line signal
+    [lineFigA,figParams] = cbFigInit([],'thinrect');
+    figParams.xLimLow = -1;
+    figParams.xLimHigh = data.nLinePixels+1;
+    figParams.xTicks = [0 25 50 75 100];
+    figParams.xTickLabels = {'^{ }0_{ }' '^{ }25_{ }' '^{ }50_{ }' '^{ }75_{ }' '^{ }100_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 '};
+    
+    plot(data.smoothLineX,data.lineSmooth,'r','LineWidth',figParams.lineWidth);
+    plot(0:data.nLinePixels-1,data.lineData,'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-markerSizeDownAdjust);
+    xlabel('Position','FontSize',figParams.labelFontSize);
+    ylabel('Image Irrradiance (arbitary units)','FontSize',figParams.labelFontSize);
+    title('Input Signal','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(lineFigA,figParams);
+    
+    FigureSave(fullfile(outputDir,[mfilename '_LinePlotA']),lineFigA,figParams.figType);
+    
+    % The line psf
+    [lineFigB,figParams] = cbFigInit([],'thinrect');
+    figParams.xLimLow = -8;
+    figParams.xLimHigh = 8;
+    figParams.xTicks = [-16 -12 -8 -4 0 4 8 12 16];
+    figParams.xTickLabels = {'^{ }-8_{ }'  '^{ }-4_{ }' '^{ }0_{ }' '^{ }4_{ }' '^{ }8_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 0.5;
+    figParams.yTicks = [0 0.25 0.5];
+    figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
+    
+    plot(data.smoothPsfX,data.linePsfSmooth,'r','LineWidth',figParams.lineWidth);
+    plot(data.linePsfLowPixels:data.linePsfHighPixels,data.linePsf,'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-markerSizeDownAdjust);
+    xlabel('Position','FontSize',figParams.labelFontSize);
+    ylabel('Point Spread Function','FontSize',figParams.labelFontSize);
+    title('Point Spread Function','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(lineFigB,figParams);
+    
+    FigureSave(fullfile(outputDir,[mfilename '_LinePlotB']),lineFigA,figParams.figType);
+    
+    % The blurred line signal
+    [lineFigC,figParams] = cbFigInit([],'thinrect');
+    figParams.xLimLow = -1;
+    figParams.xLimHigh = data.nLinePixels+1;
+    figParams.xTicks = [0 25 50 75 100];
+    figParams.xTickLabels = {'^{ }0_{ }' '^{ }25_{ }' '^{ }50_{ }' '^{ }75_{ }' '^{ }100_{ }'};
+    figParams.yLimLow = 0;
+    figParams.yLimHigh = 1;
+    figParams.yTicks = [0 0.5 1];
+    figParams.yTickLabels = {' 0.0 ' ' 0.5 ' ' 1.0 '};
+    
+    plot(data.smoothLineX,data.blurredLineSmooth,'r','LineWidth',figParams.lineWidth);
+    plot(0:data.nLinePixels-1,data.blurredLineData,'ro','MarkerFaceColor','r','MarkerSize',figParams.markerSize-markerSizeDownAdjust);
+    xlabel('Position','FontSize',figParams.labelFontSize);
+    ylabel('Image Irrradiance (arbitary units)','FontSize',figParams.labelFontSize);
+    title('Blurred Signal','FontSize',figParams.titleFontSize);
+    cbFigAxisSet(lineFigC,figParams);
+    
+    FigureSave(fullfile(outputDir,[mfilename '_LinePlotC']),lineFigC,figParams.figType);
+end
+
+
 
 %% Save validation data
-UnitTest.validationData('validateDataStruct', data);
+%UnitTest.validationData('validateDataStruct', data);
 
 end
 
